@@ -62,7 +62,6 @@ void *userTask(void *arg)
         // check for mouse event
         if (event.type == ALLEGRO_EVENT_MOUSE_BUTTON_DOWN)
         {
-            printf("OK: mouse button down\n");
             // get mouse position
             int x = event.mouse.x;
             int y = event.mouse.y;
@@ -86,10 +85,9 @@ void *userTask(void *arg)
 
                 if(x > bitmapX && x < bitmapWidthX && y > bitmapY && y < bitmapHeightY){
                     
-                    // get the veicle id
-
-                    // say to graphics veicle to zoom in
-
+                    zoomId = current->id;
+                    setZoomId(zoomId);
+                    zoomIn = 1;
 
                     break;
                 }

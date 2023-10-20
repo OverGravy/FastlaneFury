@@ -205,16 +205,57 @@ void ZoomIn(pthread_mutex_t *mutex, struct SharedList *shared, int id){
         if (current->id == id)
         {
             // create sub bitmap around the car
-            int x = (int)round(current->Veicle.pos.x*SCALE_FACTOR);
+            int x = ((int)round(current->Veicle.pos.x*SCALE_FACTOR))-300;
+            int y = ((int)round(current->Veicle.pos.y*SCALE_FACTOR))-300;
+
+            int width = (al_get_bitmap_width(veicleBtm[current->Veicle.veicle]) * VEICLE_SCALE)+300;
+            int height = (al_get_bitmap_height(veicleBtm[current->Veicle.veicle]) * VEICLE_SCALE)+300;
+
+            // check if the sub bitmap is out of screen
+            if (x+width>SCREEN_W)   // out on right
+            {
+                width = SCREEN_W-x;
+            }else if(y<0)          // out on top
+            {
+                y = 0;
+            }else if((y+height)>((SCREEN_H/(LANE_NUMBER+1))*4)){  // out on bottom
+                height = ((SCREEN_H/(LANE_NUMBER+1))*4)-y;
+            }
+            
+            zoomdScreen = al_create_sub_bitmap(al_get_backbuffer(display), x, y, width, height);
+            
+
+            //save zoomed bitmap
+            al_save_bitmap("zoomedScreen.png", zoomdScreen);
+
             break;
         }
         current = current->next;
     }
 
     pthread_mutex_unlock(mutex);
+}
+
+// function that draw the zoomed screen
+void DrawZoomedScreen(){
+    al_set_target_backbuffer(display);
+    al_clear_to_color(al_map_rgb(0, 0, 0));
+    zoomdScreen = al_load_bitmap("zoomedScreen.png");
+    al_draw_bitmap(zoomdScreen, 0, 0, 0);
 
 
+    // draw zoomed screen
 
+}
+
+// function that get zoom id
+int getZoomId(){
+    return ZoomedId;
+}
+
+// function that set zoom id 
+int setZoomId(int id){
+    ZoomedId = id;
 }
 
 // fucntion that return veicle bitmap
@@ -285,20 +326,16 @@ void initVeicleState(struct VeicleState *state){
 
 // function that act as a sensor check if there is some veicle on front of the veicle
 int ProximitySensor(struct Position *position, int range){
-     int distance = 0;
+    int distance = 0;
+    al_set_target_backbuffer(display);
 
     ALLEGRO_COLOR initialColor = al_map_rgb(188, 188, 188); // Gray color
-    printf("hey");
-
+    ALLEGRO_BITMAP *target = al_get_backbuffer(display);
     // Check each pixel in the range moving towards the left
     for (int i = (position->x)*SCALE_FACTOR - 2; i > ((position->x)*SCALE_FACTOR) - range; i--) {
-        ALLEGRO_COLOR color = al_get_pixel(al_get_backbuffer(display), i, (position->y*SCALE_FACTOR)-50);
+        ALLEGRO_COLOR color = al_get_pixel(target, 100, 100);
         // Compare the color with the initial gray color
-        if (color.r != initialColor.r || color.g != initialColor.g || color.b != initialColor.b) {
-            // Color is different, return the distance
-            printf("distance: %d\n", distance);
-            return distance;
-        }
+
 
         // Increment the distance
         distance++; 

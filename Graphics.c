@@ -41,6 +41,13 @@ void *graphicsTask(void *arg)
         pthread_mutex_unlock(GraphicsArg.mutex);
 
         // check for zoom
+        ZoomId = getZoomId();
+        if (ZoomId != -1)
+        {   
+            ZoomIn(GraphicsArg.mutex, GraphicsArg.shared, ZoomId);
+            clearDisplay();
+            DrawZoomedScreen();
+        }
       
 
         // flip display

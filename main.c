@@ -23,6 +23,7 @@ ALLEGRO_TIMER *timer = NULL;
 ALLEGRO_BITMAP *veicleBtm[MAX_VEICLE_TYPE];
 ALLEGRO_FONT *fonts[MAX_FONT];
 ALLEGRO_BITMAP *zoomdScreen = NULL;
+int ZoomedId = -1;
 
 int main(){
 

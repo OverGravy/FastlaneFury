@@ -30,6 +30,7 @@ extern ALLEGRO_TIMER *timer;
 extern ALLEGRO_BITMAP *veicleBtm[MAX_VEICLE_TYPE];
 extern ALLEGRO_FONT *fonts[MAX_FONT];
 extern ALLEGRO_BITMAP *zoomdScreen;
+extern int ZoomedId;
 
 // ALLEGRO FUNCTIONS    
 
@@ -66,8 +67,20 @@ void DrawVeicle(double x, double y, int type);
 // function that draws the info
 void DrawInfo(pthread_mutex_t *mutex, struct SharedList *shared, int id);
 
+
+// ZOOM FUNCTIONS
+
 // function that zoom in a specific car
 void ZoomIn(pthread_mutex_t *mutex, struct SharedList *shared, int id);
+
+// function that draw the zoomed screen
+void DrawZoomedScreen();
+
+// function that check if there is a zoom
+int getZoomId();
+
+// function that return set the zoomId
+int setZoomId(int id);
 
 // VEICLE FUNCTIONS
 
