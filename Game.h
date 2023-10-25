@@ -1,6 +1,6 @@
 #ifndef __GAME__
 #define __GAME__
-#include <allegro5/allegro.h>
+#include <allegro.h>
 #include <allegro5/allegro_image.h>
 #include <allegro5/allegro_primitives.h>
 #include <allegro5/allegro_font.h>
