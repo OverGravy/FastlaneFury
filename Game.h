@@ -1,40 +1,51 @@
 #ifndef __GAME__
 #define __GAME__
 #include <allegro.h>
-#include <allegro5/allegro_image.h>
-#include <allegro5/allegro_primitives.h>
-#include <allegro5/allegro_font.h>
-#include <allegro5/allegro_ttf.h>
+
 #include <stdio.h>
 #include <stdlib.h>
+#include <pthread.h>
 #include "Ptask.h"
 #include "List.h"
 #include <math.h>
 
-#define SCREEN_W 1880
-#define SCREEN_H 720
+// allegro costant
+#define MY_SCREEN_W 1880
+#define MY_SCREEN_H 720
 #define SCREEN_FPS 60
-#define SCALE_FACTOR 15
-#define VEICLE_SCALE 0.8
-#define LANE_NUMBER 4
-
-#define FOCUS_
-
-#define MAX_VEICLE_TYPE 94
 #define MAX_FONT 1
 
-extern ALLEGRO_DISPLAY *display;
-extern ALLEGRO_EVENT_QUEUE *event_queue;
-extern ALLEGRO_EVENT event;
-extern ALLEGRO_TIMER *timer;
-extern ALLEGRO_BITMAP *veicleBtm[MAX_VEICLE_TYPE];
-extern ALLEGRO_FONT *fonts[MAX_FONT];
-extern ALLEGRO_BITMAP *zoomdScreen;
-extern int ZoomedId;
+// Game costant 
+#define MAX_VEICLE_TYPE 94
+#define LANE_NUMBER 4
+#define VEICLE_SCALE 0.8
+#define SCALE_FACTOR 15
+
+// Sensor costant
+#define SMAX 1000    // max distance in px
+#define SMIN 10      // minimun distance in px
+#define SSTEP 5      // step in meter
+
+// Selection constant
+#define VEICLE 0
+#define BUTTON 1
+#define ROAD 2
+
+
+// Game variables
+extern BITMAP* buffer;                    // display buffer bitmap
+extern BITMAP* background;                // background bitmap
+extern BITMAP* cursor;                    // cursor bitmap
+extern BITMAP* Veicles[MAX_VEICLE_TYPE] ; // array of veicles bitmaps
+extern FONT* fonts[MAX_FONT];             // array of fonts
+
+// User variables
+extern int selectedVeicle;
+extern int selectedButton;
 
 // ALLEGRO FUNCTIONS    
 
-// funtion that initialize allegro 
+// funtion that initialize allegro 4.2
 int initAllegro();
 
 // close duntion that take reference to everithing needed to close allegro
@@ -46,9 +57,6 @@ int loadGraphicsAssets();
 
 // DRAWING FUNCTIONS
 
-// function that returns allegro event
-ALLEGRO_EVENT getEvent();
-
 // function that clear the display
 void clearDisplay();
 
@@ -58,36 +66,44 @@ void flipDisplay();
 // function that draws the backgroung
 void DrawBackground();
 
-// function that get veicle bitmap
-ALLEGRO_BITMAP *getVeicleBitmap(int type);
-
-// function that draws the veicle
-void DrawVeicle(double x, double y, int type);
-
-// function that draws the info
+// fucntion that draws info
 void DrawInfo(pthread_mutex_t *mutex, struct SharedList *shared, int id);
 
+// function that draws veicle
+void DrawVeicle(double x, double y, int type);
 
-// ZOOM FUNCTIONS
+// function that draws mouse
+void DrawMouse(int x, int y);
 
-// function that zoom in a specific car
-void ZoomIn(pthread_mutex_t *mutex, struct SharedList *shared, int id);
-
-// function that draw the zoomed screen
-void DrawZoomedScreen();
-
-// function that check if there is a zoom
-int getZoomId();
-
-// function that return set the zoomId
-int setZoomId(int id);
 
 // VEICLE FUNCTIONS
 
-// function that init veicle State
+// function that initialize veicle
 void initVeicleState(struct VeicleState *state);
 
-// function that check if there is some veiche on fornt of the veicle
-int ProximitySensor(struct Position *position, int range);
+// function that returns veicle bitmap
+int getVeicleWidth(int id);
+
+// function that returns distance from other veicle
+double proximitySensor(int id, double x, double y, double range);
+
+
+// USER FUNCTIONS
+
+// function that returns the index of the selected veicle
+int getSelection(int x, int y, pthread_mutex_t *mutex, struct SharedList *shared);
+
+// function that returns the index of the selected veicle
+int getSelectedVeicle();
+
+// function that set the index of the selected veicle
+void setSelectedVeicle(int id);
+
+// function that return the index of the selected button
+int getSelectedButton();
+
+// function that set the index of the selected button
+void setSelectedButton(int id);
+
 
 #endif

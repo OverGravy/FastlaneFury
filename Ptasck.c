@@ -150,6 +150,12 @@ void ptask_exit()
             pthread_cancel(tid[i]);
         }
     }
+    pthread_cancel(tid[0]);
+}
+
+// function that check if a task is active
+int task_is_active(int i){
+    return freeIndex[i];
 }
 
 // function that return the task index
@@ -206,7 +212,6 @@ int deadline_miss(int i)
 }
 
 // function that return number of all deadline misses of all task
-
 int get_deadline_miss()
 {
     int i;

@@ -1,131 +1,72 @@
 #include "Game.h"
 
-// function that initialize allegro
+// ALLEGRO FUNCTIONS
+
+// function that initialize allegro 4.2
 int initAllegro()
 {
-    // initialize allegro
-    if (!al_init())
+    // Initialize Allegro
+    if (allegro_init() != 0)
     {
-        fprintf(stderr, "ERROR: failed to initialize allegro!\n");
-        return 0;
-    }
-    // initialize primitives addon
-    if (!al_init_primitives_addon())
-    {
-        fprintf(stderr, "ERROR: failed to initialize primitives!\n");
-        return 0;
-    }
-    // initialize image addon
-    if (!al_init_image_addon())
-    {
-        fprintf(stderr, "ERROR: failed to initialize image addon!\n");
-        return 0;
-    }
-    // initialize font addon
-    if (!al_init_font_addon())
-    {
-        fprintf(stderr, "ERROR: failed to initialize font addon!\n");
-        return 0;
-    }
-    // initialize ttf addon
-    if (!al_init_ttf_addon())
-    {
-        fprintf(stderr, "ERROR: failed to initialize ttf addon!\n");
-        return 0;
-    }
-    // create and check display
-    display = al_create_display(SCREEN_W, SCREEN_H);
-
-    // set window title
-    al_set_window_title(display, "Highway: Traffic Simulator");
-
-    // make target buffer
-    if (!display)
-    {
-        fprintf(stderr, "ERROR: failed to create display!\n");
-        return 0;
-    }
-    // create and check timer
-    timer = al_create_timer(1.0 / SCREEN_FPS);
-    if (!timer)
-    {
-        fprintf(stderr, "ERROR: failed to create timer!\n");
-        al_destroy_display(display);
-        return 0;
-    }
-    // create and check event queue
-    event_queue = al_create_event_queue();
-    if (!event_queue)
-    {
-        fprintf(stderr, "ERROR: failed to create event_queue!\n");
-        al_destroy_timer(timer);
-        al_destroy_display(display);
+        allegro_message("Failed to initialize Allegro!");
         return 0;
     }
 
-    // install keyboard
-    if (!al_install_keyboard())
+    // Set up a graphics mode
+    if (set_gfx_mode(GFX_AUTODETECT_WINDOWED, MY_SCREEN_W, MY_SCREEN_H, 0, 0) != 0)
     {
-        fprintf(stderr, "ERROR: failed to initialize the keyboard!\n");
-        al_destroy_timer(timer);
-        al_destroy_event_queue(event_queue);
-        return 0;
-    }
-    // install mouse
-    if (!al_install_mouse())
-    {
-        fprintf(stderr, "ERROR: failed to initialize the mouse!\n");
-        al_destroy_timer(timer);
-        al_destroy_event_queue(event_queue);
+        allegro_message("Failed to set graphics mode!");
         return 0;
     }
 
-    // register event sources
-    al_register_event_source(event_queue, al_get_display_event_source(display)); // register display from event queue
-    al_register_event_source(event_queue, al_get_timer_event_source(timer));     // register timer from event queue
-    al_register_event_source(event_queue, al_get_keyboard_event_source());       // register keyboard from event queue
-    al_register_event_source(event_queue, al_get_mouse_event_source());          // register mouse from event queue
+    printf("OK: Allegro initialized\n");
+
+    // Install the keyboard
+    if (install_keyboard() < 0)
+    {
+        allegro_message("Failed to install keyboard!");
+        return 0;
+    }
+
+    // Install the mouse
+    if (install_mouse() < 0)
+    {
+        allegro_message("Failed to install mouse!");
+        return 0;
+    }
+
+    printf("OK: Keyboard and mouse installed\n");
+
+    // This bitmap will be used as the virtual screen
+    buffer = create_bitmap(MY_SCREEN_W, MY_SCREEN_H);
+
+    // init bitmap
+    clear_to_color(buffer, makecol(0, 0, 0)); // Clear to black
+
+    // init screen bitmap
+    clear_to_color(screen, makecol(0, 0, 0)); // Clear to black
+
+    background = create_bitmap(MY_SCREEN_W, MY_SCREEN_H);
+
+    // create backgroud bitmap
+    DrawBackgroundInBitmap();
 
     return 1;
 }
 
-// function that returns allegro event
-ALLEGRO_EVENT getEvent()
+// function that init the backgroung
+void DrawBackgroundInBitmap()
 {
-    // get event from event queue
-    al_get_next_event(event_queue, &event);
-    return event;
-}
-
-// function that clear the display
-void clearDisplay()
-{
-    al_set_target_backbuffer(display);
-    al_clear_to_color(al_map_rgb(0, 0, 0));
-}
-
-// function that flip the display
-void flipDisplay()
-{
-    al_set_target_backbuffer(display);
-    al_flip_display();
-}
-
-// function that draws the backgroung
-void DrawBackground()
-{
-    al_set_target_backbuffer(display);
-
-    al_draw_filled_rectangle(0, 0, SCREEN_W, (SCREEN_H / (LANE_NUMBER + 1)) * 4, al_map_rgb(188, 188, 188));  // road
-    al_draw_filled_rectangle(0, (SCREEN_H / (LANE_NUMBER + 1)) * 4, SCREEN_W, SCREEN_H, al_map_rgb(0, 0, 0)); // terminal
+    rectfill(background, 0, 0, MY_SCREEN_W, (MY_SCREEN_H / (LANE_NUMBER + 1)) * 4, makecol(188, 188, 188));     // road
+    rectfill(background, 0, (MY_SCREEN_H / (LANE_NUMBER + 1)) * 4, MY_SCREEN_W, MY_SCREEN_H, makecol(0, 0, 0)); // terminal
 
     // draw dashed line
     int x1 = 0;
-    int y1 = ((SCREEN_H / (LANE_NUMBER + 1)));
-    int x2 = SCREEN_W;
-    int y2 = ((SCREEN_H / (LANE_NUMBER + 1)));
+    int y1 = ((MY_SCREEN_H / (LANE_NUMBER + 1)));
+    int x2 = MY_SCREEN_W;
+    int y2 = ((MY_SCREEN_H / (LANE_NUMBER + 1)));
 
-    bool draw = true;
+    int draw = 1;
     int segment_length = 20; // segment length
     int space_length = 20;   // space length
 
@@ -133,9 +74,9 @@ void DrawBackground()
     {
         if (draw)
         {
-            al_draw_line(x1, y1, x1 + segment_length, y2, al_map_rgb(255, 255, 255), 5);
-            al_draw_line(x1, y1 * 2, x1 + segment_length, y2 * 2, al_map_rgb(255, 255, 255), 5);
-            al_draw_line(x1, y1 * 3, x1 + segment_length, y2 * 3, al_map_rgb(255, 255, 255), 5);
+            line(background, x1, y1, x1 + segment_length, y2, makecol(255, 255, 255));
+            line(background, x1, y1 * 2, x1 + segment_length, y2 * 2, makecol(255, 255, 255));
+            line(background, x1, y1 * 3, x1 + segment_length, y2 * 3, makecol(255, 255, 255));
         }
         x1 += segment_length;
         x1 += space_length;
@@ -146,201 +87,283 @@ void DrawBackground()
     for (int i = 0; i < 4; i++)
     {
         sprintf(lane, "%d", i);
-        al_draw_text(fonts[0], al_map_rgb(0, 0, 0), 30, ((SCREEN_H / (LANE_NUMBER + 1))) * i + 25, 0, lane);
+        textout_ex(background, font, lane, 30, ((MY_SCREEN_H / (LANE_NUMBER + 1))) * i + 25, makecol(0, 0, 0), -1);
     }
 }
 
-// function that draws info on the screen
-void DrawInfo(pthread_mutex_t *mutex, struct SharedList *shared, int id)
-{
-    char info[50];
-    al_set_target_backbuffer(display);
-
-    // print active veicles
-    pthread_mutex_lock(mutex);
-    sprintf(info, "Active Veicles: %d", shared->size);
-    al_draw_text(fonts[0], al_map_rgb(255, 255, 255), 20, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 + 20, 0, info);
-    pthread_mutex_unlock(mutex);
-
-    // print dead line missed
-    sprintf(info, "Total Deadline Miss: %d", get_deadline_miss());
-    al_draw_text(fonts[0], al_map_rgb(255, 255, 255), 20, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 + 40, 0, info);
-
-    // print info about the task with id
-     sprintf(info, "Task: %d", id);
-     al_draw_text(fonts[0], al_map_rgb(255, 255, 255), 450, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 + 20, 0, info);
-     sprintf(info, "Period: %d", task_get_period(id));
-     al_draw_text(fonts[0], al_map_rgb(255, 255, 255), 450, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 + 40, 0, info);
-     sprintf(info, "Deadline: %d", task_get_deadline(id));
-     al_draw_text(fonts[0], al_map_rgb(255, 255, 255), 450, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 + 60, 0, info);
-     sprintf(info, "Priority: %d", task_get_priority(id));
-     al_draw_text(fonts[0], al_map_rgb(255, 255, 255), 450, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 + 80, 0, info);
-}
-
-// function that draws the veicle
-void DrawVeicle(double x, double y, int type)
-{
-    al_set_target_backbuffer(display);
-
-    int xg = (int)round(x*SCALE_FACTOR);
-    int yg = (int)round(y*SCALE_FACTOR);
-
-    // calculate new width and height
-    int new_width = al_get_bitmap_width(veicleBtm[type]) * VEICLE_SCALE;
-    int new_height = al_get_bitmap_height(veicleBtm[type]) * VEICLE_SCALE;
-    
-    al_draw_scaled_bitmap(veicleBtm[type], 0, 0, al_get_bitmap_width(veicleBtm[type]), al_get_bitmap_height(veicleBtm[type]), xg,yg, new_width, new_height, 0);
-}
-
-// function that zoom in a specific car
-void ZoomIn(pthread_mutex_t *mutex, struct SharedList *shared, int id){
-    // find the right car in the screen
-    pthread_mutex_lock(mutex);
-
-    // search for right car in the list
-    struct Node *current = shared->head;
-
-    while (current != NULL)
-    {
-        if (current->id == id)
-        {
-            // create sub bitmap around the car
-            int x = ((int)round(current->Veicle.pos.x*SCALE_FACTOR))-300;
-            int y = ((int)round(current->Veicle.pos.y*SCALE_FACTOR))-300;
-
-            int width = (al_get_bitmap_width(veicleBtm[current->Veicle.veicle]) * VEICLE_SCALE)+300;
-            int height = (al_get_bitmap_height(veicleBtm[current->Veicle.veicle]) * VEICLE_SCALE)+300;
-
-            // check if the sub bitmap is out of screen
-            if (x+width>SCREEN_W)   // out on right
-            {
-                width = SCREEN_W-x;
-            }else if(y<0)          // out on top
-            {
-                y = 0;
-            }else if((y+height)>((SCREEN_H/(LANE_NUMBER+1))*4)){  // out on bottom
-                height = ((SCREEN_H/(LANE_NUMBER+1))*4)-y;
-            }
-            
-            zoomdScreen = al_create_sub_bitmap(al_get_backbuffer(display), x, y, width, height);
-            
-
-            //save zoomed bitmap
-            al_save_bitmap("zoomedScreen.png", zoomdScreen);
-
-            break;
-        }
-        current = current->next;
-    }
-
-    pthread_mutex_unlock(mutex);
-}
-
-// function that draw the zoomed screen
-void DrawZoomedScreen(){
-    al_set_target_backbuffer(display);
-    al_clear_to_color(al_map_rgb(0, 0, 0));
-    zoomdScreen = al_load_bitmap("zoomedScreen.png");
-    al_draw_bitmap(zoomdScreen, 0, 0, 0);
-
-
-    // draw zoomed screen
-
-}
-
-// function that get zoom id
-int getZoomId(){
-    return ZoomedId;
-}
-
-// function that set zoom id 
-int setZoomId(int id){
-    ZoomedId = id;
-}
-
-// fucntion that return veicle bitmap
-ALLEGRO_BITMAP *getVeicleBitmap(int type)
-{
-    return veicleBtm[type];
-}
-
-// function that closes allegro
+// function to close allegro
 void closeAllegro()
 {
-    // destroy display
-    al_destroy_display(display);
-    // destroy timer
-    al_destroy_timer(timer);
-    // destroy event queue
-    al_destroy_event_queue(event_queue);
-    // unistall keyboard
-    al_uninstall_keyboard();
-    // unistall mouse
-    al_uninstall_mouse();
+    // Destroy the buffer bitmap
+    destroy_bitmap(buffer);
+
+    // Destroy the background bitmap
+    destroy_bitmap(background);
+
+    // destroy all veicles bitmaps
+    for (int i = 0; i < MAX_VEICLE_TYPE; i++)
+    {
+        destroy_bitmap(Veicles[i]);
+    }
+
+    // Uninstall the mouse
+    remove_mouse();
+
+    // Uninstall the keyboard
+    remove_keyboard();
+
+    // Exit program
+    allegro_exit();
 }
 
-// function that loads graphics assets
+// function that load all the graphics assets
 int loadGraphicsAssets()
 {
     // load all cars bitmaps in folder Sprites
     for (int i = 0; i < MAX_VEICLE_TYPE; i++)
     {
         char path[50];
-        sprintf(path, "./Bitmap/veicle%d.png", i);
-        veicleBtm[i] = al_load_bitmap(path);
-        if (!veicleBtm[i])
+        sprintf(path, "./Bitmap/veicle%d.bmp", i);
+        Veicles[i] = load_bitmap(path, NULL);
+        if (!Veicles[i])
         {
             fprintf(stderr, "ERROR: failed to load car bitmap %d!\n", i);
+            return 0;
         }
     }
     printf("OK: Loaded all veicle bitmaps\n");
-    // load background bitmap
-    // background = al_load_bitmap("./Bitmap/background.png");
+
 
     // load all fonts in folder Fonts
-    for (int i = 0; i < MAX_FONT; i++)
+    /* for (int i = 0; i < MAX_FONT; i++)
     {
         char path[50];
-        sprintf(path, "./Fonts/font%d.ttf", i);
-        fonts[i] = al_load_ttf_font(path, 15, 0);
+        sprintf(path, "./Fonts/font%d.pcx", i);
+        fonts[i] = load_font(path, NULL, NULL);
         if (!fonts[i])
         {
-            fprintf(stderr, "ERROR: failed to load font%d!\n ", i);
+            fprintf(stderr, "ERROR: failed to load font%d!\n", i);
             return 0;
         }
     }
     printf("OK: Loaded all fonts\n");
+    */
     return 1;
 }
 
-// function that init veicle state
-void initVeicleState(struct VeicleState *state){
-    state->veicle = rand() % MAX_VEICLE_TYPE;
-    state->lane = 1;
-    state->pos.x = (SCREEN_W-2)/SCALE_FACTOR;    // in meter
-    int margin = ((SCREEN_H / (LANE_NUMBER + 1)) - (al_get_bitmap_height(veicleBtm[state->veicle])*VEICLE_SCALE))/2; // margin in pixel
-    state->pos.y =(((SCREEN_H/(LANE_NUMBER+1))*state->lane) + margin)/SCALE_FACTOR; // in meter
-    state->speed = 10.0; // speed in ms
-    state->acceleration = 0.0; // acceleration in ms^2
+// GRAPHICS FUNCTIONS
+
+// funtion that clear the display
+void clearDisplay()
+{
+    clear_to_color(buffer, makecol(0, 0, 0));
 }
 
-// function that act as a sensor check if there is some veicle on front of the veicle
-int ProximitySensor(struct Position *position, int range){
-    int distance = 0;
-    al_set_target_backbuffer(display);
+// function that flip the display
+void flipDisplay()
+{
+    acquire_screen();
+    blit(buffer, screen, 0, 0, 0, 0, MY_SCREEN_W, MY_SCREEN_H);
+    vsync();
+    release_screen();
+}
 
-    ALLEGRO_COLOR initialColor = al_map_rgb(188, 188, 188); // Gray color
-    ALLEGRO_BITMAP *target = al_get_backbuffer(display);
-    // Check each pixel in the range moving towards the left
-    for (int i = (position->x)*SCALE_FACTOR - 2; i > ((position->x)*SCALE_FACTOR) - range; i--) {
-        ALLEGRO_COLOR color = al_get_pixel(target, 100, 100);
-        // Compare the color with the initial gray color
+// fucntion that draws info
+void DrawInfo(pthread_mutex_t *mutex, struct SharedList *shared, int id)
+{
+    char info[50];
 
+    // print active veicles
+    pthread_mutex_lock(mutex);
+    sprintf(info, "Active Veicles: %d", shared->size);
+    textout_ex(buffer, font, info, 20, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 + 20, makecol(255, 255, 255), -1);
+    pthread_mutex_unlock(mutex);
 
-        // Increment the distance
-        distance++; 
+    // print dead line missed
+    sprintf(info, "Total Deadline Miss: %d", get_deadline_miss());
+    textout_ex(buffer, font, info, 20, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 + 40, makecol(255, 255, 255), -1);
+
+    if (selectedVeicle != -1){
+    // print info about the task with id
+    sprintf(info, "Task: %d", selectedVeicle);
+    textout_ex(buffer, font, info, 450, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 + 20, makecol(255, 255, 255), -1);
+    sprintf(info, "Period: %d", task_get_period(selectedVeicle));
+    textout_ex(buffer, font, info, 450, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 + 40, makecol(255, 255, 255), -1);
+    sprintf(info, "Deadline: %d", task_get_deadline(selectedVeicle));
+    textout_ex(buffer, font, info, 450, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 + 60, makecol(255, 255, 255), -1);
+    sprintf(info, "Priority: %d", task_get_priority(selectedVeicle));
+    textout_ex(buffer, font, info, 450, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 + 80, makecol(255, 255, 255), -1);
+
+    // print info about the veicle with id
+    pthread_mutex_lock(mutex);
+    struct Node *current = shared->head;
+    while (current != NULL)
+    {
+        if (current->id == selectedVeicle)
+        {
+            sprintf(info, "Veicle: %d", current->id);
+            textout_ex(buffer, font, info, 650, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 + 20, makecol(255, 255, 255), -1);
+            sprintf(info, "Type: %d", current->Veicle.veicle);
+            textout_ex(buffer, font, info, 650, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 + 40, makecol(255, 255, 255), -1);
+            sprintf(info, "Lane: %d", current->Veicle.lane);
+            textout_ex(buffer, font, info, 650, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 + 60, makecol(255, 255, 255), -1);
+            sprintf(info, "Speed: %.2f", current->Veicle.speed);
+            textout_ex(buffer, font, info, 650, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 + 80, makecol(255, 255, 255), -1);
+            sprintf(info, "Acceleration: %.2f", current->Veicle.acceleration);
+            textout_ex(buffer, font, info, 650, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 + 100, makecol(255, 255, 255), -1);
+            sprintf(info, "Position: (%.2f, %.2f)", current->Veicle.pos.x, current->Veicle.pos.y);
+            textout_ex(buffer, font, info, 650, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 + 120, makecol(255, 255, 255), -1);
+            break;
+        }
+        current = current->next;
+    }
+    pthread_mutex_unlock(mutex);
+
     }
 
-    // If no different color is found in the range, return -1 to indicate no object found
-    return -1;
+   
+}
+
+// function that draws veicle
+void DrawVeicle(double x, double y, int type)
+{
+    int xg = (int)round(x * SCALE_FACTOR);
+    int yg = (int)round(y * SCALE_FACTOR);
+
+    // calculate new width and height
+    int new_width = (Veicles[type]->w) * VEICLE_SCALE;
+    int new_height = (Veicles[type]->h) * VEICLE_SCALE;
+
+    stretch_blit(Veicles[type], buffer, 0, 0, Veicles[type]->w, Veicles[type]->h, xg, yg, new_width, new_height);
+}
+
+// function that draws background
+void DrawBackground()
+{
+    blit(background, buffer, 0, 0, 0, 0, MY_SCREEN_W, MY_SCREEN_H);
+}
+
+// function that draws mouse
+void DrawMouse(int x, int y)
+{
+    circlefill(buffer, x, y, 5, makecol(255, 0, 0));
+}
+
+// VEICLE FUNCTIONS
+
+// function that return the bitmap width of a veicle
+int getVeicleWidth(int veicle)
+{
+    return Veicles[veicle]->w;
+}
+
+// function that initialize veicle
+void initVeicleState(struct VeicleState *state)
+{
+    state->veicle = rand() % MAX_VEICLE_TYPE;
+    state->lane = 1;
+    state->pos.x = (MY_SCREEN_W - 2) / SCALE_FACTOR;                                                     // in meter
+    int margin = ((MY_SCREEN_H / (LANE_NUMBER + 1)) - ((Veicles[state->veicle]->h) * VEICLE_SCALE)) / 2; // margin in pixel
+    state->pos.y = (((MY_SCREEN_H / (LANE_NUMBER + 1)) * state->lane) + margin) / SCALE_FACTOR;          // in meter
+    state->speed = 10.0;                                                                                 // speed in ms
+    state->acceleration = 0.0;                                                                           // acceleration in ms^2
+}
+
+// function that returns the distance from the other veicle
+double proximitySensor(int id, double x, double y, double range)
+{
+
+    // the sensor return the distance from the other veicle in meter
+
+    double distance = -1.0;
+    int i = 0;
+    int color;
+
+    // check if the range is in the limit
+    if (range > SMAX)
+    {
+        range = SMAX;
+    }
+
+    // conversion
+    int xg = (int)round(x * SCALE_FACTOR);
+    int yg = (int)round(y * SCALE_FACTOR);
+    int rangeg = (int)round(range * SCALE_FACTOR);
+
+    // center y in the middle of the veicle
+    yg += (Veicles[id]->h * VEICLE_SCALE) / 2;
+
+    // check for veicle in front
+    for (i = SMIN; i < rangeg; i += SSTEP)
+    {
+        color = getpixel(screen, xg - i, yg); // get color
+
+        if (color != makecol(188, 188, 188) && color != -1) // if there is a veicle
+        {
+            distance = (double)i / SCALE_FACTOR; // distance in meter
+            break;
+        }
+    }
+
+    return distance;
+}
+
+// USER FUNCTIONS
+
+// function that return the index of the selected veicle
+int getSelection(int x, int y, pthread_mutex_t *mutex, struct SharedList *shared)
+{
+    int selection = -1;
+
+    // 1) check if the mouse is in the screen
+    // 2) check if the mouse is on a veicle
+    // 3) check if the mouse is on a button
+
+    if (x > 0 && x < MY_SCREEN_W && y > 0 && y < MY_SCREEN_H) // check if mouse is in the screen
+    {
+        // check if the mouse is on a veicle
+        pthread_mutex_lock(mutex);
+
+        // check all the veicles
+        struct Node *current = shared->head;
+        while (current != NULL)
+        {
+            int xg = (int)round((current->Veicle.pos.x) * SCALE_FACTOR);
+            int yg = (int)round((current->Veicle.pos.y) * SCALE_FACTOR);
+            int width = ((Veicles[current->Veicle.veicle]->w) * VEICLE_SCALE);
+            int height = (Veicles[current->Veicle.veicle]->h) * VEICLE_SCALE;
+
+            if (x > xg && x < xg + width && y > yg && y < yg + height)
+            {
+                selection = VEICLE;
+                selectedVeicle = current->id;
+                break;
+            }
+            current = current->next;
+        }
+
+        pthread_mutex_unlock(mutex);
+
+        // check if the mouse is on a button
+    }
+
+    return selection;
+}
+
+// function that return the index of the selected veicle
+int getSelectedVeicle()
+{
+    return selectedVeicle;
+}
+
+// function that set the index of the selected veicle
+void setSelectedVeicle(int id)
+{
+    selectedVeicle = id;
+}
+
+// function that return the index of the selected button
+int getSelectedButton()
+{
+    return selectedButton;
 }

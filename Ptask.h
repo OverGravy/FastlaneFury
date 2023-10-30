@@ -79,6 +79,9 @@ void task_deactivate(int i);
 // function that whit for activation
 void wait_for_activation(int i);
 
+// function that check if a task is active
+int task_is_active(int i);
+
 // function that check if deadline were missed
 int deadline_miss(int i);
 

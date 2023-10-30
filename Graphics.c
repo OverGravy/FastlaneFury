@@ -40,17 +40,10 @@ void *graphicsTask(void *arg)
         }
         pthread_mutex_unlock(GraphicsArg.mutex);
 
-        // check for zoom
-        ZoomId = getZoomId();
-        if (ZoomId != -1)
-        {   
-            ZoomIn(GraphicsArg.mutex, GraphicsArg.shared, ZoomId);
-            clearDisplay();
-            DrawZoomedScreen();
-        }
-      
+        // draw mouse
+        DrawMouse(mouse_x, mouse_y);
 
-        // flip display
+        //flip the display
         flipDisplay();
 
         // check for miss deadline

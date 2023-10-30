@@ -9,12 +9,11 @@ void *userTask(void *arg)
     struct argument userTaskArg = get_task_argument(arg);
 
     int running = 1;
-    int counter = 0;
 
-    int zoomIn = 0;
-    int zoomId = 0;
-
-    ALLEGRO_EVENT event;
+    // selction variables
+    int selection = -1;
+    int selectedVeicle = -1;
+    int selectedButton = -1;
 
     int ti = get_task_index(arg);
     wait_for_activation(ti);
@@ -24,98 +23,75 @@ void *userTask(void *arg)
     // user input
     while (running)
     {
-        counter++;
-        event = getEvent();
-        if (event.type == ALLEGRO_EVENT_KEY_DOWN)
+        // check for user input
+        if (keypressed())
         {
-            switch (event.keyboard.keycode)
+            // check keyboard
+            int key = readkey() >> 8;
+            switch (key)
             {
-            case ALLEGRO_KEY_ESCAPE:
+            case KEY_ESC: // esc key
                 running = 0;
                 printf("OK: User task deactivated\n");
                 break;
-            case ALLEGRO_KEY_SPACE:
-                if (zoomIn == 1){
-                    zoomIn = 0;
+            case KEY_SPACE: // spawn a veicle
+                struct argument veicleTaskArg;
+                veicleTaskArg.mutex = userTaskArg.mutex;
+                veicleTaskArg.shared = userTaskArg.shared;
+                int index = get_free_index();
+                if (index == -1)
+                {
+                    printf("ERROR:can not create a new veicle No free index\n");
                 }
-                break;
-            case ALLEGRO_KEY_UP:
-                // increase speed
-                break;
-            case ALLEGRO_KEY_DOWN:
-                // decrease speed
-                break;
-            case ALLEGRO_KEY_LEFT:
-                // change lane
-                break;
-            case ALLEGRO_KEY_RIGHT:
-                // change lane
-                break;
-            }
-        }
-
-        if (event.type == ALLEGRO_EVENT_DISPLAY_CLOSE)
-        {
-            running = 0;
-        }
-
-        // check for mouse event
-        if (event.type == ALLEGRO_EVENT_MOUSE_BUTTON_DOWN)
-        {
-            // get mouse position
-            int x = event.mouse.x;
-            int y = event.mouse.y;
-            int bitmapX = 0;
-            int bitmapY = 0;
-            int bitmapWidthX = 0;
-            int bitmapHeightY = 0;
-
-            // check if mouse is on veicle
-            pthread_mutex_lock(userTaskArg.mutex);
-
-            struct Node *current = userTaskArg.shared->head;
-            while (current != NULL)
-            {
-                // get bitmap position on screen
-                bitmapX = (current->Veicle.pos.x)*SCALE_FACTOR;
-                bitmapY = (current->Veicle.pos.y)*SCALE_FACTOR;
-
-                bitmapWidthX =  bitmapX + al_get_bitmap_width(getVeicleBitmap(current->Veicle.veicle)); 
-                bitmapHeightY = bitmapY + al_get_bitmap_height(getVeicleBitmap(current->Veicle.veicle));
-
-                if(x > bitmapX && x < bitmapWidthX && y > bitmapY && y < bitmapHeightY){
-                    
-                    zoomId = current->id;
-                    setZoomId(zoomId);
-                    zoomIn = 1;
-
-                    break;
+                else
+                {
+                    task_create(veicleTask, index, veicleTaskArg, 20, 20, 10, ACT);
                 }
-
-                current = current->next;
             }
-            pthread_mutex_unlock(userTaskArg.mutex);
         }
+        // Handle mouse input
 
+        // SELECTION HANDLER
+        /*
 
+        We get what the user selected and we handle it separately
 
-        if (counter == 200)
+        */
+
+        if (mouse_b & 1)
         {
-            counter = 0;
-            // create a new veicle using ptask
-            struct argument veicleTaskArg;
-            veicleTaskArg.mutex = userTaskArg.mutex;
-            veicleTaskArg.shared = userTaskArg.shared;
-            int index = get_free_index();
-            if (index == -1)
+            selection = getSelection(mouse_x, mouse_y, userTaskArg.mutex, userTaskArg.shared); // get selection
+            switch (selection)
             {
-                printf("ERROR:can not create a new veicle No free index\n");
-            }
-            else
-            {
-                task_create(veicleTask, index, veicleTaskArg, 20, 20, 10, ACT);
+            case VEICLE:
+                selectedVeicle = getSelectedVeicle(); // get veicle id
+                printf("OK: Veicle selected, %d\n", selectedVeicle);
+                break;
+
+            case BUTTON:
+                selectedButton = getSelectedButton(); // get button id
+                printf("OK: Button selected, %d\n", selectedButton);
+                break;
+
+            case ROAD:
+                printf("OK: Road selected\n");
+                break;
             }
         }
+
+        // check if selected veicle is valid
+        if (selectedVeicle != -1)
+        {
+            // check if the veicle is still active if not deselect it
+            if (!task_is_active(selectedVeicle))
+            {
+                selectedVeicle = -1;
+                setSelectedVeicle(selectedVeicle);
+            }
+        }
+
+        // Handle button selection
+     
 
         if (deadline_miss(ti))
         {
