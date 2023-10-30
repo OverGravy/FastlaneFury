@@ -2,8 +2,8 @@ from PIL import Image
 import os
 
 # Input and output folders
-input_folder = "/home/jimmy/Documents/FastlaneFury"
-output_folder = "/home/jimmy/Documents/FastlaneFury"
+input_folder = "/home/jimmy/Documents/FastlaneFury/Bitmap"
+output_folder = "/home/jimmy/Documents/FastlaneFury/Bitmap"
 
 # Create the output folder if it doesn't exist
 if not os.path.exists(output_folder):
@@ -18,12 +18,12 @@ for filename in os.listdir(input_folder):
         # Open the PNG image with transparency
         png_image = Image.open(input_image_path)
 
-        # Convert and save the image as BMP with transparent background
-        png_image.save(output_image_path, "BMP")
+        # Convert and save the image as BMP with specific options
+        png_image.save(output_image_path, "BMP", params=['-d', 'n', '-r', 'n', '-s', 'n'])
 
         # Delete the original PNG file
         os.remove(input_image_path)
 
-        print(f"{filename} converted to BMP with transparent background and original PNG file deleted.")
+        print(f"{filename} converted to BMP with options and original PNG file deleted.")
 
 print("Conversion and deletion complete.")

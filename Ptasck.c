@@ -133,6 +133,8 @@ void task_activate(int i)
 // function that deactivate a task
 void task_deactivate(int i)
 {
+    // cancel the thread
+    pthread_cancel(tid[i]);
     ptaskActivated--;
     freeIndex[i] = 0;              
 }
@@ -147,7 +149,7 @@ void ptask_exit()
         sem_destroy(&tp[i].tsem);
         if (freeIndex[i] == 1)
         {
-            pthread_cancel(tid[i]);
+           task_deactivate(i);
         }
     }
     pthread_cancel(tid[0]);

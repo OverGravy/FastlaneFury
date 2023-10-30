@@ -93,9 +93,10 @@ int main()
 
 
     // Clean up and exit
-    wait_for_task_end(0);
-    closeAllegro();
-    ptask_exit();
+    wait_for_task_end(0);  // wait for user task to end
+    task_deactivate(1);    // deactivate graphics task
+    closeAllegro();        // close allegro
+    ptask_exit();          // close ramining task and exit 
 
     return 0;
 }

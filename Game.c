@@ -12,6 +12,12 @@ int initAllegro()
         return 0;
     }
 
+    // set the window title when in a GUI environment
+    set_window_title("FastLaneFury");
+
+    // true color mode
+    set_color_depth(32); // Set the color depth
+
     // Set up a graphics mode
     if (set_gfx_mode(GFX_AUTODETECT_WINDOWED, MY_SCREEN_W, MY_SCREEN_H, 0, 0) != 0)
     {
@@ -106,6 +112,12 @@ void closeAllegro()
         destroy_bitmap(Veicles[i]);
     }
 
+    // destroy the cursor bitmap
+    destroy_bitmap(cursor);
+
+    // unistall display
+    set_gfx_mode(GFX_TEXT, 0, 0, 0, 0);
+
     // Uninstall the mouse
     remove_mouse();
 
@@ -119,16 +131,22 @@ void closeAllegro()
 // function that load all the graphics assets
 int loadGraphicsAssets()
 {
+    BITMAP* mask;
+    int transparent_color = makecol(0, 0, 0);
+
     // load all cars bitmaps in folder Sprites
     for (int i = 0; i < MAX_VEICLE_TYPE; i++)
     {
         char path[50];
         sprintf(path, "./Bitmap/veicle%d.bmp", i);
         Veicles[i] = load_bitmap(path, NULL);
-        if (!Veicles[i])
+
+         if (!Veicles[i])
         {
             fprintf(stderr, "ERROR: failed to load car bitmap %d!\n", i);
             return 0;
+
+
         }
     }
     printf("OK: Loaded all veicle bitmaps\n");
@@ -234,7 +252,8 @@ void DrawVeicle(double x, double y, int type)
     int new_width = (Veicles[type]->w) * VEICLE_SCALE;
     int new_height = (Veicles[type]->h) * VEICLE_SCALE;
 
-    stretch_blit(Veicles[type], buffer, 0, 0, Veicles[type]->w, Veicles[type]->h, xg, yg, new_width, new_height);
+    draw_sprite(buffer, Veicles[type], xg, yg);
+
 }
 
 // function that draws background

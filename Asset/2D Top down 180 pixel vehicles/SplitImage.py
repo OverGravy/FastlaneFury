@@ -6,7 +6,7 @@ if not os.path.exists("Bitmap"):
     os.mkdir("Bitmap")
 
 # Load the big bitmap image
-image = cv2.imread('/home/jimmy/Documents/Highway2/Asset/2D Top down 180 pixel vehicles/AllVeicle4K.png', cv2.IMREAD_UNCHANGED)
+image = cv2.imread('/home/jimmy/Documents/FastlaneFury/Asset/2D Top down 180 pixel vehicles/AllVeicle4K.png', cv2.IMREAD_UNCHANGED)
 
 if image is None:
     print("Failed to load the image.")

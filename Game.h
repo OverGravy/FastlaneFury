@@ -20,6 +20,8 @@
 #define LANE_NUMBER 4
 #define VEICLE_SCALE 0.8
 #define SCALE_FACTOR 15
+#define VEICLE_HEIGHT 300
+#define VEICLE_WIDTH 300
 
 // Sensor costant
 #define SMAX 1000    // max distance in px

@@ -9,3 +9,11 @@ In final result feature will be:
 - Car spwan over user command.
 - Userwill be able to zoom on a singol car.
 - Cars will interact using sensor avoiding other car and slow down if needed.
+
+# Tips 
+
+
+
+- To create a correct bitmap for the program use the following command (before use sudo apt install imagemagick):
+```mogrify -format bmp -depth 16 -define bmp:format=bmp3 -define bmp:subtype=RGB *.png && rm *.png```
+ 
