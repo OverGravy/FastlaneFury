@@ -7,6 +7,7 @@ void *graphicsTask(void *arg)
     int running = 1;
     int Zoom = 0;
     int ZoomId = 0;
+    struct Node *current;
 
     // gets the arguments
     struct argument GraphicsArg = get_task_argument(arg);
@@ -15,7 +16,7 @@ void *graphicsTask(void *arg)
     wait_for_activation(ti);
 
     printf("OK: Graphics task activated\n");
-  
+
     while (running == 1)
     {
         // DRAW SCENE
@@ -25,31 +26,34 @@ void *graphicsTask(void *arg)
 
         // draw background
         DrawBackground();
-        
-        // draw info 
-        DrawInfo(GraphicsArg.mutex,GraphicsArg.shared, 0);
+
+        // draw info
+        DrawInfo(GraphicsArg.mutex, GraphicsArg.shared, 0);
 
         pthread_mutex_lock(GraphicsArg.mutex);
         // draw veicles
-        struct Node *current = GraphicsArg.shared->head;
-        while (current != NULL)
-        {
-            DrawVeicle(current->Veicle.pos.x, current->Veicle.pos.y, current->Veicle.veicle);
-            current = current->next;
 
+        if (GraphicsArg.shared->size > 0) // draw veicles only if there are veicles in the list
+        {
+            current = GraphicsArg.shared->head;
+            while (current != NULL)
+            {
+                DrawVeicle(current->Veicle.pos.x, current->Veicle.pos.y, current->Veicle.veicle);
+                current = current->next;
+            }
         }
         pthread_mutex_unlock(GraphicsArg.mutex);
 
         // draw mouse
         DrawMouse(mouse_x, mouse_y);
 
-        //flip the display
+        // flip the display
         flipDisplay();
 
         // check for miss deadline
         if (deadline_miss(ti))
         {
-           printf("GRAPHICS: deadline missed\n");
+            printf("GRAPHICS: deadline missed\n");
         }
 
         // wait for next activation

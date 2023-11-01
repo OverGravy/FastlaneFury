@@ -131,7 +131,7 @@ void closeAllegro()
 // function that load all the graphics assets
 int loadGraphicsAssets()
 {
-    BITMAP* mask;
+    BITMAP *mask;
     int transparent_color = makecol(0, 0, 0);
 
     // load all cars bitmaps in folder Sprites
@@ -141,19 +141,16 @@ int loadGraphicsAssets()
         sprintf(path, "./Bitmap/veicle%d.bmp", i);
         Veicles[i] = load_bitmap(path, NULL);
 
-         if (!Veicles[i])
+        if (!Veicles[i])
         {
             fprintf(stderr, "ERROR: failed to load car bitmap %d!\n", i);
             return 0;
-
-
         }
     }
     printf("OK: Loaded all veicle bitmaps\n");
 
-
     // load all fonts in folder Fonts
-    /* for (int i = 0; i < MAX_FONT; i++)
+    for (int i = 0; i < MAX_FONT; i++)
     {
         char path[50];
         sprintf(path, "./Fonts/font%d.pcx", i);
@@ -165,7 +162,7 @@ int loadGraphicsAssets()
         }
     }
     printf("OK: Loaded all fonts\n");
-    */
+    
     return 1;
 }
 
@@ -201,45 +198,43 @@ void DrawInfo(pthread_mutex_t *mutex, struct SharedList *shared, int id)
     sprintf(info, "Total Deadline Miss: %d", get_deadline_miss());
     textout_ex(buffer, font, info, 20, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 + 40, makecol(255, 255, 255), -1);
 
-    if (selectedVeicle != -1){
-    // print info about the task with id
-    sprintf(info, "Task: %d", selectedVeicle);
-    textout_ex(buffer, font, info, 450, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 + 20, makecol(255, 255, 255), -1);
-    sprintf(info, "Period: %d", task_get_period(selectedVeicle));
-    textout_ex(buffer, font, info, 450, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 + 40, makecol(255, 255, 255), -1);
-    sprintf(info, "Deadline: %d", task_get_deadline(selectedVeicle));
-    textout_ex(buffer, font, info, 450, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 + 60, makecol(255, 255, 255), -1);
-    sprintf(info, "Priority: %d", task_get_priority(selectedVeicle));
-    textout_ex(buffer, font, info, 450, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 + 80, makecol(255, 255, 255), -1);
-
-    // print info about the veicle with id
-    pthread_mutex_lock(mutex);
-    struct Node *current = shared->head;
-    while (current != NULL)
+    if (selectedVeicle != -1)
     {
-        if (current->id == selectedVeicle)
+        // print info about the task with id
+        sprintf(info, "Task: %d", selectedVeicle);
+        textout_ex(buffer, font, info, 450, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 + 20, makecol(255, 255, 255), -1);
+        sprintf(info, "Period: %d", task_get_period(selectedVeicle));
+        textout_ex(buffer, font, info, 450, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 + 40, makecol(255, 255, 255), -1);
+        sprintf(info, "Deadline: %d", task_get_deadline(selectedVeicle));
+        textout_ex(buffer, font, info, 450, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 + 60, makecol(255, 255, 255), -1);
+        sprintf(info, "Priority: %d", task_get_priority(selectedVeicle));
+        textout_ex(buffer, font, info, 450, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 + 80, makecol(255, 255, 255), -1);
+
+        // print info about the veicle with id
+        pthread_mutex_lock(mutex);
+        struct Node *current = shared->head;
+        while (current != NULL)
         {
-            sprintf(info, "Veicle: %d", current->id);
-            textout_ex(buffer, font, info, 650, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 + 20, makecol(255, 255, 255), -1);
-            sprintf(info, "Type: %d", current->Veicle.veicle);
-            textout_ex(buffer, font, info, 650, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 + 40, makecol(255, 255, 255), -1);
-            sprintf(info, "Lane: %d", current->Veicle.lane);
-            textout_ex(buffer, font, info, 650, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 + 60, makecol(255, 255, 255), -1);
-            sprintf(info, "Speed: %.2f", current->Veicle.speed);
-            textout_ex(buffer, font, info, 650, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 + 80, makecol(255, 255, 255), -1);
-            sprintf(info, "Acceleration: %.2f", current->Veicle.acceleration);
-            textout_ex(buffer, font, info, 650, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 + 100, makecol(255, 255, 255), -1);
-            sprintf(info, "Position: (%.2f, %.2f)", current->Veicle.pos.x, current->Veicle.pos.y);
-            textout_ex(buffer, font, info, 650, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 + 120, makecol(255, 255, 255), -1);
-            break;
+            if (current->id == selectedVeicle)
+            {
+                sprintf(info, "Veicle: %d", current->id);
+                textout_ex(buffer, font, info, 650, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 + 20, makecol(255, 255, 255), -1);
+                sprintf(info, "Type: %d", current->Veicle.veicle);
+                textout_ex(buffer, font, info, 650, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 + 40, makecol(255, 255, 255), -1);
+                sprintf(info, "Lane: %d", current->Veicle.lane);
+                textout_ex(buffer, font, info, 650, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 + 60, makecol(255, 255, 255), -1);
+                sprintf(info, "Speed: %.2f", current->Veicle.speed);
+                textout_ex(buffer, font, info, 650, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 + 80, makecol(255, 255, 255), -1);
+                sprintf(info, "Acceleration: %.2f", current->Veicle.acceleration);
+                textout_ex(buffer, font, info, 650, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 + 100, makecol(255, 255, 255), -1);
+                sprintf(info, "Position: (%.2f, %.2f)", current->Veicle.pos.x, current->Veicle.pos.y);
+                textout_ex(buffer, font, info, 650, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 + 120, makecol(255, 255, 255), -1);
+                break;
+            }
+            current = current->next;
         }
-        current = current->next;
+        pthread_mutex_unlock(mutex);
     }
-    pthread_mutex_unlock(mutex);
-
-    }
-
-   
 }
 
 // function that draws veicle
@@ -253,7 +248,6 @@ void DrawVeicle(double x, double y, int type)
     int new_height = (Veicles[type]->h) * VEICLE_SCALE;
 
     draw_sprite(buffer, Veicles[type], xg, yg);
-
 }
 
 // function that draws background

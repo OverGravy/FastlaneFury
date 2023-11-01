@@ -136,7 +136,7 @@ void task_deactivate(int i)
     // cancel the thread
     pthread_cancel(tid[i]);
     ptaskActivated--;
-    freeIndex[i] = 0;              
+    freeIndex[i] = 0;
 }
 
 // function that handle the exit from ptask
@@ -149,14 +149,15 @@ void ptask_exit()
         sem_destroy(&tp[i].tsem);
         if (freeIndex[i] == 1)
         {
-           task_deactivate(i);
+            task_deactivate(i);
         }
     }
     pthread_cancel(tid[0]);
 }
 
 // function that check if a task is active
-int task_is_active(int i){
+int task_is_active(int i)
+{
     return freeIndex[i];
 }
 

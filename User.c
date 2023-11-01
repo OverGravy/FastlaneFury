@@ -15,6 +15,10 @@ void *userTask(void *arg)
     int selectedVeicle = -1;
     int selectedButton = -1;
 
+    // car variables
+    struct argument veicleTaskArg;
+    int index = 0;
+
     int ti = get_task_index(arg);
     wait_for_activation(ti);
 
@@ -35,10 +39,9 @@ void *userTask(void *arg)
                 printf("OK: User task deactivated\n");
                 break;
             case KEY_SPACE: // spawn a veicle
-                struct argument veicleTaskArg;
                 veicleTaskArg.mutex = userTaskArg.mutex;
                 veicleTaskArg.shared = userTaskArg.shared;
-                int index = get_free_index();
+                index = get_free_index();
                 if (index == -1)
                 {
                     printf("ERROR:can not create a new veicle No free index\n");
@@ -50,13 +53,6 @@ void *userTask(void *arg)
             }
         }
         // Handle mouse input
-
-        // SELECTION HANDLER
-        /*
-
-        We get what the user selected and we handle it separately
-
-        */
 
         if (mouse_b & 1)
         {

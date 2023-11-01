@@ -88,7 +88,7 @@ void *veicleTask(void *arg)
         // check for miss deadline
         if (deadline_miss(ti))
         {
-            
+            printf("VEICLE: deadline missed\n");
         }
         wait_for_period(ti);
 

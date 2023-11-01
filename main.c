@@ -77,7 +77,6 @@ int main()
         return -1;
     }
 
-
     // create and start Graphics task
     struct argument GraphicsArg;
     GraphicsArg.mutex = &mutex;
