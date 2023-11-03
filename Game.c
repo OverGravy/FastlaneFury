@@ -131,14 +131,14 @@ void closeAllegro()
 // function that load all the graphics assets
 int loadGraphicsAssets()
 {
-    BITMAP *mask;
+
     int transparent_color = makecol(0, 0, 0);
 
     // load all cars bitmaps in folder Sprites
     for (int i = 0; i < MAX_VEICLE_TYPE; i++)
     {
         char path[50];
-        sprintf(path, "./Bitmap/veicle%d.bmp", i);
+        sprintf(path, "./Bitmap/bitmap%d.bmp", i);
         Veicles[i] = load_bitmap(path, NULL);
 
         if (!Veicles[i])
@@ -150,7 +150,7 @@ int loadGraphicsAssets()
     printf("OK: Loaded all veicle bitmaps\n");
 
     // load all fonts in folder Fonts
-    for (int i = 0; i < MAX_FONT; i++)
+    /*    for (int i = 0; i < MAX_FONT; i++)
     {
         char path[50];
         sprintf(path, "./Fonts/font%d.pcx", i);
@@ -162,7 +162,7 @@ int loadGraphicsAssets()
         }
     }
     printf("OK: Loaded all fonts\n");
-    
+    */
     return 1;
 }
 
@@ -229,6 +229,8 @@ void DrawInfo(pthread_mutex_t *mutex, struct SharedList *shared, int id)
                 textout_ex(buffer, font, info, 650, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 + 100, makecol(255, 255, 255), -1);
                 sprintf(info, "Position: (%.2f, %.2f)", current->Veicle.pos.x, current->Veicle.pos.y);
                 textout_ex(buffer, font, info, 650, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 + 120, makecol(255, 255, 255), -1);
+                sprintf(info, "Steering Angle: %.2f", current->Veicle.steeringAngle);
+                textout_ex(buffer, font, info, 800, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 +20, makecol(255, 255, 255), -1);
                 break;
             }
             current = current->next;
@@ -271,19 +273,37 @@ int getVeicleWidth(int veicle)
 }
 
 // function that initialize veicle
-void initVeicleState(struct VeicleState *state)
+void initVeicleState(struct VeicleState *state, struct VeicleStatistics *statistics, int veicle)
 {
     state->veicle = rand() % MAX_VEICLE_TYPE;
     state->lane = 1;
     state->pos.x = (MY_SCREEN_W - 2) / SCALE_FACTOR;                                                     // in meter
     int margin = ((MY_SCREEN_H / (LANE_NUMBER + 1)) - ((Veicles[state->veicle]->h) * VEICLE_SCALE)) / 2; // margin in pixel
     state->pos.y = (((MY_SCREEN_H / (LANE_NUMBER + 1)) * state->lane) + margin) / SCALE_FACTOR;          // in meter
-    state->speed = 10.0;                                                                                 // speed in ms
-    state->acceleration = 0.0;                                                                           // acceleration in ms^2
+    state->steeringAngle = 0.0;                                                                          // in degree
+
+    if (veicle == 0)
+    {
+        state->speed = 10.0;       // speed in ms
+        state->acceleration = 0.0; // acceleration in ms^2
+        statistics->maxSpeed = 10.0;
+        statistics->maxAcceleration = 0.0;
+        statistics->maxDeceleration = 0.0;
+        statistics->minDistance = 0.0;
+    }
+    else
+    {
+        state->speed = 15.0;       // speed in ms
+        state->acceleration = 0.5; // acceleration in ms^2
+        statistics->maxSpeed = 20.0;
+        statistics->maxAcceleration = 1.0;
+        statistics->maxDeceleration = -5.0;
+        statistics->minDistance = 10.0;
+    }
 }
 
 // function that returns the distance from the other veicle
-double proximitySensor(int id, double x, double y, double range)
+double proximitySensor(int id, double x, double y, double range, double alpha)
 {
 
     // the sensor return the distance from the other veicle in meter
@@ -309,7 +329,7 @@ double proximitySensor(int id, double x, double y, double range)
     // check for veicle in front
     for (i = SMIN; i < rangeg; i += SSTEP)
     {
-        color = getpixel(screen, xg - i, yg); // get color
+        color = getpixel(screen, xg - (i*cos(alpha)), yg -(i*sin(alpha))); // get color
 
         if (color != makecol(188, 188, 188) && color != -1) // if there is a veicle
         {
@@ -317,7 +337,6 @@ double proximitySensor(int id, double x, double y, double range)
             break;
         }
     }
-
     return distance;
 }
 

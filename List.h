@@ -11,14 +11,22 @@ struct Position{
     double y;               // position in meter
 };
 
+struct VeicleStatistics{
+    double maxSpeed;        // max speed in m/s
+    double maxAcceleration; // max acceleration in m/s^2
+    double maxDeceleration; // max deceleration in m/s^2
+    double minDistance;     // min distance in m that the veicle can be from another veicle
+};
 
 // Define a structure to represent a veicle state
 struct VeicleState{
-    double speed;         // speed of the car in m/s
-    double acceleration;  // acceleration of the car in m/s^2
-    struct Position pos;  // position in the highway in m
-    int veicle;           // type of the car
-    int lane;             // lane the car is in
+    double speed;           // speed of the car in m/s
+    double steeringAngle;   // steering angle of the car in degree
+    double acceleration;    // acceleration of the car in m/s^2
+    int state;              // state of the car
+    struct Position pos;    // position in the highway in m
+    int veicle;             // type of the car
+    int lane;               // lane the car is in
 };
 
 // Node structure for the list

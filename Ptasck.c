@@ -144,7 +144,7 @@ void ptask_exit()
 {
     int i;
 
-    for (i = 0; i < MAX_TASKS; i++)
+    for (i = 1; i < MAX_TASKS; i++) // clsoe all task from 1 to MAX_TASKS
     {
         sem_destroy(&tp[i].tsem);
         if (freeIndex[i] == 1)
@@ -271,4 +271,35 @@ int task_get_priority(int i)
 void wait_for_task_end(int i)
 {
     pthread_join(tid[i], NULL);
+}
+
+// function that pause all task
+void pause_all_task()
+{
+    // i dont want to kill threads so i just pause them
+    int i;
+    for (i = 1; i < MAX_TASKS; i++)
+    {
+        if (freeIndex[i] == 1)
+        {
+            pthread_kill(tid[i], SIGSTOP);
+        }
+    }
+    
+}
+
+
+// function that resume all task
+void resume_all_task()
+{
+    // i dont want to kill threads so i just resume them
+    int i;
+    for (i = 1; i < MAX_TASKS; i++)
+    {
+        if (freeIndex[i] == 1)
+        {
+            pthread_kill(tid[i], SIGCONT);
+        }
+    }
+    
 }

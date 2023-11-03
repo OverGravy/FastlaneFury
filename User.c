@@ -14,6 +14,7 @@ void *userTask(void *arg)
     int selection = -1;
     int selectedVeicle = -1;
     int selectedButton = -1;
+    int pause = 0;
 
     // car variables
     struct argument veicleTaskArg;
@@ -50,6 +51,19 @@ void *userTask(void *arg)
                 {
                     task_create(veicleTask, index, veicleTaskArg, 20, 20, 10, ACT);
                 }
+                break;
+            case KEY_P:
+                if(pause == 0){
+                    pause_all_task();
+                    pause = 1;
+                    printf("OK: game paused\n");
+                }else{
+                    pause = 0;
+                    resume_all_task();
+                    printf("OK: game resumed\n");
+                }
+                
+                break;
             }
         }
         // Handle mouse input
@@ -97,6 +111,8 @@ void *userTask(void *arg)
         // wait for next activation
         wait_for_period(ti);
     }
+    //task_deactivate(1);    // deactivate graphics task
+    ptask_exit();          // close ramining task and exit 
     task_deactivate(ti);
     return NULL;
 }

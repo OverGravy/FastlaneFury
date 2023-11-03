@@ -16,7 +16,7 @@
 #define MAX_FONT 1
 
 // Game costant 
-#define MAX_VEICLE_TYPE 94
+#define MAX_VEICLE_TYPE 158
 #define LANE_NUMBER 4
 #define VEICLE_SCALE 0.8
 #define SCALE_FACTOR 15
@@ -81,13 +81,13 @@ void DrawMouse(int x, int y);
 // VEICLE FUNCTIONS
 
 // function that initialize veicle
-void initVeicleState(struct VeicleState *state);
+void initVeicleState(struct VeicleState *state, struct VeicleStatistics *statistics, int veicle);
 
 // function that returns veicle bitmap
 int getVeicleWidth(int id);
 
 // function that returns distance from other veicle
-double proximitySensor(int id, double x, double y, double range);
+double proximitySensor(int id, double x, double y, double range, double alpha);
 
 
 // USER FUNCTIONS
