@@ -54,20 +54,20 @@ void *userTask(void *arg)
                 break;
             case KEY_P:
                 if(pause == 0){
-                    pause_all_task();
-                    pause = 1;
+                    task_set_all_pause();
                     printf("OK: game paused\n");
+                    pause = 1;
                 }else{
                     pause = 0;
-                    resume_all_task();
+                    task_set_all_resume();
                     printf("OK: game resumed\n");
                 }
                 
                 break;
             }
         }
-        // Handle mouse input
 
+        // Handle mouse input
         if (mouse_b & 1)
         {
             selection = getSelection(mouse_x, mouse_y, userTaskArg.mutex, userTaskArg.shared); // get selection

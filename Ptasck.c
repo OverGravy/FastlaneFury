@@ -1,5 +1,7 @@
 #include "Ptask.h"
 
+// TIME FUNCTION
+
 // function that copy the time in t1 to t2
 void time_copy(struct timespec *td, struct timespec ts)
 {
@@ -33,6 +35,8 @@ int time_cmp(struct timespec t1, struct timespec t2)
     return 0;
 }
 
+// PTASK FUNCTION
+
 // function that init ptask libary and set the scheduling policy
 void ptask_init(int policy)
 {
@@ -47,6 +51,13 @@ void ptask_init(int policy)
     }
 
     ptaskActivated = 0;
+
+    for (i = 0; i < MAX_TASKS; i++)
+    {
+        tp[i].paused = 0;
+        pthread_mutex_init(&tp[i].pauseMut, NULL);
+        pthread_cond_init(&tp[i].pauseCond, NULL);
+    }
 
     // set all index to 0
     for (i = 0; i < MAX_TASKS; i++)
@@ -273,33 +284,74 @@ void wait_for_task_end(int i)
     pthread_join(tid[i], NULL);
 }
 
-// function that pause all task
-void pause_all_task()
+// PAUSE AND RESUME
+
+// function that set single task pause
+void task_set_pause(int i)
 {
-    // i dont want to kill threads so i just pause them
-    int i;
-    for (i = 1; i < MAX_TASKS; i++)
-    {
-        if (freeIndex[i] == 1)
-        {
-            pthread_kill(tid[i], SIGSTOP);
-        }
-    }
-    
+    pthread_mutex_lock(&tp[i].pauseMut);
+    tp[i].paused = 1;
+    pthread_mutex_unlock(&tp[i].pauseMut);
 }
 
-
-// function that resume all task
-void resume_all_task()
+// function that pause all the thread
+void task_set_all_pause()
 {
-    // i dont want to kill threads so i just resume them
     int i;
-    for (i = 1; i < MAX_TASKS; i++)
+    for (i = 1; i < MAX_TASKS; i++) // i stop from 1 to MAX_TASKS, i dont want to pause user thread
     {
         if (freeIndex[i] == 1)
         {
-            pthread_kill(tid[i], SIGCONT);
+            pthread_mutex_lock(&tp[i].pauseMut);
+            tp[i].paused = 1;
+            pthread_mutex_unlock(&tp[i].pauseMut);
         }
     }
+}
+
+// function that resume a single task
+void task_set_resume(int i)
+{
+    pthread_mutex_lock(&tp[i].pauseMut);
+    tp[i].paused = 0;
+    pthread_cond_signal(&tp[i].pauseCond);
+    pthread_mutex_unlock(&tp[i].pauseMut);
+}
+
+// function that resume all the thread
+void task_set_all_resume()
+{
+    int i;
+    for (i = 1; i < MAX_TASKS; i++) // i stop from 1 to MAX_TASKS, i dont want to resume user thread
+    {
+        if (freeIndex[i] == 1)
+        {
+            pthread_mutex_lock(&tp[i].pauseMut);
+            tp[i].paused = 0;
+            pthread_cond_signal(&tp[i].pauseCond);
+            pthread_mutex_unlock(&tp[i].pauseMut);
+        }
+    }
+}
+
+// function that check if a task is paused and return 1 if it is
+int task_is_paused(int i)
+{
+    int temp;
+    pthread_mutex_lock(&tp[i].pauseMut);
+    temp = tp[i].paused;
+    pthread_mutex_unlock(&tp[i].pauseMut);
+    return temp;
+}
+
+// function that wait for resume
+void wait_for_resume(int i)
+{
+    pthread_mutex_lock(&tp[i].pauseMut);
+    while (tp[i].paused == 1)
+    {
+        pthread_cond_wait(&tp[i].pauseCond, &tp[i].pauseMut);
+    }
+    pthread_mutex_unlock(&tp[i].pauseMut);
     
 }

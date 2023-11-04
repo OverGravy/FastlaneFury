@@ -24,20 +24,25 @@
 #define VEICLE_WIDTH 300
 
 // Sensor costant
-#define SMAX 1000    // max distance in px
-#define SMIN 10      // minimun distance in px
-#define SSTEP 5      // step in meter
+#define SMAX 200    // max distance in px
+#define SMIN 0      // minimun distance in px
+#define SSTEP 5     // step in meter
 
 // Selection constant
 #define VEICLE 0
 #define BUTTON 1
 #define ROAD 2
 
+#define BGCOLOR makecol(188, 188, 188)
+#define FOVCOLOR makecol(255, 0, 0)
+#define CURSORCOLOR makecol(255, 0, 0)
+#define LINECOLOR makecol(0, 0, 0)
+#define LANECOLOR makecol(255, 255, 255)
+
 
 // Game variables
 extern BITMAP* buffer;                    // display buffer bitmap
 extern BITMAP* background;                // background bitmap
-extern BITMAP* cursor;                    // cursor bitmap
 extern BITMAP* Veicles[MAX_VEICLE_TYPE] ; // array of veicles bitmaps
 extern FONT* fonts[MAX_FONT];             // array of fonts
 
@@ -69,13 +74,19 @@ void flipDisplay();
 void DrawBackground();
 
 // fucntion that draws info
-void DrawInfo(pthread_mutex_t *mutex, struct SharedList *shared, int id);
+void DrawInfo(pthread_mutex_t *mutex, struct SharedList *shared);
+
+// funtion that draws fild of view of a car
+void DrawFOV(double x, double y, int range, int id);
 
 // function that draws veicle
 void DrawVeicle(double x, double y, int type);
 
 // function that draws mouse
 void DrawMouse(int x, int y);
+
+// function that draws background in buffer
+void DrawBackgroundInBitmap();
 
 
 // VEICLE FUNCTIONS
@@ -84,7 +95,10 @@ void DrawMouse(int x, int y);
 void initVeicleState(struct VeicleState *state, struct VeicleStatistics *statistics, int veicle);
 
 // function that returns veicle bitmap
-int getVeicleWidth(int id);
+int getVeicleWidth(int veicle);
+
+// function that returns veicle bitmap
+int getVeicleHeight(int veicle);
 
 // function that returns distance from other veicle
 double proximitySensor(int id, double x, double y, double range, double alpha);

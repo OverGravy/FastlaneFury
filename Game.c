@@ -80,9 +80,9 @@ void DrawBackgroundInBitmap()
     {
         if (draw)
         {
-            line(background, x1, y1, x1 + segment_length, y2, makecol(255, 255, 255));
-            line(background, x1, y1 * 2, x1 + segment_length, y2 * 2, makecol(255, 255, 255));
-            line(background, x1, y1 * 3, x1 + segment_length, y2 * 3, makecol(255, 255, 255));
+            line(background, x1, y1, x1 + segment_length, y2, LANECOLOR);
+            line(background, x1, y1 * 2, x1 + segment_length, y2 * 2, LANECOLOR);
+            line(background, x1, y1 * 3, x1 + segment_length, y2 * 3, LANECOLOR);
         }
         x1 += segment_length;
         x1 += space_length;
@@ -112,9 +112,6 @@ void closeAllegro()
         destroy_bitmap(Veicles[i]);
     }
 
-    // destroy the cursor bitmap
-    destroy_bitmap(cursor);
-
     // unistall display
     set_gfx_mode(GFX_TEXT, 0, 0, 0, 0);
 
@@ -131,9 +128,6 @@ void closeAllegro()
 // function that load all the graphics assets
 int loadGraphicsAssets()
 {
-
-    int transparent_color = makecol(0, 0, 0);
-
     // load all cars bitmaps in folder Sprites
     for (int i = 0; i < MAX_VEICLE_TYPE; i++)
     {
@@ -184,9 +178,10 @@ void flipDisplay()
 }
 
 // fucntion that draws info
-void DrawInfo(pthread_mutex_t *mutex, struct SharedList *shared, int id)
+void DrawInfo(pthread_mutex_t *mutex, struct SharedList *shared)
 {
     char info[50];
+    double speedKmH = 0;
 
     // print active veicles
     pthread_mutex_lock(mutex);
@@ -223,7 +218,9 @@ void DrawInfo(pthread_mutex_t *mutex, struct SharedList *shared, int id)
                 textout_ex(buffer, font, info, 650, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 + 40, makecol(255, 255, 255), -1);
                 sprintf(info, "Lane: %d", current->Veicle.lane);
                 textout_ex(buffer, font, info, 650, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 + 60, makecol(255, 255, 255), -1);
-                sprintf(info, "Speed: %.2f", current->Veicle.speed);
+                // speed in km/h
+                speedKmH = (int)round(current->Veicle.speed * 3.6);
+                sprintf(info, "Speed: %.2f", speedKmH);
                 textout_ex(buffer, font, info, 650, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 + 80, makecol(255, 255, 255), -1);
                 sprintf(info, "Acceleration: %.2f", current->Veicle.acceleration);
                 textout_ex(buffer, font, info, 650, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 + 100, makecol(255, 255, 255), -1);
@@ -231,6 +228,9 @@ void DrawInfo(pthread_mutex_t *mutex, struct SharedList *shared, int id)
                 textout_ex(buffer, font, info, 650, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 + 120, makecol(255, 255, 255), -1);
                 sprintf(info, "Steering Angle: %.2f", current->Veicle.steeringAngle);
                 textout_ex(buffer, font, info, 800, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 +20, makecol(255, 255, 255), -1);
+
+                DrawFOV(current->Veicle.pos.x, current->Veicle.pos.y, SMAX, current->Veicle.veicle);
+
                 break;
             }
             current = current->next;
@@ -242,12 +242,8 @@ void DrawInfo(pthread_mutex_t *mutex, struct SharedList *shared, int id)
 // function that draws veicle
 void DrawVeicle(double x, double y, int type)
 {
-    int xg = (int)round(x * SCALE_FACTOR);
-    int yg = (int)round(y * SCALE_FACTOR);
-
-    // calculate new width and height
-    int new_width = (Veicles[type]->w) * VEICLE_SCALE;
-    int new_height = (Veicles[type]->h) * VEICLE_SCALE;
+    int xg = (int)round(x * SCALE_FACTOR); // conversion of x in pixel
+    int yg = (int)round(y * SCALE_FACTOR); // conversion of y in pixel
 
     draw_sprite(buffer, Veicles[type], xg, yg);
 }
@@ -264,12 +260,48 @@ void DrawMouse(int x, int y)
     circlefill(buffer, x, y, 5, makecol(255, 0, 0));
 }
 
+// funtion thath draws fild of view of a veicle
+void DrawFOV(double x, double y, int range, int id)
+{
+    int xg = (int)round(x * SCALE_FACTOR);
+    int yg = (int)round(y * SCALE_FACTOR);
+
+    // center y in the middle of the veicle
+    yg += (Veicles[id]->h * VEICLE_SCALE) / 2;
+
+    // draw the fov
+    for (int i = SMIN; i < range; i += SSTEP)
+    {
+        circlefill(buffer, xg, yg, i, FOVCOLOR);
+
+    }
+
+    
+    
+}
+
+// function that draws line distance from the other veicle
+void DrawDistance(double x, double y, double distance, double alpha)
+{
+    for (int i = 0; i < 10; i++) {
+        line(buffer, x+i, y+i, x - (distance*cos(alpha))+i, y -(distance*sin(alpha))+i, LINECOLOR);  
+    }
+    
+}
+
+
 // VEICLE FUNCTIONS
 
 // function that return the bitmap width of a veicle
 int getVeicleWidth(int veicle)
 {
     return Veicles[veicle]->w;
+}
+
+// function that return the bitmap height of a veicle
+int getVeicleHeight(int veicle)
+{
+    return Veicles[veicle]->h;
 }
 
 // function that initialize veicle
@@ -291,13 +323,13 @@ void initVeicleState(struct VeicleState *state, struct VeicleStatistics *statist
         statistics->maxDeceleration = 0.0;
         statistics->minDistance = 0.0;
     }
-    else
+    else 
     {
         state->speed = 15.0;       // speed in ms
         state->acceleration = 0.5; // acceleration in ms^2
         statistics->maxSpeed = 20.0;
-        statistics->maxAcceleration = 1.0;
-        statistics->maxDeceleration = -5.0;
+        statistics->maxAcceleration = 1.5;
+        statistics->maxDeceleration = -7.0;
         statistics->minDistance = 10.0;
     }
 }
@@ -331,7 +363,7 @@ double proximitySensor(int id, double x, double y, double range, double alpha)
     {
         color = getpixel(screen, xg - (i*cos(alpha)), yg -(i*sin(alpha))); // get color
 
-        if (color != makecol(188, 188, 188) && color != -1) // if there is a veicle
+        if (color != BGCOLOR && color != -1 && color != FOVCOLOR && color!= CURSORCOLOR && color!=LINECOLOR && color!=LANECOLOR) // if there is a veicle
         {
             distance = (double)i / SCALE_FACTOR; // distance in meter
             break;

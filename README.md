@@ -1,5 +1,5 @@
 # FastlaneFury
-Small university project that include using pthread and Allegro library and ulti thread programming. The program will be a small dimulation of a fraction of an highway with  ultiple veicle and every veicle will be a task-
+Small university project that include using pthread and Allegro library and multi thread programming. The program will be a small dimulation of a fraction of an highway with  ultiple veicle and every veicle will be a task-
 
 # Final result
 In final result feature will be:
@@ -17,25 +17,32 @@ In final result feature will be:
 - Car spwan over user command.
 - Car distance is implemented using a sensor.
 - User is able to select a car and see some information about it and thread itseaf
+- Is possible to pause the game.
+- Is possible to see lot of information about the car and the thread by clicking over a car.
 
 # How to use
-
-Pressing space after the program start car appear demostrating how sensor work if you make spawn another car.
+Before compiling using make sure you have install the right allegro library version witch is allegro 4.2 using the following command:
+```sudo apt install liballegro4-dev```
+Pressing space after the program spawn 1 car pressing another time spawn another car that perform overtake.
+- Pressing 'p' will pause the game.
+- Pressing 'esc' will close the game.
+- Pressing 'space' will spawn a car.
 
 # Future feature 
 
 - User will be able to zoom on a singol car.
-- there will be a pause funtion.
 - There will be a menu to change some option.
 - Car will have a much realistic movement.
-- Car will be able to overtake other car.
+
 
 # Actual problem 
 
-- If car start overtaking it will not stop changing line.
 - I'm still not able to load different font from the default one.
 - Pause function kill the program.
 - Sometime due to a thread problem closing the game crash it;
+- While game is in pause thread miss a lot of deadline and it seems to produce lag when game resume.
+- Closing game some time crash it.
+- I have to figure out how to draw a distance line between car to show how sensor work.
 
 # Tips 
 

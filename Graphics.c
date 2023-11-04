@@ -5,8 +5,6 @@ void *graphicsTask(void *arg)
 {
 
     int running = 1;
-    int Zoom = 0;
-    int ZoomId = 0;
     struct Node *current;
 
     // gets the arguments
@@ -15,7 +13,6 @@ void *graphicsTask(void *arg)
     int ti = get_task_index(arg);
     wait_for_activation(ti);
 
-    printf("OK: Graphics task activated\n");
 
     while (running == 1)
     {
@@ -28,7 +25,7 @@ void *graphicsTask(void *arg)
         DrawBackground();
 
         // draw info
-        DrawInfo(GraphicsArg.mutex, GraphicsArg.shared, 0);
+        DrawInfo(GraphicsArg.mutex, GraphicsArg.shared);
 
         pthread_mutex_lock(GraphicsArg.mutex);
         // draw veicles
@@ -54,6 +51,13 @@ void *graphicsTask(void *arg)
         if (deadline_miss(ti))
         {
             printf("GRAPHICS: deadline missed\n");
+        }
+
+        if (task_is_paused(ti))                // OVVIAMENTE MISSA LE DEADLINE NELL'ATETSA
+        {
+            printf("GRAPHICS: task paused\n");
+            wait_for_resume(ti);
+            printf("GRAPHICS: task resumed\n");
         }
 
         // wait for next activation

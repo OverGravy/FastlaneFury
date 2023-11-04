@@ -23,17 +23,20 @@ struct argument
 
 struct task_par
 {
-    int index;          // task id
-    struct argument arg;// task argument
-    long wcet;          // task WCET in us
-    int period;         // task period in ms
-    int deadline;       // relative deadline in ms
-    int priority;       // task priority in [0,99]
-    int dmiss;          // # of deadline misses
-    struct timespec at; // next activation time
-    struct timespec dl; // current abs. deadline
-    pthread_t tid;      // thread id
-    sem_t tsem;         // activation semaphore
+    int index;                // task id
+    struct argument arg;      // task argument
+    long wcet;                // task WCET in us
+    int period;               // task period in ms
+    int deadline;             // relative deadline in ms
+    int priority;             // task priority in [0,99]
+    int paused;               // task paused
+    pthread_mutex_t pauseMut; // mutex for pause
+    pthread_cond_t pauseCond; // condition variable for pause
+    int dmiss;                // # of deadline misses
+    struct timespec at;       // next activation time
+    struct timespec dl;       // current abs. deadline
+    pthread_t tid;            // thread id
+    sem_t tsem;               // activation semaphore
 };
 
 // global variables of ptask
@@ -129,5 +132,27 @@ void task_set_period(int i, int period);
 
 // function that set a deadline
 void task_set_deadline(int i, int deadline);
+
+
+// PAUSE AND RESUME
+
+// function that set single task pause
+void task_set_pause(int i);
+
+// function that pause all the thread
+void task_set_all_pause();
+
+// function that resume a single task
+void task_set_resume(int i);
+
+// function that resume all the thread
+void task_set_all_resume();
+
+// function that check if a task is paused and return 1 if it is
+int task_is_paused(int i);
+
+// function that wait for a task to be resumed
+void wait_for_resume(int i);
+
 
 #endif

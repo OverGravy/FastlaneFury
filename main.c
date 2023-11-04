@@ -21,7 +21,6 @@ int freeIndex[MAX_TASKS];
 // declare allegro things
 BITMAP *buffer;                   // display buffer bitmap
 BITMAP *background;               // background bitmap
-BITMAP *cursor;                   // cursor bitmap
 BITMAP *Veicles[MAX_VEICLE_TYPE]; // array of veicles bitmaps
 FONT *fonts[MAX_FONT];            // array of fonts
 

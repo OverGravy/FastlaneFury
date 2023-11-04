@@ -17,6 +17,7 @@
 #define SLOWDOWN 1
 #define OVERTAKE 2
 #define CRASH 3
+#define ABORTOVERTAKE 4
 
 
 
