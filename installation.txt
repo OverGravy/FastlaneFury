@@ -1,3 +1,0 @@
-We have installed allegro 4.2
-
-# sudo apt-geti nstall liballegro4.2 liballegro4.2-dev
