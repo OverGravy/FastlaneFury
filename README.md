@@ -27,6 +27,7 @@ Pressing space after the program spawn 1 car pressing another time spawn another
 - Pressing 'p' will pause the game.
 - Pressing 'esc' will close the game.
 - Pressing 'space' will spawn a car.
+5
 
 # Future feature 
 
