@@ -13,21 +13,23 @@ In final result feature will be:
 # Actual Feature
 
 - User thread  handle input part and grafics thread handle the screen refresh.
-- There are more than 150 different car bitmap preloaded.
+- There are mosre than 150 different car bitmap preloaded.
 - Car spwan over user command.
 - Car distance is implemented using a sensor.
 - User is able to select a car and see some information about it and thread itseaf
 - Is possible to pause the game.
 - Is possible to see lot of information about the car and the thread by clicking over a car.
+- Is NOW possible to pause all the car by leaving Graphics thread and User thread running.
 
 # How to use
 Before compiling using make sure you have install the right allegro library version witch is allegro 4.2 using the following command:
 ```sudo apt install liballegro4-dev```
 Pressing space after the program spawn 1 car pressing another time spawn another car that perform overtake.
 - Pressing 'p' will pause the game.
+- Pressing 'p' again resume the game.
 - Pressing 'esc' will close the game.
 - Pressing 'space' will spawn a car.
-5
+
 
 # Future feature 
 
@@ -41,9 +43,9 @@ Pressing space after the program spawn 1 car pressing another time spawn another
 - I'm still not able to load different font from the default one.
 - Pause function kill the program.
 - Sometime due to a thread problem closing the game crash it;
-- While game is in pause thread miss a lot of deadline and it seems to produce lag when game resume.
-- Closing game some time crash it.
+- If you pause the game to fast it will crash
 - I have to figure out how to draw a distance line between car to show how sensor work.
+
 
 # Tips 
 

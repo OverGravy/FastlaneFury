@@ -1,13 +1,15 @@
 #include "Veicle.h"
 
 // function that handle Veicle driving logic
-void DrivingHandling(struct VeicleState *State, struct VeicleStatistics *Statistics)
+void DrivingHandling(struct VeicleState *State, struct VeicleStatistics *Statistics, int tIndex)
 {
 
     int middleLane = 0;
     int margin;
     double FrontDistance = proximitySensor(State->veicle, State->pos.x, State->pos.y, 15, 0); // distance in m
     double OtherVeicleDistance = 0;
+
+    struct supportList *temp = NULL;
 
     // STATE HANDLING ********************************************
     switch (State->state)
@@ -21,11 +23,11 @@ void DrivingHandling(struct VeicleState *State, struct VeicleStatistics *Statist
         }
         break;
 
-    case SLOWDOWN:                                                      // slowing down
-        State->acceleration = FrontDistance - Statistics->minDistance;  // set decelation in function of distance
-        if (State->acceleration < Statistics->maxDeceleration)          // check for max deceleration
+    case SLOWDOWN:                                                     // slowing down
+        State->acceleration = FrontDistance - Statistics->minDistance; // set decelation in function of distance
+        if (State->acceleration < Statistics->maxDeceleration)         // check for max deceleration
         {
-            State->acceleration = Statistics->maxDeceleration;          // set max deceleration
+            State->acceleration = Statistics->maxDeceleration; // set max deceleration
         }
         break;
 
@@ -41,7 +43,6 @@ void DrivingHandling(struct VeicleState *State, struct VeicleStatistics *Statist
         margin = ((MY_SCREEN_H / (LANE_NUMBER + 1)) - (getVeicleHeight(State->veicle))) / 2; // margin in pixel
         middleLane = (((MY_SCREEN_H / (LANE_NUMBER + 1)) * (State->lane + 1)) + margin);     // in meter
 
-       
         if (((State->pos.y) * SCALE_FACTOR) >= middleLane)
         { // check if i am in the middle lane
             State->lane += 1;
@@ -52,15 +53,15 @@ void DrivingHandling(struct VeicleState *State, struct VeicleStatistics *Statist
 
         break;
 
-    case ABORTOVERTAKE:                    // abort overtake
-        State->steeringAngle += 0.5;       // increase gradually steering angle
-        if (State->steeringAngle > 0)      // check for max steering angle
+    case ABORTOVERTAKE:               // abort overtake
+        State->steeringAngle += 0.5;  // increase gradually steering angle
+        if (State->steeringAngle > 0) // check for max steering angle
         {
-            State->steeringAngle = 0;      // set max steering angle
+            State->steeringAngle = 0; // set max steering angle
         }
-        
+
         margin = ((MY_SCREEN_H / (LANE_NUMBER + 1)) - (getVeicleHeight(State->veicle))) / 2; // margin in pixel
-        middleLane = (((MY_SCREEN_H / (LANE_NUMBER + 1)) * (State->lane)) + margin);     // in meter
+        middleLane = (((MY_SCREEN_H / (LANE_NUMBER + 1)) * (State->lane)) + margin);         // in meter
 
         if (((State->pos.y) * SCALE_FACTOR) <= middleLane)
         { // check if i am in the middle lane
@@ -76,18 +77,22 @@ void DrivingHandling(struct VeicleState *State, struct VeicleStatistics *Statist
         State->acceleration = 0;
         printf("CRASH\n");
         break;
+
+    case PAUSE:
+        State->acceleration = 0;
+        State->speed = 0;
+        break;
     }
 
     // STATE CHANGING ********************************************
 
     // check for veicle in front
-    if (FrontDistance != -1)
+    if (FrontDistance != -1 && State->state != PAUSE)
     {
         // switch to crash
         if (FrontDistance == SMIN)
         {
             State->state = CRASH;
-            printf("YO");
         }
 
         // switch to slowing down
@@ -101,20 +106,33 @@ void DrivingHandling(struct VeicleState *State, struct VeicleStatistics *Statist
         {
             State->state = OVERTAKE;
         }
-
     }
-    else if (FrontDistance == -1 && State->state != OVERTAKE)
+    else if (FrontDistance == -1 && State->state != OVERTAKE && State->state != CRASH && State->state != PAUSE)
     {
         State->state = NORMAL;
     }
 
+    if (checkPause(tIndex) && State->state != PAUSE)
+    {
+        addVecileInfoToSupport(State, tIndex);
+        State->state = PAUSE;
+    }
+    else if (State->state == PAUSE && !checkPause(tIndex))
+    {
+        temp = getSupportNode(tIndex);
+        State->acceleration = temp->acceleration;
+        State->speed = temp->speed;
+        State->state = temp->state;
+    }
+
     // check for veicle in the left lane
-    for(int i = 0; i<360; i++){
-        if(proximitySensor(State->veicle, State->pos.x, State->pos.y, 15, i)!=-1){
+    for (int i = 0; i < 360; i++)
+    {
+        if (proximitySensor(State->veicle, State->pos.x, State->pos.y, 15, i) != -1)
+        {
             break;
         }
     }
-
 
     // check for speed limit
     if (State->speed < 0)
@@ -142,7 +160,7 @@ void *veicleTask(void *arg)
     // initialize veicle State
     struct VeicleState State;
     struct VeicleStatistics Statistics;
-    initVeicleState(&State, &Statistics, veicleArg.shared->size);
+    initVeicleState(&State, &Statistics, getListSize());
 
     veicleWidth = getVeicleWidth(State.veicle);
 
@@ -152,13 +170,12 @@ void *veicleTask(void *arg)
     double DeltaSpeed = 0;     // delta speed in m/s
 
     // add veicle to list
-    addVeicleToList(veicleArg.shared, veicleArg.mutex, ti, State);
+    addVeicleToList(ti, State);
 
     printf("OK: Veicle task activated id: %d\n", ti);
 
     while (running)
     {
-
         // UPDATE VEICLE STATE
 
         // calculate veiele speed and position using MKS unit
@@ -172,10 +189,10 @@ void *veicleTask(void *arg)
         State.pos.y -= DeltaPositionY;                                               // position in m
 
         // set veicle state in the list
-        setVeicleState(veicleArg.shared, veicleArg.mutex, ti, State);
+        setVeicleState(ti, State);
 
         // Handle driving logic
-        DrivingHandling(&State, &Statistics);
+        DrivingHandling(&State, &Statistics, ti);
 
         // CHECK STATUS
 
@@ -183,7 +200,7 @@ void *veicleTask(void *arg)
         if (State.pos.x < -(veicleWidth / SCALE_FACTOR))
         {
             // remove veicle from list
-            removeVeicleFromList(veicleArg.shared, veicleArg.mutex, ti);
+            removeVeicleFromList(ti);
             running = 0;
         }
 
@@ -191,14 +208,6 @@ void *veicleTask(void *arg)
         if (deadline_miss(ti))
         {
             printf("VEICLE: deadline missed\n");
-        }
-
-        // check for the pause
-        if (task_is_paused(ti))
-        {
-            printf("VEICLE: task paused\n");
-            wait_for_resume(ti);
-            printf("VEICLE: task resumed\n");
         }
 
         // wait for period

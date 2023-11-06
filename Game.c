@@ -121,6 +121,16 @@ void closeAllegro()
     // Uninstall the keyboard
     remove_keyboard();
 
+    // destroy mutex
+    pthread_mutex_destroy(&mutex);
+    pthread_mutex_destroy(&supportMutex);
+
+    // destroy shared list
+    destroySharedList();
+
+    // destroy support list 
+    destroySupportList();
+
     // Exit program
     allegro_exit();
 }
@@ -228,6 +238,9 @@ void DrawInfo(pthread_mutex_t *mutex, struct SharedList *shared)
                 textout_ex(buffer, font, info, 650, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 + 120, makecol(255, 255, 255), -1);
                 sprintf(info, "Steering Angle: %.2f", current->Veicle.steeringAngle);
                 textout_ex(buffer, font, info, 800, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 +20, makecol(255, 255, 255), -1);
+                sprintf(info, "State %d", current->Veicle.state);
+                textout_ex(buffer, font, info, 800, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 +40, makecol(255, 255, 255), -1);
+
 
                 DrawFOV(current->Veicle.pos.x, current->Veicle.pos.y, SMAX, current->Veicle.veicle);
 
@@ -365,6 +378,7 @@ double proximitySensor(int id, double x, double y, double range, double alpha)
 
         if (color != BGCOLOR && color != -1 && color != FOVCOLOR && color!= CURSORCOLOR && color!=LINECOLOR && color!=LANECOLOR) // if there is a veicle
         {
+            //DrawDistance(xg, yg, i, alpha);
             distance = (double)i / SCALE_FACTOR; // distance in meter
             break;
         }
@@ -431,3 +445,41 @@ int getSelectedButton()
 {
     return selectedButton;
 }
+
+
+// PAUSE AND RESUME FUNCTIONS
+
+// function that pause all the veicles
+void pauseVeicles(pthread_mutex_t *mutex, struct SharedList *shared)
+{
+    cleanSupportList();
+    pthread_mutex_lock(mutex);
+    struct Node *current = shared->head;
+    while (current != NULL)
+    {
+       paused[current->id] = 1;                                   // set pause to 1
+       printf("OK: Veicle %d paused\n", current->id);
+       current = current->next;
+    }
+    pthread_mutex_unlock(mutex);
+}
+
+// function that resume all the veicles
+void resumeVeicles(pthread_mutex_t *mutex, struct SharedList *shared)
+{
+    pthread_mutex_lock(mutex); 
+    struct Node *current = shared->head;              // current node
+    while (current != NULL)
+    {   
+        paused[current->id] = 0;                       // set pause to 0
+        current = current->next;
+    }
+    pthread_mutex_unlock(mutex);
+}
+
+// function that check if the veicle is paused
+int checkPause(int id)
+{
+   return paused[id];
+}
+

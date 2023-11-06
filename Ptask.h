@@ -7,19 +7,23 @@
 #include <semaphore.h>
 #include <errno.h>
 #include <signal.h>
+#include "List.h"
 
 #define MAX_TASKS 200
 #define MICRO 0
 #define MILLI 1
 #define ACT 1
 
+
+// task argument
 struct argument
 {
+    pthread_mutex_t *mutex;
+    struct SharedList *shared;
     int screenW;
     int screenH;
-    struct SharedList *shared;
-    pthread_mutex_t *mutex;
 };
+
 
 struct task_par
 {
@@ -134,25 +138,6 @@ void task_set_period(int i, int period);
 void task_set_deadline(int i, int deadline);
 
 
-// PAUSE AND RESUME
-
-// function that set single task pause
-void task_set_pause(int i);
-
-// function that pause all the thread
-void task_set_all_pause();
-
-// function that resume a single task
-void task_set_resume(int i);
-
-// function that resume all the thread
-void task_set_all_resume();
-
-// function that check if a task is paused and return 1 if it is
-int task_is_paused(int i);
-
-// function that wait for a task to be resumed
-void wait_for_resume(int i);
 
 
 #endif

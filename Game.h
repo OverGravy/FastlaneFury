@@ -7,6 +7,7 @@
 #include <pthread.h>
 #include "Ptask.h"
 #include "List.h"
+#include "SupportList.h"
 #include <math.h>
 
 // allegro costant
@@ -33,6 +34,8 @@
 #define BUTTON 1
 #define ROAD 2
 
+
+// color constant
 #define BGCOLOR makecol(188, 188, 188)
 #define FOVCOLOR makecol(255, 0, 0)
 #define CURSORCOLOR makecol(255, 0, 0)
@@ -40,15 +43,26 @@
 #define LANECOLOR makecol(255, 255, 255)
 
 
+// veicle state constant
+#define NORMAL 0
+#define SLOWDOWN 1
+#define OVERTAKE 2
+#define CRASH 3
+#define ABORTOVERTAKE 4
+#define PAUSE 5 
+
+
 // Game variables
 extern BITMAP* buffer;                    // display buffer bitmap
 extern BITMAP* background;                // background bitmap
 extern BITMAP* Veicles[MAX_VEICLE_TYPE] ; // array of veicles bitmaps
 extern FONT* fonts[MAX_FONT];             // array of fonts
+extern int paused[MAX_TASKS];              // array of pause
 
 // User variables
 extern int selectedVeicle;
 extern int selectedButton;
+
 
 // ALLEGRO FUNCTIONS    
 
@@ -120,6 +134,22 @@ int getSelectedButton();
 
 // function that set the index of the selected button
 void setSelectedButton(int id);
+
+
+
+// PAUSE AND RESUME FUNCTIONS
+
+// function that pause all the veicles
+void pauseVeicles(pthread_mutex_t *mutex, struct SharedList *shared);
+
+// function that resume all the veicles
+void resumeVeicles(pthread_mutex_t *mutex, struct SharedList *shared);
+
+// function that cheks if a veicle is paused
+int checkPause(int id);
+
+
+
 
 
 #endif

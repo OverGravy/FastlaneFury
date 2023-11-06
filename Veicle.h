@@ -7,19 +7,12 @@
 
 #include "Game.h"
 #include "List.h"
+#include "SupportList.h"
 #include "Ptask.h"
 #include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-
-#define NORMAL 0
-#define SLOWDOWN 1
-#define OVERTAKE 2
-#define CRASH 3
-#define ABORTOVERTAKE 4
-
-
 
 void *veicleTask(void *arg);
 

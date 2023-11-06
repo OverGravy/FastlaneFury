@@ -42,19 +42,29 @@ struct SharedList{
    int size;
 };
 
+
+extern struct SharedList *shared;
+extern pthread_mutex_t mutex;
+
 // function that create the list and return the pointer to the liststruct SharedList* createSharedList();                                                   // create a shared list
 struct SharedList* createSharedList();                                                   
 
 // function that insert a veicle in the list 
-void addVeicleToList(struct SharedList *shared, pthread_mutex_t *mutex, int id, struct VeicleState veicle);  
+void addVeicleToList(int id, struct VeicleState veicle);  
 
 // function that remove a veicle from the list
-void removeVeicleFromList(struct SharedList *shared, pthread_mutex_t *mutex, int id);      
+void removeVeicleFromList(int id);      
 
 // function that set veicle state in the list 
-void setVeicleState(struct SharedList *shared, pthread_mutex_t *mutex, int id, struct VeicleState State);  
+void setVeicleState(int id, struct VeicleState State);  
+
+// function that return list size
+int getListSize();
 
 // function that destroy the list
-void destroySharedList(struct SharedList *shared);
+void destroySharedList();
+
+
+
 
 #endif

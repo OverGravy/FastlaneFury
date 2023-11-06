@@ -53,12 +53,6 @@ void *graphicsTask(void *arg)
             printf("GRAPHICS: deadline missed\n");
         }
 
-        if (task_is_paused(ti))                // OVVIAMENTE MISSA LE DEADLINE NELL'ATETSA
-        {
-            printf("GRAPHICS: task paused\n");
-            wait_for_resume(ti);
-            printf("GRAPHICS: task resumed\n");
-        }
 
         // wait for next activation
         wait_for_period(ti);

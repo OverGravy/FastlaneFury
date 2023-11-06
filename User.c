@@ -47,19 +47,23 @@ void *userTask(void *arg)
                 {
                     printf("ERROR:can not create a new veicle No free index\n");
                 }
-                else
+                else 
                 {
-                    task_create(veicleTask, index, veicleTaskArg, 20, 20, 10, ACT);
+                    if(pause == 0){
+                        task_create(veicleTask, index, veicleTaskArg, 20, 20, 10, ACT);
+                    }else{
+                        printf("ERROR: can not create a new veicle game paused\n");
+                    }
                 }
                 break;
             case KEY_P:
                 if(pause == 0){
-                    task_set_all_pause();
+                    pauseVeicles(userTaskArg.mutex, userTaskArg.shared);
                     printf("OK: game paused\n");
                     pause = 1;
                 }else{
                     pause = 0;
-                    task_set_all_resume();
+                    resumeVeicles(userTaskArg.mutex, userTaskArg.shared);
                     printf("OK: game resumed\n");
                 }
                 

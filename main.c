@@ -24,6 +24,12 @@ BITMAP *background;               // background bitmap
 BITMAP *Veicles[MAX_VEICLE_TYPE]; // array of veicles bitmaps
 FONT *fonts[MAX_FONT];            // array of fonts
 
+// Shared variable things
+struct SharedList *shared;
+pthread_mutex_t mutex;
+pthread_mutex_t supportMutex;
+struct supportList *support;      // support list
+int paused[MAX_TASKS];             // array of pause
 
 
 int selectedVeicle = -1;
@@ -50,8 +56,9 @@ int main()
     // init ptask
     ptask_init(SCHED_FIFO); // init ptask with a SCHED policy
 
-    // create a shared list of veicles
-    struct SharedList *shared = createSharedList();
+    // create a shared list of veicles and support list
+    shared = createSharedList();
+    support = createSupportList();
 
     if (shared == NULL)
     {
@@ -60,8 +67,8 @@ int main()
     }
 
     // init mutex
-    pthread_mutex_t mutex;
     pthread_mutex_init(&mutex, NULL);
+    pthread_mutex_init(&supportMutex, NULL);
 
     // create and start User task
     struct argument userTaskArg;
@@ -92,6 +99,5 @@ int main()
     // Clean up and exit
     wait_for_task_end(0);  // wait for user task to end
     closeAllegro();        // close allegro
-
     return 0;
 }
