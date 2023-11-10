@@ -322,7 +322,7 @@ void DrawDistance(double x, double y, double distance, double alpha)
 }
 
 // function that draws pause if the veicle is paused
-void DrawPause()  
+void DrawPause()
 {
     circlefill(buffer, 40, SCREEN_H - 40, 30, makecol(255, 255, 255));
     // make the pause sign 5 pixel more hight and in the left
@@ -398,6 +398,19 @@ void initVeicleState(struct VeicleState *state, struct VeicleStatistics *statist
         statistics->maxDeceleration = 0.0;
         statistics->minDistance = 0.0;
     }
+    else if (veicle == 2)
+    {
+        state->speed = 40.0;       // speed in ms
+        state->acceleration = 5.0; // acceleration in ms^2
+        state->lane = 2;
+        state->pos.x = (MY_SCREEN_W - 2) / SCALE_FACTOR;                                                     // in meter
+        margin = ((MY_SCREEN_H / (LANE_NUMBER + 1)) - ((Veicles[state->veicle]->h) * VEICLE_SCALE)) / 2; // margin in pixel
+        state->pos.y = (((MY_SCREEN_H / (LANE_NUMBER + 1)) * state->lane) + margin) / SCALE_FACTOR;          // in meter
+        statistics->maxSpeed = 40.0;
+        statistics->maxAcceleration = 0.0;
+        statistics->maxDeceleration = 0.0;
+        statistics->minDistance = 0.0;
+    }
     else
     {
         state->speed = 15.0;       // speed in ms
@@ -427,15 +440,13 @@ double proximitySensor(double x, double y, int range, double alpha)
     {
         range = SMAX;
     }
-    
 
     // check for veicle in front
     for (i = SMIN; i < range; i += SSTEP)
     {
-        color = getpixel(screen, x + (i * cos(alpha)), y + (i * sin(alpha))); // get color
+        color = getpixel(screen, x + (i * cos(alpha)), y + (i * sin(alpha)));                                                                                 // get color
         if (color != BGCOLOR && color != -1 && color != FOVCOLOR && color != CURSORCOLOR && color != LINECOLOR && color != LANECOLOR && color != SENSORCOLOR) // if there is a veicle
         {
-            line(buffer, x, y, x + (i * cos(alpha)), y + (i * sin(alpha)), SENSORCOLOR);
             distance = (double)i / SCALE_FACTOR; // distance in meter
             break;
         }

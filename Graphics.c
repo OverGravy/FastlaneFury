@@ -49,7 +49,8 @@ void *graphicsTask(void *arg)
         DrawMouse(mouse_x, mouse_y);
 
         // flip the display
-        flipDisplay();
+        flipDisplay(); 
+
 
         // check for miss deadline
         if (deadline_miss(ti))

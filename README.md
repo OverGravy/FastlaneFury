@@ -19,7 +19,10 @@ In final result feature will be:
 - User is able to select a car and see some information about it and thread itseaf
 - Is possible to pause the game.
 - Is possible to see lot of information about the car and the thread by clicking over a car.
+- When cliccking over a car the fowv is realistic on what car see.
 - Is NOW possible to pause all the car by leaving Graphics thread and User thread running.
+- Car handle better with a NEW system to keep track of multiple direction
+
 
 # How to use
 Before compiling using make sure you have install the right allegro library version witch is allegro 4.2 using the following command:
@@ -44,7 +47,6 @@ Pressing space after the program spawn 1 car pressing another time spawn another
 - Pause function kill the program.
 - Sometime due to a thread problem closing the game crash it;
 - If you pause the game to fast it will crash
-- I have to figure out how to draw a distance line between car to show how sensor work.
 
 
 # Tips 

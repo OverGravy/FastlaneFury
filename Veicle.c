@@ -64,6 +64,7 @@ void DrivingHandling(
     distance[(DETECTION_DEGREE * 2) + 1] = proximitySensor(x, y, 50, 0);
 
     // STATE HANDLING -----------------------------------------------
+
     switch (State->state)
     {
 
@@ -143,14 +144,11 @@ void DrivingHandling(
     if (distance[0] != -1)
     {
         front = 0;
-        printf("front: %d\n", front);
-        printf("distance: %f\n", distance[front]);
     }
     else
     {
         front = -1;
     }
-    printf("front: %d\n", front);
 
     // #CHECK LEFT#
 
@@ -159,8 +157,6 @@ void DrivingHandling(
         if (distance[i] != -1)
         {
             left = i;
-            printf("left: %d\n", left);
-            printf("distance: %f\n", distance[i]);
             break;
         }
         else
@@ -177,8 +173,6 @@ void DrivingHandling(
         if (distance[i] != -1)
         {
             right = i;
-            printf("right: %d\n", right);
-            printf("distance: %f\n", distance[i]);    
             break;
         }
         else
@@ -193,8 +187,6 @@ void DrivingHandling(
     if (distance[(DETECTION_DEGREE * 2) + 1] != -1)
     {
         back = (DETECTION_DEGREE * 2) + 1;
-        printf("back: %d\n", back);
-        printf("distance: %f\n", distance[back]);
     }
     else
     {
@@ -218,9 +210,15 @@ void DrivingHandling(
         }
 
         // switch to overtaking, the condition is that the distance from the veicle in front is between 0.5 and 1.5 meters and i am not going too fast
-        if (distance[front] > 0.5 && distance[front] < Statistics->minDistance && State->speed < 10 && distance[front] > SMIN && State->state != ABORTOVERTAKE && left == -1)
+        if (distance[front] > 0.5 && distance[front] < Statistics->minDistance && State->speed < 15  && State->state != ABORTOVERTAKE)
         {
             State->state = OVERTAKE;
+        }
+
+        // switch to abort overtake if i am overtaking and i detect a veicle on the left
+        if (State->state == OVERTAKE && left != -1)
+        {
+            State->state = ABORTOVERTAKE;
         }
     }
     else if (front == -1 && State->state != OVERTAKE && State->state != CRASH && State->state != PAUSE)
@@ -228,6 +226,19 @@ void DrivingHandling(
         State->state = NORMAL;
     }
 
+    // check for speed limit
+    if (State->speed < 0)
+    {
+        State->speed = 0;
+    }
+
+    if (State->speed > Statistics->maxSpeed)
+    {
+        State->speed = Statistics->maxSpeed;
+    }
+
+
+    // handling PAUSE state
     if (checkPause(tIndex) && State->state != PAUSE)
     {
         addVecileInfoToSupport(State, tIndex);
@@ -241,16 +252,6 @@ void DrivingHandling(
         State->state = temp->state;
     }
 
-    // check for speed limit
-    if (State->speed < 0)
-    {
-        State->speed = 0;
-    }
-
-    if (State->speed > Statistics->maxSpeed)
-    {
-        State->speed = Statistics->maxSpeed;
-    }
 }
 
 // function task veicle
