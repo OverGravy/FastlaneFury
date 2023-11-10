@@ -1,17 +1,69 @@
 #include "Veicle.h"
 
+/**
+ * Dentro distance sono contenute tutte le distanze, in metri, che il veicolo ha rilevato.
+ *  Front, left right e back sono variabili che vengono riempite con l'index del vettore che ocntiene tutte le distanze nel caso ci sia una distanza valida.
+ *  Se non ci sono distanze valide, il valore di front, left, right e back è -1.
+ */
+
 // function that handle Veicle driving logic
-void DrivingHandling(struct VeicleState *State, struct VeicleStatistics *Statistics, int tIndex)
+void DrivingHandling(
+    struct VeicleState *State, struct VeicleStatistics *Statistics, int tIndex, double distance[])
 {
 
     int middleLane = 0;
     int margin;
-    double FrontDistance = proximitySensor(State->veicle, State->pos.x, State->pos.y, 15, 0); // distance in m
-    double OtherVeicleDistance = 0;
-
+    int i, j, x, y;
+    int degree;
     struct supportList *temp = NULL;
 
-    // STATE HANDLING ********************************************
+    // every possible direction
+    int front = -1;
+    int left = -1;
+    int back = -1;
+    int right = -1;
+
+    // MISURE -----------------------------------------------------
+
+    // # GET DISTANCE FRONT #
+
+    x = (State->pos.x) * SCALE_FACTOR - 10;
+    y = (State->pos.y * SCALE_FACTOR) + (getVeicleHeight(State->veicle) / 2);
+
+    distance[0] = proximitySensor(x, y, 150, 180);
+
+    // # GET DISTANCE LEFT #
+
+    x = (((State->pos.x) * SCALE_FACTOR) + (getVeicleWidth(State->veicle) / 2));
+    y = ((State->pos.y * SCALE_FACTOR) + getVeicleHeight(State->veicle)) + 10;
+
+    for (i = 1; i <= DETECTION_DEGREE; i++)
+    {
+        degree = 10 + i;
+        distance[i] = proximitySensor(x, y, 150, degree);
+    }
+
+    // # GET DISTANCE RIGHT #
+
+    x = (State->pos.x * SCALE_FACTOR) + (getVeicleWidth(State->veicle) / 2);
+    y = (State->pos.y * SCALE_FACTOR) - 10;
+
+    j = 0;
+    for (i = DETECTION_DEGREE + 1; i <= (DETECTION_DEGREE * 2); i++)
+    {
+        j++;
+        degree = 190 + j;
+        distance[i] = proximitySensor(x, y, 150, degree);
+    }
+    
+    // # GET DISTANCE BACK #
+
+    x = (((State->pos.x) * SCALE_FACTOR) + getVeicleWidth(State->veicle)) + 10;
+    y = (((State->pos.y) * SCALE_FACTOR) + (getVeicleHeight(State->veicle) / 2));
+
+    distance[(DETECTION_DEGREE * 2) + 1] = proximitySensor(x, y, 50, 0);
+
+    // STATE HANDLING -----------------------------------------------
     switch (State->state)
     {
 
@@ -23,9 +75,9 @@ void DrivingHandling(struct VeicleState *State, struct VeicleStatistics *Statist
         }
         break;
 
-    case SLOWDOWN:                                                     // slowing down
-        State->acceleration = FrontDistance - Statistics->minDistance; // set decelation in function of distance
-        if (State->acceleration < Statistics->maxDeceleration)         // check for max deceleration
+    case SLOWDOWN:                                                   // slowing down
+        State->acceleration = distance[0] - Statistics->minDistance; // set decelation in function of distance
+        if (State->acceleration < Statistics->maxDeceleration)       // check for max deceleration
         {
             State->acceleration = Statistics->maxDeceleration; // set max deceleration
         }
@@ -84,30 +136,94 @@ void DrivingHandling(struct VeicleState *State, struct VeicleStatistics *Statist
         break;
     }
 
-    // STATE CHANGING ********************************************
+    // ANALIZE MISURE -----------------------------------------------------
+
+    // # CHECK FRONT #
+
+    if (distance[0] != -1)
+    {
+        front = 0;
+        printf("front: %d\n", front);
+        printf("distance: %f\n", distance[front]);
+    }
+    else
+    {
+        front = -1;
+    }
+    printf("front: %d\n", front);
+
+    // #CHECK LEFT#
+
+    for (i = 1; i <= DETECTION_DEGREE; i++)
+    {
+        if (distance[i] != -1)
+        {
+            left = i;
+            printf("left: %d\n", left);
+            printf("distance: %f\n", distance[i]);
+            break;
+        }
+        else
+        {
+            left = -1;
+        }
+    }
+    printf("left: %d\n", left);
+
+    // #CHECK RIGHT#
+
+    for (i = DETECTION_DEGREE; i <= (DETECTION_DEGREE * 2); i++)
+    {
+        if (distance[i] != -1)
+        {
+            right = i;
+            printf("right: %d\n", right);
+            printf("distance: %f\n", distance[i]);    
+            break;
+        }
+        else
+        {
+            right = -1;
+        }
+    }
+
+
+    // #CHECK BACK#
+
+    if (distance[(DETECTION_DEGREE * 2) + 1] != -1)
+    {
+        back = (DETECTION_DEGREE * 2) + 1;
+        printf("back: %d\n", back);
+        printf("distance: %f\n", distance[back]);
+    }
+    else
+    {
+        back = -1;
+    }
+    
 
     // check for veicle in front
-    if (FrontDistance != -1 && State->state != PAUSE)
+    if (front != -1 && State->state != PAUSE)
     {
         // switch to crash
-        if (FrontDistance == SMIN)
+        if (distance[front] == SMIN)
         {
             State->state = CRASH;
         }
 
         // switch to slowing down
-        if (FrontDistance < Statistics->minDistance && State->state != OVERTAKE && State->state != CRASH)
+        if (distance[front] < Statistics->minDistance && State->state != OVERTAKE && State->state != CRASH)
         {
             State->state = SLOWDOWN;
         }
 
         // switch to overtaking, the condition is that the distance from the veicle in front is between 0.5 and 1.5 meters and i am not going too fast
-        if (FrontDistance > 0.5 && FrontDistance < Statistics->minDistance && State->speed < 10 && FrontDistance > SMIN && State->state != ABORTOVERTAKE)
+        if (distance[front] > 0.5 && distance[front] < Statistics->minDistance && State->speed < 10 && distance[front] > SMIN && State->state != ABORTOVERTAKE && left == -1)
         {
             State->state = OVERTAKE;
         }
     }
-    else if (FrontDistance == -1 && State->state != OVERTAKE && State->state != CRASH && State->state != PAUSE)
+    else if (front == -1 && State->state != OVERTAKE && State->state != CRASH && State->state != PAUSE)
     {
         State->state = NORMAL;
     }
@@ -123,15 +239,6 @@ void DrivingHandling(struct VeicleState *State, struct VeicleStatistics *Statist
         State->acceleration = temp->acceleration;
         State->speed = temp->speed;
         State->state = temp->state;
-    }
-
-    // check for veicle in the left lane
-    for (int i = 0; i < 360; i++)
-    {
-        if (proximitySensor(State->veicle, State->pos.x, State->pos.y, 15, i) != -1)
-        {
-            break;
-        }
     }
 
     // check for speed limit
@@ -150,9 +257,8 @@ void DrivingHandling(struct VeicleState *State, struct VeicleStatistics *Statist
 void *veicleTask(void *arg)
 {
     int running = 1;
-    int veicleWidth = 0;
-    int veicleHeight = 0;
 
+    // get task argument and wait for activation
     struct argument veicleArg = get_task_argument(arg);
     int ti = get_task_index(arg);
     wait_for_activation(ti);
@@ -162,14 +268,13 @@ void *veicleTask(void *arg)
     struct VeicleStatistics Statistics;
     initVeicleState(&State, &Statistics, getListSize());
 
-    veicleWidth = getVeicleWidth(State.veicle);
-
     // initialize veicle variables
-    double DeltaPositionX = 0; // delta position in m
-    double DeltaPositionY = 0; // delta position in m
-    double DeltaSpeed = 0;     // delta speed in m/s
+    double DeltaPositionX = 0;                   // delta position in m
+    double DeltaPositionY = 0;                   // delta position in m
+    double DeltaSpeed = 0;                       // delta speed in m/s
+    double distance[(DETECTION_DEGREE * 2) + 2]; // distance on m
 
-    // add veicle to list
+    // add veicle to shared list
     addVeicleToList(ti, State);
 
     printf("OK: Veicle task activated id: %d\n", ti);
@@ -192,12 +297,12 @@ void *veicleTask(void *arg)
         setVeicleState(ti, State);
 
         // Handle driving logic
-        DrivingHandling(&State, &Statistics, ti);
+        DrivingHandling(&State, &Statistics, ti, distance);
 
         // CHECK STATUS
 
         // check if veicle is out of screen
-        if (State.pos.x < -(veicleWidth / SCALE_FACTOR))
+        if ((State.pos.x < -(getVeicleWidth(State.veicle) / SCALE_FACTOR)))
         {
             // remove veicle from list
             removeVeicleFromList(ti);
@@ -214,6 +319,6 @@ void *veicleTask(void *arg)
         wait_for_period(ti);
     }
     printf("OK: Veicle task terminated id: %d\n", ti);
-    task_deactivate(ti);
+    task_clean(ti);
     return NULL;
 }

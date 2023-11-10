@@ -128,7 +128,7 @@ void closeAllegro()
     // destroy shared list
     destroySharedList();
 
-    // destroy support list 
+    // destroy support list
     destroySupportList();
 
     // Exit program
@@ -138,11 +138,12 @@ void closeAllegro()
 // function that load all the graphics assets
 int loadGraphicsAssets()
 {
+    int i;
     // load all cars bitmaps in folder Sprites
-    for (int i = 0; i < MAX_VEICLE_TYPE; i++)
+    for (i = 0; i < MAX_VEICLE_TYPE; i++)
     {
         char path[50];
-        sprintf(path, "./Bitmap/bitmap%d.bmp", i);
+        sprintf(path, "./Bitmap/VeicleBitmap/bitmap%d.bmp", i);
         Veicles[i] = load_bitmap(path, NULL);
 
         if (!Veicles[i])
@@ -152,6 +153,19 @@ int loadGraphicsAssets()
         }
     }
     printf("OK: Loaded all veicle bitmaps\n");
+
+    for (i = 0; i < MAX_OTHER_BPM; i++)
+    {
+        char path[50];
+        sprintf(path, "./Bitmap/OtherBitmap/bitmap%d.bmp", i);
+        otherBmp[i] = load_bitmap(path, NULL);
+
+        if (!otherBmp[i])
+        {
+            fprintf(stderr, "ERROR: failed to load other bitmap %d!\n", i);
+            return 0;
+        }
+    }
 
     // load all fonts in folder Fonts
     /*    for (int i = 0; i < MAX_FONT; i++)
@@ -192,6 +206,8 @@ void DrawInfo(pthread_mutex_t *mutex, struct SharedList *shared)
 {
     char info[50];
     double speedKmH = 0;
+    int x = 0;
+    int y = 0;
 
     // print active veicles
     pthread_mutex_lock(mutex);
@@ -237,12 +253,35 @@ void DrawInfo(pthread_mutex_t *mutex, struct SharedList *shared)
                 sprintf(info, "Position: (%.2f, %.2f)", current->Veicle.pos.x, current->Veicle.pos.y);
                 textout_ex(buffer, font, info, 650, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 + 120, makecol(255, 255, 255), -1);
                 sprintf(info, "Steering Angle: %.2f", current->Veicle.steeringAngle);
-                textout_ex(buffer, font, info, 800, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 +20, makecol(255, 255, 255), -1);
+                textout_ex(buffer, font, info, 800, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 + 20, makecol(255, 255, 255), -1);
                 sprintf(info, "State %d", current->Veicle.state);
-                textout_ex(buffer, font, info, 800, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 +40, makecol(255, 255, 255), -1);
+                textout_ex(buffer, font, info, 800, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 + 40, makecol(255, 255, 255), -1);
 
+                // DrawFOV(current->Veicle.pos.x, current->Veicle.pos.y, SMAX, current->Veicle.veicle);
 
-                DrawFOV(current->Veicle.pos.x, current->Veicle.pos.y, SMAX, current->Veicle.veicle);
+                // Front sensor
+                x = (current->Veicle.pos.x) * SCALE_FACTOR - 10;
+                y = (current->Veicle.pos.y * SCALE_FACTOR) + (getVeicleHeight(current->Veicle.veicle) / 2);
+                DrawLine(x, y, x - 150, y, FOVCOLOR);
+                DrawPoint(x, y, SENSORCOLOR);
+
+                // Right sensor
+                x = (current->Veicle.pos.x * SCALE_FACTOR) + (getVeicleWidth(current->Veicle.veicle) / 2);
+                y = (current->Veicle.pos.y * SCALE_FACTOR) - 10;
+                DrawArch(x, y, 150, 190.0, 350.0, FOVCOLOR);
+                DrawPoint(x, y, SENSORCOLOR);
+
+                // Left sensor
+                x = (((current->Veicle.pos.x) * SCALE_FACTOR) + (getVeicleWidth(current->Veicle.veicle) / 2));
+                y = ((current->Veicle.pos.y * SCALE_FACTOR) + getVeicleHeight(current->Veicle.veicle)) + 10;
+                DrawArch(x, y, 150, 10.0, 170.0, FOVCOLOR);
+                DrawPoint(x, y, SENSORCOLOR);
+
+                // Back sensor
+                x = (((current->Veicle.pos.x) * SCALE_FACTOR) + getVeicleWidth(current->Veicle.veicle)) + 10;
+                y = (((current->Veicle.pos.y) * SCALE_FACTOR) + (getVeicleHeight(current->Veicle.veicle) / 2));
+                DrawLine(x, y, x + 50, y, FOVCOLOR);
+                DrawPoint(x, y, SENSORCOLOR);
 
                 break;
             }
@@ -273,35 +312,58 @@ void DrawMouse(int x, int y)
     circlefill(buffer, x, y, 5, makecol(255, 0, 0));
 }
 
-// funtion thath draws fild of view of a veicle
-void DrawFOV(double x, double y, int range, int id)
-{
-    int xg = (int)round(x * SCALE_FACTOR);
-    int yg = (int)round(y * SCALE_FACTOR);
-
-    // center y in the middle of the veicle
-    yg += (Veicles[id]->h * VEICLE_SCALE) / 2;
-
-    // draw the fov
-    for (int i = SMIN; i < range; i += SSTEP)
-    {
-        circlefill(buffer, xg, yg, i, FOVCOLOR);
-
-    }
-
-    
-    
-}
-
 // function that draws line distance from the other veicle
 void DrawDistance(double x, double y, double distance, double alpha)
 {
-    for (int i = 0; i < 10; i++) {
-        line(buffer, x+i, y+i, x - (distance*cos(alpha))+i, y -(distance*sin(alpha))+i, LINECOLOR);  
+    for (int i = 0; i < 10; i++)
+    {
+        line(buffer, x + i, y + i, x - (distance * cos(alpha)) + i, y - (distance * sin(alpha)) + i, LINECOLOR);
     }
-    
 }
 
+// function that draws pause if the veicle is paused
+void DrawPause()  
+{
+    circlefill(buffer, 40, SCREEN_H - 40, 30, makecol(255, 255, 255));
+    // make the pause sign 5 pixel more hight and in the left
+    rectfill(buffer, 30, SCREEN_H - 60, 35, SCREEN_H - 20, makecol(0, 0, 0));
+    rectfill(buffer, 45, SCREEN_H - 60, 50, SCREEN_H - 20, makecol(0, 0, 0));
+}
+
+// function that draws point where we need
+void DrawPoint(int x, int y, int color)
+{
+    circlefill(buffer, x, y, 5, color);
+}
+
+// draw arch
+void DrawArch(int x, int y, int radius, double startAngle, double endAngle, int color)
+{
+    // draw arch using line to fill it
+    double angle;
+    int px, py;
+
+    // convert angle in rad
+    startAngle = (startAngle * M_PI) / 180;
+    endAngle = (endAngle * M_PI) / 180;
+
+    for (angle = startAngle; angle <= endAngle; angle += 0.01)
+    {
+        px = x + radius * cos(angle);
+        py = y + radius * sin(angle);
+        line(buffer, x, y, px, py, color);
+    }
+}
+
+// function that draws line where we need
+void DrawLine(int x1, int y1, int x2, int y2, int color)
+{
+    for (int i = 0; i < 5; i++)
+    {
+        line(buffer, x1, y1 + i, x2, y2 + i, color);
+        line(buffer, x1, y1 - i, x2, y2 - i, color);
+    }
+}
 
 // VEICLE FUNCTIONS
 
@@ -336,7 +398,7 @@ void initVeicleState(struct VeicleState *state, struct VeicleStatistics *statist
         statistics->maxDeceleration = 0.0;
         statistics->minDistance = 0.0;
     }
-    else 
+    else
     {
         state->speed = 15.0;       // speed in ms
         state->acceleration = 0.5; // acceleration in ms^2
@@ -348,37 +410,32 @@ void initVeicleState(struct VeicleState *state, struct VeicleStatistics *statist
 }
 
 // function that returns the distance from the other veicle
-double proximitySensor(int id, double x, double y, double range, double alpha)
+double proximitySensor(double x, double y, int range, double alpha)
 {
 
-    // the sensor return the distance from the other veicle in meter
+    // the sensor return the distance from the other veicle in meter and obtain position in pixel and range in pixel
 
     double distance = -1.0;
     int i = 0;
     int color;
+
+    // convert alpha in rad
+    alpha = (alpha * M_PI) / 180;
 
     // check if the range is in the limit
     if (range > SMAX)
     {
         range = SMAX;
     }
-
-    // conversion
-    int xg = (int)round(x * SCALE_FACTOR);
-    int yg = (int)round(y * SCALE_FACTOR);
-    int rangeg = (int)round(range * SCALE_FACTOR);
-
-    // center y in the middle of the veicle
-    yg += (Veicles[id]->h * VEICLE_SCALE) / 2;
+    
 
     // check for veicle in front
-    for (i = SMIN; i < rangeg; i += SSTEP)
+    for (i = SMIN; i < range; i += SSTEP)
     {
-        color = getpixel(screen, xg - (i*cos(alpha)), yg -(i*sin(alpha))); // get color
-
-        if (color != BGCOLOR && color != -1 && color != FOVCOLOR && color!= CURSORCOLOR && color!=LINECOLOR && color!=LANECOLOR) // if there is a veicle
+        color = getpixel(screen, x + (i * cos(alpha)), y + (i * sin(alpha))); // get color
+        if (color != BGCOLOR && color != -1 && color != FOVCOLOR && color != CURSORCOLOR && color != LINECOLOR && color != LANECOLOR && color != SENSORCOLOR) // if there is a veicle
         {
-            //DrawDistance(xg, yg, i, alpha);
+            line(buffer, x, y, x + (i * cos(alpha)), y + (i * sin(alpha)), SENSORCOLOR);
             distance = (double)i / SCALE_FACTOR; // distance in meter
             break;
         }
@@ -446,20 +503,20 @@ int getSelectedButton()
     return selectedButton;
 }
 
-
 // PAUSE AND RESUME FUNCTIONS
 
 // function that pause all the veicles
 void pauseVeicles(pthread_mutex_t *mutex, struct SharedList *shared)
 {
     cleanSupportList();
+    paused[0] = 1; // to inform grapfic task to draw pause
     pthread_mutex_lock(mutex);
     struct Node *current = shared->head;
     while (current != NULL)
     {
-       paused[current->id] = 1;                                   // set pause to 1
-       printf("OK: Veicle %d paused\n", current->id);
-       current = current->next;
+        paused[current->id] = 1; // set pause to 1
+        printf("OK: Veicle %d paused\n", current->id);
+        current = current->next;
     }
     pthread_mutex_unlock(mutex);
 }
@@ -467,11 +524,12 @@ void pauseVeicles(pthread_mutex_t *mutex, struct SharedList *shared)
 // function that resume all the veicles
 void resumeVeicles(pthread_mutex_t *mutex, struct SharedList *shared)
 {
-    pthread_mutex_lock(mutex); 
-    struct Node *current = shared->head;              // current node
+    pthread_mutex_lock(mutex);
+    paused[0] = 0;
+    struct Node *current = shared->head; // current node
     while (current != NULL)
-    {   
-        paused[current->id] = 0;                       // set pause to 0
+    {
+        paused[current->id] = 0; // set pause to 0
         current = current->next;
     }
     pthread_mutex_unlock(mutex);
@@ -480,6 +538,5 @@ void resumeVeicles(pthread_mutex_t *mutex, struct SharedList *shared)
 // function that check if the veicle is paused
 int checkPause(int id)
 {
-   return paused[id];
+    return paused[id];
 }
-

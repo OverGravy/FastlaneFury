@@ -1,10 +1,6 @@
 #ifndef __VEICLE__
 #define __VEICLE__
 
-#ifndef M_PI
-#define M_PI 3.14159265358979323846
-#endif
-
 #include "Game.h"
 #include "List.h"
 #include "SupportList.h"
@@ -13,6 +9,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+
+#define DETECTION_DEGREE 160 // degree arch in which the veicle can detect other veicles, left, right
 
 void *veicleTask(void *arg);
 

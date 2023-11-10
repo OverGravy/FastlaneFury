@@ -49,8 +49,6 @@ struct supportList* getSupportNode(int index){
     struct supportList* temp = support->next;
     while (temp != NULL)
     {
-        printf("temp id: %d\n", index);
-        printf("temp id: %d\n", temp->id);
         if (temp->id == index)
         {
             break;

@@ -2,6 +2,11 @@
 #define __GAME__
 #include <allegro.h>
 
+// define M_PI if not defined
+#ifndef M_PI
+#define M_PI 3.14159265358979323846
+#endif
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <pthread.h>
@@ -18,6 +23,7 @@
 
 // Game costant 
 #define MAX_VEICLE_TYPE 158
+#define MAX_OTHER_BPM 1
 #define LANE_NUMBER 4
 #define VEICLE_SCALE 0.8
 #define SCALE_FACTOR 15
@@ -41,6 +47,7 @@
 #define CURSORCOLOR makecol(255, 0, 0)
 #define LINECOLOR makecol(0, 0, 0)
 #define LANECOLOR makecol(255, 255, 255)
+#define SENSORCOLOR makecol(0, 255, 0)
 
 
 // veicle state constant
@@ -51,13 +58,17 @@
 #define ABORTOVERTAKE 4
 #define PAUSE 5 
 
+// array position of other bitmaps
+#define PAUSE_AP 0 
+
 
 // Game variables
 extern BITMAP* buffer;                    // display buffer bitmap
 extern BITMAP* background;                // background bitmap
 extern BITMAP* Veicles[MAX_VEICLE_TYPE] ; // array of veicles bitmaps
+extern BITMAP* otherBmp[MAX_OTHER_BPM];   // array of other bitmaps
 extern FONT* fonts[MAX_FONT];             // array of fonts
-extern int paused[MAX_TASKS];              // array of pause
+extern int paused[MAX_TASKS];             // array of pause
 
 // User variables
 extern int selectedVeicle;
@@ -90,9 +101,6 @@ void DrawBackground();
 // fucntion that draws info
 void DrawInfo(pthread_mutex_t *mutex, struct SharedList *shared);
 
-// funtion that draws fild of view of a car
-void DrawFOV(double x, double y, int range, int id);
-
 // function that draws veicle
 void DrawVeicle(double x, double y, int type);
 
@@ -101,6 +109,20 @@ void DrawMouse(int x, int y);
 
 // function that draws background in buffer
 void DrawBackgroundInBitmap();
+
+// function that draws pause 
+void DrawPause();
+
+// function that draws point where we need
+void DrawPoint(int x, int y, int color);
+
+// function that draws arch where we need
+void DrawArch(int x, int y, int radius, double startAngle, double endAngle, int color);
+
+// function that draws line where we need
+void DrawLine(int x1, int y1, int x2, int y2, int color);
+
+
 
 
 // VEICLE FUNCTIONS
@@ -115,7 +137,7 @@ int getVeicleWidth(int veicle);
 int getVeicleHeight(int veicle);
 
 // function that returns distance from other veicle
-double proximitySensor(int id, double x, double y, double range, double alpha);
+double proximitySensor(double x, double y, int range, double alpha);
 
 
 // USER FUNCTIONS

@@ -27,8 +27,12 @@ void *graphicsTask(void *arg)
         // draw info
         DrawInfo(GraphicsArg.mutex, GraphicsArg.shared);
 
-        pthread_mutex_lock(GraphicsArg.mutex);
+        if (checkPause(0)){
+            DrawPause();
+        }
+
         // draw veicles
+        pthread_mutex_lock(GraphicsArg.mutex);
 
         if (GraphicsArg.shared->size > 0) // draw veicles only if there are veicles in the list
         {
@@ -57,7 +61,6 @@ void *graphicsTask(void *arg)
         // wait for next activation
         wait_for_period(ti);
     }
-
-    task_deactivate(ti);
+    printf("OK: Graphics task terminated\n");
     return NULL;
 }

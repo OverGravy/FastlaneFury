@@ -22,18 +22,19 @@ int freeIndex[MAX_TASKS];
 BITMAP *buffer;                   // display buffer bitmap
 BITMAP *background;               // background bitmap
 BITMAP *Veicles[MAX_VEICLE_TYPE]; // array of veicles bitmaps
+BITMAP *otherBmp[MAX_OTHER_BPM]; // array of other bitmaps
 FONT *fonts[MAX_FONT];            // array of fonts
 
 // Shared variable things
-struct SharedList *shared;
-pthread_mutex_t mutex;
-pthread_mutex_t supportMutex;
+struct SharedList *shared;        // shared list
+pthread_mutex_t mutex;            // mutex for shared list 
+pthread_mutex_t supportMutex;     // suport mutex
 struct supportList *support;      // support list
-int paused[MAX_TASKS];             // array of pause
+int paused[MAX_TASKS];            // array of pause
 
-
-int selectedVeicle = -1;
-int selectedButton = -1;
+// User task things
+int selectedVeicle = -1;          // selected veicle
+int selectedButton = -1;          // selected button
 
 int main()
 {
@@ -63,6 +64,12 @@ int main()
     if (shared == NULL)
     {
         fprintf(stderr, "ERROR:  creating shared list\n");
+        return -1;
+    }
+
+    if (support == NULL)
+    {
+        fprintf(stderr, "ERROR:  creating support list\n");
         return -1;
     }
 
@@ -98,6 +105,5 @@ int main()
 
     // Clean up and exit
     wait_for_task_end(0);  // wait for user task to end
-    closeAllegro();        // close allegro
     return 0;
 }

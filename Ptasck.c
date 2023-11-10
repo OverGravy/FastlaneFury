@@ -144,7 +144,6 @@ void task_activate(int i)
 // function that deactivate a task
 void task_deactivate(int i)
 {
-    // cancel the thread
     pthread_cancel(tid[i]);
     ptaskActivated--;
     freeIndex[i] = 0;
@@ -163,7 +162,6 @@ void ptask_exit()
             task_deactivate(i);
         }
     }
-    pthread_cancel(tid[0]);
 }
 
 // function that check if a task is active
@@ -284,3 +282,8 @@ void wait_for_task_end(int i)
     pthread_join(tid[i], NULL);
 }
 
+// function that clean task resources
+void task_clean(int i){
+    ptaskActivated--;
+    freeIndex[i] = 0;
+}

@@ -10,7 +10,7 @@ void *userTask(void *arg)
 
     int running = 1;
 
-    // selction variables
+    // Local selction variables
     int selection = -1;
     int selectedVeicle = -1;
     int selectedButton = -1;
@@ -47,26 +47,32 @@ void *userTask(void *arg)
                 {
                     printf("ERROR:can not create a new veicle No free index\n");
                 }
-                else 
+                else
                 {
-                    if(pause == 0){
+                    if (pause == 0)
+                    {
                         task_create(veicleTask, index, veicleTaskArg, 20, 20, 10, ACT);
-                    }else{
+                    }
+                    else
+                    {
                         printf("ERROR: can not create a new veicle game paused\n");
                     }
                 }
                 break;
             case KEY_P:
-                if(pause == 0){
+                if (pause == 0)
+                {
                     pauseVeicles(userTaskArg.mutex, userTaskArg.shared);
                     printf("OK: game paused\n");
                     pause = 1;
-                }else{
+                }
+                else
+                {
                     pause = 0;
                     resumeVeicles(userTaskArg.mutex, userTaskArg.shared);
                     printf("OK: game resumed\n");
                 }
-                
+
                 break;
             }
         }
@@ -74,7 +80,7 @@ void *userTask(void *arg)
         // Handle mouse input
         if (mouse_b & 1)
         {
-            selection = getSelection(mouse_x, mouse_y, userTaskArg.mutex, userTaskArg.shared); // get selection
+            selection = getSelection(mouse_x, mouse_y, userTaskArg.mutex, userTaskArg.shared); // handle on what the user clicked
             switch (selection)
             {
             case VEICLE:
@@ -105,7 +111,6 @@ void *userTask(void *arg)
         }
 
         // Handle button selection
-     
 
         if (deadline_miss(ti))
         {
@@ -115,8 +120,11 @@ void *userTask(void *arg)
         // wait for next activation
         wait_for_period(ti);
     }
-    //task_deactivate(1);    // deactivate graphics task
-    ptask_exit();          // close ramining task and exit 
-    task_deactivate(ti);
+
+    // close the game
+    task_deactivate(1); // close graphics task
+    
+    ptask_exit();       // close ramining task and exit
+    closeAllegro();     // close allegro
     return NULL;
 }

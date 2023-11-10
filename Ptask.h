@@ -99,11 +99,8 @@ void wait_for_period(int i);
 // function that wait for a specific task to terminate
 void wait_for_task_end(int i);
 
-// function that pause all task
-void pause_all_task();
-
-// function that resume all task
-void resume_all_task();
+// funtion that clean task resources
+void task_clean(int i);
 
 // GETTER
 
