@@ -39,6 +39,7 @@ Pressing space after the program spawn 1 car pressing another time spawn another
 - User will be able to zoom on a singol car.
 - There will be a menu to change some option.
 - Car will have a much realistic movement.
+- There will be a menu to change some option about the car and visualization.
 
 
 # Actual problem 
@@ -47,7 +48,7 @@ Pressing space after the program spawn 1 car pressing another time spawn another
 - Pause function kill the program.
 - Sometime due to a thread problem closing the game crash it;
 - If you pause the game to fast it will crash
-
+- Still need a litte bit of work on the car movement.
 
 # Tips 
 
