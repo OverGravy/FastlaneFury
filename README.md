@@ -23,7 +23,6 @@ In final result feature will be:
 - Is NOW possible to pause all the car by leaving Graphics thread and User thread running.
 - Car handle better with a NEW system to keep track of multiple direction
 
-
 # How to use
 Before compiling using make sure you have install the right allegro library version witch is allegro 4.2 using the following command:
 ```sudo apt install liballegro4-dev```
@@ -40,6 +39,7 @@ Pressing space after the program spawn 1 car pressing another time spawn another
 - There will be a menu to change some option.
 - Car will have a much realistic movement.
 - There will be a menu to change some option about the car and visualization.
+- There will be different type of veicle and by loading data from a file there will be different veicle with different statistics.
 
 
 # Actual problem 

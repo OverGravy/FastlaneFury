@@ -6,9 +6,179 @@
  *  Se non ci sono distanze valide, il valore di front, left, right e back è -1.
  */
 
+int front = -1;
+int left = -1;
+int back = -1;
+int right = -1;
+
+// function that handle IDLE state logic and change state
+void idle(struct VeicleState *State, struct VeicleStatistics *Statistics, int tIndex, double distance[])
+{
+    // Handling state logic
+
+    // changing state logic
+    if (front == -1 && State->acceleration < Statistics->maxAcceleration) // No car in front
+    {
+        State->state = ACCELERATE;
+    }
+
+    if (front != -1) // Car in front
+    {
+        State->state = SLOWDOWN;
+    }
+
+    if (left == -1 && State->speed > 45) // No car on left and speed > 45 m/s
+    {
+        State->state = OVERTAKE;
+    }
+}
+
+// function that handle NORMAL state logic and change state
+void accelerate(struct VeicleState *State, struct VeicleStatistics *Statistics, int tIndex, double distance[])
+{
+    // Handling state logic
+
+    State->acceleration += 0.5;
+    if (State->acceleration > Statistics->maxAcceleration) // check for max acceleration
+    {
+        State->acceleration = Statistics->maxAcceleration; // set max acceleration
+        State->state = IDLE;
+    }
+
+    // changing state logic
+    if (front != -1) // Car in front
+    {
+        State->state = SLOWDOWN;
+    }
+}
+
+// function that handle SLOWDOWN state logic and change state
+void slowDown(struct VeicleState *State, struct VeicleStatistics *Statistics, int tIndex, double distance[])
+{
+    // Handling state logic
+
+    State->acceleration = distance[front] - Statistics->minDistance; // set decelation in function of distance
+    if (State->acceleration < Statistics->maxDeceleration)           // check for max deceleration
+    {
+        State->acceleration = Statistics->maxDeceleration; // set max deceleration
+    }
+
+    // changing state logic
+    if (front == -1) // No car in front
+    {
+        State->state = ACCELERATE;
+    }
+    if (distance[front] > 0.5 && distance[front] < Statistics->minDistance && State->speed < 15) // check for overtaking condition
+    {
+        State->state = OVERTAKE;
+    }
+    if (distance[front] < 0.2) // check for crash condition
+    {
+        State->state = CRASH;
+    }
+}
+
+// function that handle OVERTAKE state logic and change state
+void overtake(struct VeicleState *State, struct VeicleStatistics *Statistics, int tIndex, double distance[])
+{
+    int margin;
+    int middleLane;
+
+    // handling state logic
+
+    State->acceleration = Statistics->maxAcceleration; // set max acceleration
+    State->steeringAngle -= 0.5;                       // increase gradually steering angle
+
+    if (State->steeringAngle < -45) // check for max steering angle
+    {
+        State->steeringAngle = -45; // set max steering angle
+    }
+
+    // changing state logic
+
+    // calculate middle lane position to stop overtaking
+    margin = ((MY_SCREEN_H / (LANE_NUMBER + 1)) - (getVeicleHeight(State->veicle))) / 2; // margin in pixel
+    middleLane = (((MY_SCREEN_H / (LANE_NUMBER + 1)) * (State->lane + 1)) + margin);     // in meter
+
+    if (((State->pos.y) * SCALE_FACTOR) >= middleLane)
+    { // check if i am in the middle lane
+        State->lane += 1;
+        printf("Veicle: %d, switch to lane: %d\n", State->veicle, State->lane);
+        State->steeringAngle = 0;
+        State->state = IDLE;
+    }
+
+    if (left != -1) // check for abort overtake condition
+    {
+        State->steeringAngle = 0;
+        State->state = ABORTOVERTAKE;
+    }
+}
+
+// function that handle ABORTOVERTAKE state logic and change state
+void abortOvertake(struct VeicleState *State, struct VeicleStatistics *Statistics, int tIndex, double distance[])
+{
+    int margin;
+    int middleLane;
+
+    // handling state logic
+
+    State->steeringAngle += 0.5; // increase gradually steering angle
+
+    if (front != -1) // check if i have veicle in front while im aborting overtake
+    {
+        State->acceleration = distance[front] - Statistics->minDistance;
+    }
+    else
+    {
+        State->acceleration = Statistics->maxAcceleration;
+    }
+
+    if (State->acceleration < Statistics->maxDeceleration) // check for max deceleration
+    {
+        State->acceleration = Statistics->maxDeceleration;
+    }
+
+    if (State->steeringAngle > 45) // check for max steering angle
+    {
+        State->steeringAngle = 45;
+    }
+
+    // changing state logic
+
+    margin = ((MY_SCREEN_H / (LANE_NUMBER + 1)) - (getVeicleHeight(State->veicle))) / 2; // margin in pixel
+    middleLane = (((MY_SCREEN_H / (LANE_NUMBER + 1)) * (State->lane)) + margin);         // in meter
+
+    if (((State->pos.y) * SCALE_FACTOR) <= middleLane)
+    { // check if i am in the middle lane
+        printf("Veicle: %d, switch to lane: %d\n", State->veicle, State->lane);
+        State->steeringAngle = 0;
+        State->state = IDLE;
+    }
+}
+
+// function that handle CRASH state logic and change state
+void crash(struct VeicleState *State, struct VeicleStatistics *Statistics, int tIndex, double distance[])
+{
+    // handling state logic
+    State->speed = 0;
+    State->acceleration = 0;
+    printf("CRASH\n");
+}
+
+// function that handle PAUSE state logic and change state
+void pauseState(struct VeicleState *State, struct VeicleStatistics *Statistics, int tIndex, double distance[])
+{
+    // handling state logic
+    State->speed = 0;
+    State->acceleration = 0;
+}
+
+
+
+
 // function that handle Veicle driving logic
-void DrivingHandling(
-    struct VeicleState *State, struct VeicleStatistics *Statistics, int tIndex, double distance[])
+void DrivingHandling(struct VeicleState *State, struct VeicleStatistics *Statistics, int tIndex, double distance[])
 {
 
     int middleLane = 0;
@@ -16,12 +186,6 @@ void DrivingHandling(
     int i, j, x, y;
     int degree;
     struct supportList *temp = NULL;
-
-    // every possible direction
-    int front = -1;
-    int left = -1;
-    int back = -1;
-    int right = -1;
 
     // MISURE -----------------------------------------------------
 
@@ -55,7 +219,7 @@ void DrivingHandling(
         degree = 190 + j;
         distance[i] = proximitySensor(x, y, 150, degree);
     }
-    
+
     // # GET DISTANCE BACK #
 
     x = (((State->pos.x) * SCALE_FACTOR) + getVeicleWidth(State->veicle)) + 10;
@@ -63,81 +227,7 @@ void DrivingHandling(
 
     distance[(DETECTION_DEGREE * 2) + 1] = proximitySensor(x, y, 50, 0);
 
-    // STATE HANDLING -----------------------------------------------
-
-    switch (State->state)
-    {
-
-    case NORMAL: // normal driving
-        State->acceleration += 0.5;
-        if (State->acceleration > Statistics->maxAcceleration) // check for max acceleration
-        {
-            State->acceleration = Statistics->maxAcceleration; // set max acceleration
-        }
-        break;
-
-    case SLOWDOWN:                                                   // slowing down
-        State->acceleration = distance[0] - Statistics->minDistance; // set decelation in function of distance
-        if (State->acceleration < Statistics->maxDeceleration)       // check for max deceleration
-        {
-            State->acceleration = Statistics->maxDeceleration; // set max deceleration
-        }
-        break;
-
-    case OVERTAKE:                                         // overtaking
-        State->acceleration = Statistics->maxAcceleration; // set max acceleration
-        State->steeringAngle -= 0.5;                       // increase gradually steering angle
-        if (State->steeringAngle > 45)                     // check for max steering angle
-        {
-            State->steeringAngle = 45; // set max steering angle
-        }
-
-        // calculate middle lane position to stop overtaking
-        margin = ((MY_SCREEN_H / (LANE_NUMBER + 1)) - (getVeicleHeight(State->veicle))) / 2; // margin in pixel
-        middleLane = (((MY_SCREEN_H / (LANE_NUMBER + 1)) * (State->lane + 1)) + margin);     // in meter
-
-        if (((State->pos.y) * SCALE_FACTOR) >= middleLane)
-        { // check if i am in the middle lane
-            State->lane += 1;
-            printf("Veicle: %d, switch to lane: %d\n", State->veicle, State->lane);
-            State->steeringAngle = 0;
-            State->state = NORMAL;
-        }
-
-        break;
-
-    case ABORTOVERTAKE:               // abort overtake
-        State->steeringAngle += 0.5;  // increase gradually steering angle
-        if (State->steeringAngle > 0) // check for max steering angle
-        {
-            State->steeringAngle = 0; // set max steering angle
-        }
-
-        margin = ((MY_SCREEN_H / (LANE_NUMBER + 1)) - (getVeicleHeight(State->veicle))) / 2; // margin in pixel
-        middleLane = (((MY_SCREEN_H / (LANE_NUMBER + 1)) * (State->lane)) + margin);         // in meter
-
-        if (((State->pos.y) * SCALE_FACTOR) <= middleLane)
-        { // check if i am in the middle lane
-            printf("Veicle: %d, switch to lane: %d\n", State->veicle, State->lane);
-            State->steeringAngle = 0;
-            State->state = SLOWDOWN;
-        }
-
-        break;
-
-    case CRASH: // crash
-        State->speed = 0;
-        State->acceleration = 0;
-        printf("CRASH\n");
-        break;
-
-    case PAUSE:
-        State->acceleration = 0;
-        State->speed = 0;
-        break;
-    }
-
-    // ANALIZE MISURE -----------------------------------------------------
+    // CHECK DISTANCE -----------------------------------------------------
 
     // # CHECK FRONT #
 
@@ -164,7 +254,6 @@ void DrivingHandling(
             left = -1;
         }
     }
-    printf("left: %d\n", left);
 
     // #CHECK RIGHT#
 
@@ -181,7 +270,6 @@ void DrivingHandling(
         }
     }
 
-
     // #CHECK BACK#
 
     if (distance[(DETECTION_DEGREE * 2) + 1] != -1)
@@ -192,38 +280,39 @@ void DrivingHandling(
     {
         back = -1;
     }
-    
 
-    // check for veicle in front
-    if (front != -1 && State->state != PAUSE)
+    // STATE HANDLING -----------------------------------------------
+
+    switch (State->state)
     {
-        // switch to crash
-        if (distance[front] == SMIN)
-        {
-            State->state = CRASH;
-        }
 
-        // switch to slowing down
-        if (distance[front] < Statistics->minDistance && State->state != OVERTAKE && State->state != CRASH)
-        {
-            State->state = SLOWDOWN;
-        }
+    case IDLE: // normal driving
+        idle(State, Statistics, tIndex, distance);
+        break;
 
-        // switch to overtaking, the condition is that the distance from the veicle in front is between 0.5 and 1.5 meters and i am not going too fast
-        if (distance[front] > 0.5 && distance[front] < Statistics->minDistance && State->speed < 15  && State->state != ABORTOVERTAKE)
-        {
-            State->state = OVERTAKE;
-        }
+    case ACCELERATE: // accelerating
+        accelerate(State, Statistics, tIndex, distance);
+        break;
 
-        // switch to abort overtake if i am overtaking and i detect a veicle on the left
-        if (State->state == OVERTAKE && left != -1)
-        {
-            State->state = ABORTOVERTAKE;
-        }
-    }
-    else if (front == -1 && State->state != OVERTAKE && State->state != CRASH && State->state != PAUSE)
-    {
-        State->state = NORMAL;
+    case SLOWDOWN: // slowing down
+        slowDown(State, Statistics, tIndex, distance);
+        break;
+
+    case OVERTAKE: // overtaking
+        overtake(State, Statistics, tIndex, distance);
+        break;
+
+    case ABORTOVERTAKE: // abort overtake
+        abortOvertake(State, Statistics, tIndex, distance);
+        break;
+
+    case CRASH: // crash
+        crash(State, Statistics, tIndex, distance);
+        break;
+
+    case PAUSE:
+        pauseState(State, Statistics, tIndex, distance);
+        break;
     }
 
     // check for speed limit
@@ -236,7 +325,6 @@ void DrivingHandling(
     {
         State->speed = Statistics->maxSpeed;
     }
-
 
     // handling PAUSE state
     if (checkPause(tIndex) && State->state != PAUSE)
@@ -251,7 +339,6 @@ void DrivingHandling(
         State->speed = temp->speed;
         State->state = temp->state;
     }
-
 }
 
 // function task veicle
@@ -283,6 +370,8 @@ void *veicleTask(void *arg)
     while (running)
     {
         // UPDATE VEICLE STATE
+
+        printf("Veicle %d, state: %d\n", ti, State.state);
 
         // calculate veiele speed and position using MKS unit
         DeltaSpeed = State.acceleration * ((double)task_get_period(ti) / 1000.0); // delta speed in m/s0

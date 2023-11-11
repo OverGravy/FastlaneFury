@@ -51,12 +51,13 @@
 
 
 // veicle state constant
-#define NORMAL 0
-#define SLOWDOWN 1
-#define OVERTAKE 2
-#define CRASH 3
-#define ABORTOVERTAKE 4
-#define PAUSE 5 
+#define IDLE 0
+#define ACCELERATE 1
+#define SLOWDOWN 2
+#define OVERTAKE 3
+#define CRASH 4
+#define ABORTOVERTAKE 5
+#define PAUSE 6
 
 // array position of other bitmaps
 #define PAUSE_AP 0 
@@ -169,8 +170,6 @@ void resumeVeicles(pthread_mutex_t *mutex, struct SharedList *shared);
 
 // function that cheks if a veicle is paused
 int checkPause(int id);
-
-
 
 
 
