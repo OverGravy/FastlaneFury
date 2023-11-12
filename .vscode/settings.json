@@ -4,7 +4,8 @@
         "allegro_font.h": "c",
         "allegro_ttf.h": "c",
         "list.h": "c",
-        "veicle.h": "c"
+        "veicle.h": "c",
+        "supportlist.h": "c"
     },
     "C_Cpp.dimInactiveRegions": false
 }

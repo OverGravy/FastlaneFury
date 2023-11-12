@@ -11,13 +11,6 @@ struct Position{
     double y;               // position in meter
 };
 
-struct VeicleStatistics{
-    double maxSpeed;        // max speed in m/s
-    double maxAcceleration; // max acceleration in m/s^2
-    double maxDeceleration; // max deceleration in m/s^2
-    double minDistance;     // min distance in m that the veicle can be from another veicle
-};
-
 // Define a structure to represent a veicle state
 struct VeicleState{
     double speed;           // speed of the car in m/s

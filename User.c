@@ -124,7 +124,8 @@ void *userTask(void *arg)
     // close the game
     task_deactivate(1); // close graphics task
     
-    ptask_exit();       // close ramining task and exit
-    closeAllegro();     // close allegro
+    ptask_exit();         // close ramining task and exit
+    closeAllegro();       // close allegro
+    CloseStatisticFile(); // close statistic file
     return NULL;
 }

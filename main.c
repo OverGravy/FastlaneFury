@@ -36,6 +36,9 @@ int paused[MAX_TASKS];            // array of pause
 int selectedVeicle = -1;          // selected veicle
 int selectedButton = -1;          // selected button
 
+// statistic things
+FILE* CarFp, *TruckFp, *MotorcycleFp; // file pointer
+
 int main()
 {
     srand(time(NULL));
@@ -51,6 +54,13 @@ int main()
     if (!loadGraphicsAssets())
     {
         fprintf(stderr, "ERROR: failed to load graphics assets!\n");
+        return -1;
+    }
+
+    // check statistic file
+    if (!CheckStatisticFile())
+    {
+        fprintf(stderr, "ERROR: failed to load statistic file!\n");
         return -1;
     }
 

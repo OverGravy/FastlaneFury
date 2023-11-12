@@ -22,6 +22,7 @@ In final result feature will be:
 - When cliccking over a car the fowv is realistic on what car see.
 - Is NOW possible to pause all the car by leaving Graphics thread and User thread running.
 - Car handle better with a NEW system to keep track of multiple direction
+- Car Statistics such as MaxSpeed or MaxAcceleration are now loaded from an extern file giving mach variability to car behaviour.
 
 # How to use
 Before compiling using make sure you have install the right allegro library version witch is allegro 4.2 using the following command:
@@ -53,5 +54,6 @@ Pressing space after the program spawn 1 car pressing another time spawn another
 # Tips 
 
 - To create a correct bitmap for the program use the following command (before use sudo apt install imagemagick):
+
 ```mogrify -format bmp -depth 16 -define bmp:format=bmp3 -define bmp:subtype=RGB *.png && rm *.png```
  

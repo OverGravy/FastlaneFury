@@ -10,10 +10,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <pthread.h>
+#include <math.h>
 #include "Ptask.h"
 #include "List.h"
 #include "SupportList.h"
-#include <math.h>
+#include "VeicleStat.h"
 
 // allegro costant
 #define MY_SCREEN_W 1880
@@ -74,7 +75,6 @@ extern int paused[MAX_TASKS];             // array of pause
 // User variables
 extern int selectedVeicle;
 extern int selectedButton;
-
 
 // ALLEGRO FUNCTIONS    
 
