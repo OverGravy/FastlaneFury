@@ -1,4 +1,4 @@
-#include "Veicle.h"
+#include "../libs/Veicle.h"
 
 /**
  * Dentro distance sono contenute tutte le distanze, in metri, che il veicolo ha rilevato.
@@ -52,7 +52,10 @@ void *veicleTask(void *arg)
         setVeicleState(ti, State);
 
         // execute sensor
-        DoMesurements(&State, measurements, &distance);
+        if (State.state != PAUSE)
+        {
+            DoMesurements(&State, measurements, &distance);
+        }
 
         // Handle driving logic
         DrivingHandling(&State, &Statistics, &distance);

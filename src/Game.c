@@ -1,4 +1,4 @@
-#include "Game.h"
+#include "../libs/Game.h"   
 
 // ALLEGRO FUNCTIONS
 
@@ -143,7 +143,7 @@ int loadGraphicsAssets()
     for (i = 0; i < MAX_VEICLE_TYPE; i++)
     {
         char path[50];
-        sprintf(path, "./Bitmap/VeicleBitmap/bitmap%d.bmp", i);
+        sprintf(path, "../Assets/Bitmap/VeicleBitmap/bitmap%d.bmp", i);
         Veicles[i] = load_bitmap(path, NULL);
 
         if (!Veicles[i])
@@ -157,7 +157,7 @@ int loadGraphicsAssets()
     for (i = 0; i < MAX_OTHER_BPM; i++)
     {
         char path[50];
-        sprintf(path, "./Bitmap/OtherBitmap/bitmap%d.bmp", i);
+        sprintf(path, "../Assets/Bitmap/OtherBitmap/bitmap%d.bmp", i);
         otherBmp[i] = load_bitmap(path, NULL);
 
         if (!otherBmp[i])
@@ -171,7 +171,7 @@ int loadGraphicsAssets()
     /*    for (int i = 0; i < MAX_FONT; i++)
     {
         char path[50];
-        sprintf(path, "./Fonts/font%d.pcx", i);
+        sprintf(path, "../Assets/Fonts/font%d.pcx", i);
         fonts[i] = load_font(path, NULL, NULL);
         if (!fonts[i])
         {
@@ -445,7 +445,7 @@ double proximitySensor(double x, double y, int range, double alpha)
     for (i = SMIN; i < range; i += SSTEP)
     {
         color = getpixel(screen, x + (i * cos(alpha)), y + (i * sin(alpha)));                                                                                 // get color
-        if (color != BGCOLOR && color != -1 && color != FOVCOLOR && color != CURSORCOLOR && color != LINECOLOR && color != LANECOLOR && color != SENSORCOLOR) // if there is a veicle
+        if (color != BGCOLOR && color != -1 && color != FOVCOLOR && color != CURSORCOLOR && color != LINECOLOR && color != LANECOLOR && color != SENSORCOLOR && color!=PAUSE_MENU_COLOR) // if there is a veicle
         {
             distance = (double)i / SCALE_FACTOR; // distance in meter
             break;
@@ -520,7 +520,7 @@ int getSelectedButton()
 void pauseVeicles(pthread_mutex_t *mutex, struct SharedList *shared)
 {
     cleanSupportList();
-    paused[0] = 1; // to inform grapfic task to draw pause
+    paused[0] = 1;                     // to inform grapfic task to draw pause
     pthread_mutex_lock(mutex);
     struct Node *current = shared->head;
     while (current != NULL)
@@ -550,4 +550,21 @@ void resumeVeicles(pthread_mutex_t *mutex, struct SharedList *shared)
 int checkPause(int id)
 {
     return paused[id];
+}
+
+
+// SETTING FUNCTIONS
+
+// SETTER
+
+// function that set autospawn
+void setAutoSpawn(int value)
+{
+    settings.autoSpawn = value;
+}
+
+// GETTER
+int getAutoSpawn()
+{
+    return settings.autoSpawn;
 }

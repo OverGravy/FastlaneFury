@@ -1,12 +1,12 @@
 #ifndef __GAME__
 #define __GAME__
-#include <allegro.h>
 
 // define M_PI if not defined
 #ifndef M_PI
 #define M_PI 3.14159265358979323846
 #endif
 
+#include <allegro.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <pthread.h>
@@ -15,6 +15,8 @@
 #include "List.h"
 #include "SupportList.h"
 #include "VeicleStat.h"
+#include "PauseMenu.h"
+
 
 // allegro costant
 #define MY_SCREEN_W 1880
@@ -36,11 +38,6 @@
 #define SMIN 0      // minimun distance in px
 #define SSTEP 5     // step in meter
 
-// Selection constant
-#define VEICLE 0
-#define BUTTON 1
-#define ROAD 2
-
 
 // color constant
 #define BGCOLOR makecol(188, 188, 188)
@@ -49,6 +46,7 @@
 #define LINECOLOR makecol(0, 0, 0)
 #define LANECOLOR makecol(255, 255, 255)
 #define SENSORCOLOR makecol(0, 255, 0)
+#define PAUSE_MENU_COLOR makecol(50, 50, 50)
 
 
 // veicle state constant
@@ -60,21 +58,42 @@
 #define ABORTOVERTAKE 5
 #define PAUSE 6
 
+
 // array position of other bitmaps
 #define PAUSE_AP 0 
 
 
-// Game variables
+// Selection constant
+#define VEICLE 0
+#define BUTTON 1
+#define ROAD 2
+
+
+// setting structures
+struct Setting
+{
+    int autoSpawn;     // auto spawn veicle
+    int autoSpawnTime; // auto spawn time in second
+};
+
+
+// Graphics variables
 extern BITMAP* buffer;                    // display buffer bitmap
 extern BITMAP* background;                // background bitmap
 extern BITMAP* Veicles[MAX_VEICLE_TYPE] ; // array of veicles bitmaps
 extern BITMAP* otherBmp[MAX_OTHER_BPM];   // array of other bitmaps
 extern FONT* fonts[MAX_FONT];             // array of fonts
+
+
+// Game Variables
+extern struct Setting settings;            // setting structure
 extern int paused[MAX_TASKS];             // array of pause
 
+
 // User variables
-extern int selectedVeicle;
-extern int selectedButton;
+extern int selectedVeicle;                // index of selected veicle
+extern int selectedButton;                // index of selected button
+
 
 // ALLEGRO FUNCTIONS    
 
@@ -172,5 +191,16 @@ void resumeVeicles(pthread_mutex_t *mutex, struct SharedList *shared);
 int checkPause(int id);
 
 
+// SETTING FUNCTIONS
+
+// SETTER
+
+// function that set autospawn 
+void setAutoSpawn(int value);
+
+// GETTER
+
+// function that get autospawn
+int getAutoSpawn();
 
 #endif

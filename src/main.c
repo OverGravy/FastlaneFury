@@ -1,13 +1,11 @@
 #include <pthread.h>
-#include "Game.h"
 #include <allegro.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include "List.h"
-#include "Ptask.h"
-#include "Graphics.h"
-#include "User.h"
-#include "time.h"
+#include "../libs/Game.h"
+#include "../libs/Graphics.h"
+#include "../libs/User.h"
+#include <time.h>
 #include <math.h>
 
 // declare ptask things
@@ -39,6 +37,14 @@ int selectedButton = -1;          // selected button
 // statistic things
 FILE* CarFp, *TruckFp, *MotorcycleFp; // file pointer
 
+// Game Variables
+struct Setting settings;            // setting structure
+
+// Pause menu things
+struct option options[OPTION_NUM];  // array of options
+struct MenuConfig pauseMenuConfig;  // pause menu config
+
+
 int main()
 {
     srand(time(NULL));
@@ -64,6 +70,7 @@ int main()
         return -1;
     }
 
+
     // init ptask
     ptask_init(SCHED_FIFO); // init ptask with a SCHED policy
 
@@ -86,6 +93,9 @@ int main()
     // init mutex
     pthread_mutex_init(&mutex, NULL);
     pthread_mutex_init(&supportMutex, NULL);
+
+    // init menus
+    initPauseMenu(); 
 
     // create and start User task
     struct argument userTaskArg;

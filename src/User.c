@@ -1,4 +1,4 @@
-#include "User.h"
+#include "../libs/User.h"
 
 // user task handle:
 // - create a new veicle
@@ -33,6 +33,11 @@ void *userTask(void *arg)
         {
             // check keyboard
             int key = readkey() >> 8;
+
+            if (pause == 1){
+                //handleInputPauseMenu(-1, -1, key);
+            }
+
             switch (key)
             {
             case KEY_ESC: // esc key
@@ -80,6 +85,10 @@ void *userTask(void *arg)
         // Handle mouse input
         if (mouse_b & 1)
         {
+            if (pause == 1){
+               // handleInputPauseMenu(mouse_x, mouse_y, -1);
+            }
+
             selection = getSelection(mouse_x, mouse_y, userTaskArg.mutex, userTaskArg.shared); // handle on what the user clicked
             switch (selection)
             {
@@ -97,6 +106,8 @@ void *userTask(void *arg)
                 printf("OK: Road selected\n");
                 break;
             }
+
+           
         }
 
         // check if selected veicle is valid

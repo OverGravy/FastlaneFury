@@ -5,8 +5,6 @@
 #include <stdlib.h>
 #include <pthread.h>
 #include <allegro.h>
-#include "List.h"
-#include "Ptask.h"
 #include "Game.h"
 #include "Veicle.h"
 

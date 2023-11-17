@@ -1,10 +1,10 @@
-#include "VeicleStat.h"
+#include "../libs/VeicleStat.h"
 
 // function that open the file and return the file pointer
 int CheckStatisticFile(){
-    CarFp = fopen("./Data/Car.txt", "r");
-    TruckFp = fopen("./Data/Truck.txt", "r");
-    MotorcycleFp = fopen("./Data/Motorcycle.txt", "r");
+    CarFp = fopen("../Assets/Data/Car.txt", "r");
+    TruckFp = fopen("../Assets/Data/Truck.txt", "r");
+    MotorcycleFp = fopen("../Assets/Data/Motorcycle.txt", "r");
     if (CarFp == NULL)
     {
         printf("Error opening file Car.txt\n");

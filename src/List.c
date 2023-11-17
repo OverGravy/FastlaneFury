@@ -1,4 +1,4 @@
-#include "List.h"
+#include "../libs/List.h"
 
 // function that create a new list
 struct SharedList* createSharedList(){

@@ -3,9 +3,6 @@
 
 #include "Game.h"
 #include "Drive.h"
-#include "List.h"
-#include "SupportList.h"
-#include "Ptask.h"
 #include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>
