@@ -15,8 +15,8 @@
 #include "List.h"
 #include "SupportList.h"
 #include "VeicleStat.h"
-#include "PauseMenu.h"
-
+#include "Configuration.h"
+#include "ConfigMenu.h"
 
 // allegro costant
 #define MY_SCREEN_W 1880
@@ -25,19 +25,14 @@
 #define MAX_FONT 1
 
 // Game costant 
-#define MAX_VEICLE_TYPE 158
-#define MAX_OTHER_BPM 1
-#define LANE_NUMBER 4
-#define VEICLE_SCALE 0.8
-#define SCALE_FACTOR 15
-#define VEICLE_HEIGHT 300
-#define VEICLE_WIDTH 300
+#define MAX_VEICLE_TYPE 158  // max veicle type
+#define LANE_NUMBER 4        // number of lane
+#define SCALE_FACTOR 15      // scale factor for car for meter to px
 
 // Sensor costant
 #define SMAX 200    // max distance in px
 #define SMIN 0      // minimun distance in px
-#define SSTEP 5     // step in meter
-
+#define SSTEP 5     // step in px
 
 // color constant
 #define BGCOLOR makecol(188, 188, 188)
@@ -46,8 +41,8 @@
 #define LINECOLOR makecol(0, 0, 0)
 #define LANECOLOR makecol(255, 255, 255)
 #define SENSORCOLOR makecol(0, 255, 0)
-#define PAUSE_MENU_COLOR makecol(50, 50, 50)
-
+#define CONFIG_MENU_COLOR makecol(50, 50, 50)
+#define CONFIG_MENU_TEXT_COLOR makecol(255, 255, 255)
 
 // veicle state constant
 #define IDLE 0
@@ -58,35 +53,20 @@
 #define ABORTOVERTAKE 5
 #define PAUSE 6
 
-
-// array position of other bitmaps
-#define PAUSE_AP 0 
-
-
 // Selection constant
 #define VEICLE 0
 #define BUTTON 1
 #define ROAD 2
 
 
-// setting structures
-struct Setting
-{
-    int autoSpawn;     // auto spawn veicle
-    int autoSpawnTime; // auto spawn time in second
-};
-
-
 // Graphics variables
 extern BITMAP* buffer;                    // display buffer bitmap
 extern BITMAP* background;                // background bitmap
 extern BITMAP* Veicles[MAX_VEICLE_TYPE] ; // array of veicles bitmaps
-extern BITMAP* otherBmp[MAX_OTHER_BPM];   // array of other bitmaps
 extern FONT* fonts[MAX_FONT];             // array of fonts
 
 
 // Game Variables
-extern struct Setting settings;            // setting structure
 extern int paused[MAX_TASKS];             // array of pause
 
 
@@ -131,7 +111,7 @@ void DrawMouse(int x, int y);
 void DrawBackgroundInBitmap();
 
 // function that draws pause 
-void DrawPause();
+void DrawPauseSymbol();
 
 // function that draws point where we need
 void DrawPoint(int x, int y, int color);
@@ -184,23 +164,18 @@ void setSelectedButton(int id);
 // function that pause all the veicles
 void pauseVeicles(pthread_mutex_t *mutex, struct SharedList *shared);
 
+// function that pause veicle and open the menu 
+void pauseForMenu(pthread_mutex_t *mutex, struct SharedList *shared);
+
 // function that resume all the veicles
 void resumeVeicles(pthread_mutex_t *mutex, struct SharedList *shared);
+
+// function that resume veicle and close the menu
+void resumeFromMenu(pthread_mutex_t *mutex, struct SharedList *shared);
 
 // function that cheks if a veicle is paused
 int checkPause(int id);
 
 
-// SETTING FUNCTIONS
-
-// SETTER
-
-// function that set autospawn 
-void setAutoSpawn(int value);
-
-// GETTER
-
-// function that get autospawn
-int getAutoSpawn();
 
 #endif

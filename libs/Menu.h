@@ -4,9 +4,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-// option type
-#define CHECK 0
-#define SLIDER 1
 
 // struct that contains menu configuration
 struct MenuConfig{
@@ -30,8 +27,8 @@ struct optionPos{
 // struct that contains option configuration
 struct option{
     struct optionPos pos;      // position of the option
+    int selected;              // 1 if selected 0 otherwise
     int number;                // option number
-    int type;                  // type of option
     char *text;                // text to display
     int value;                 // value to save if necessary
     void (*function)(int);     // function to call to apply the option
@@ -51,5 +48,11 @@ void menu_draw_frame(struct MenuConfig *config, BITMAP *buffer, int color);
 
 // function that draws menu options
 void menu_draw_option(struct option *options, BITMAP *buffer);
+
+// function that draw bit map inside the menu box
+void menu_draw_bitmap(BITMAP *bitmap, int x, int y, struct MenuConfig *config, BITMAP *buffer);
+
+// function that draw text inside the menu box
+void menu_draw_text(char *text, int x, int y, struct MenuConfig *config, BITMAP *buffer);
 
 #endif

@@ -1,4 +1,4 @@
-#include "../libs/Game.h"   
+#include "../libs/Game.h"
 
 // ALLEGRO FUNCTIONS
 
@@ -153,19 +153,6 @@ int loadGraphicsAssets()
         }
     }
     printf("OK: Loaded all veicle bitmaps\n");
-
-    for (i = 0; i < MAX_OTHER_BPM; i++)
-    {
-        char path[50];
-        sprintf(path, "../Assets/Bitmap/OtherBitmap/bitmap%d.bmp", i);
-        otherBmp[i] = load_bitmap(path, NULL);
-
-        if (!otherBmp[i])
-        {
-            fprintf(stderr, "ERROR: failed to load other bitmap %d!\n", i);
-            return 0;
-        }
-    }
 
     // load all fonts in folder Fonts
     /*    for (int i = 0; i < MAX_FONT; i++)
@@ -322,7 +309,7 @@ void DrawDistance(double x, double y, double distance, double alpha)
 }
 
 // function that draws pause if the veicle is paused
-void DrawPause()
+void DrawPauseSymbol()
 {
     circlefill(buffer, 40, SCREEN_H - 40, 30, makecol(255, 255, 255));
     // make the pause sign 5 pixel more hight and in the left
@@ -384,10 +371,10 @@ void initVeicleState(struct VeicleState *state, struct VeicleStatistics *statist
 {
     state->veicle = rand() % MAX_VEICLE_TYPE;
     state->lane = 1;
-    state->pos.x = (MY_SCREEN_W - 2) / SCALE_FACTOR;                                                     // in meter
-    int margin = ((MY_SCREEN_H / (LANE_NUMBER + 1)) - ((Veicles[state->veicle]->h) * VEICLE_SCALE)) / 2; // margin in pixel
-    state->pos.y = (((MY_SCREEN_H / (LANE_NUMBER + 1)) * state->lane) + margin) / SCALE_FACTOR;          // in meter
-    state->steeringAngle = 0.0;                                                                          // in degree
+    state->pos.x = (MY_SCREEN_W - 2) / SCALE_FACTOR;                                            // in meter
+    int margin = ((MY_SCREEN_H / (LANE_NUMBER + 1)) - ((Veicles[state->veicle]->h))) / 2;       // margin in pixel
+    state->pos.y = (((MY_SCREEN_H / (LANE_NUMBER + 1)) * state->lane) + margin) / SCALE_FACTOR; // in meter
+    state->steeringAngle = 0.0;                                                                 // in degree
 
     if (veicle == 0)
     {
@@ -396,20 +383,20 @@ void initVeicleState(struct VeicleState *state, struct VeicleStatistics *statist
         statistics->maxSpeed = 10.0;
         statistics->maxAcceleration = 0.0;
         statistics->maxDeceleration = 0.0;
-        statistics->minDistance = 0.0;
+        statistics->minDistance = 10.0;
     }
     else if (veicle == 2)
     {
         state->speed = 40.0;       // speed in ms
         state->acceleration = 5.0; // acceleration in ms^2
         state->lane = 2;
-        state->pos.x = (MY_SCREEN_W - 2) / SCALE_FACTOR;                                                     // in meter
-        margin = ((MY_SCREEN_H / (LANE_NUMBER + 1)) - ((Veicles[state->veicle]->h) * VEICLE_SCALE)) / 2; // margin in pixel
-        state->pos.y = (((MY_SCREEN_H / (LANE_NUMBER + 1)) * state->lane) + margin) / SCALE_FACTOR;          // in meter
+        state->pos.x = (MY_SCREEN_W - 2) / SCALE_FACTOR;                                            // in meter
+        margin = ((MY_SCREEN_H / (LANE_NUMBER + 1)) - ((Veicles[state->veicle]->h))) / 2;           // margin in pixel
+        state->pos.y = (((MY_SCREEN_H / (LANE_NUMBER + 1)) * state->lane) + margin) / SCALE_FACTOR; // in meter
         statistics->maxSpeed = 40.0;
         statistics->maxAcceleration = 0.0;
         statistics->maxDeceleration = 0.0;
-        statistics->minDistance = 0.0;
+        statistics->minDistance = 10.0;
     }
     else
     {
@@ -444,8 +431,8 @@ double proximitySensor(double x, double y, int range, double alpha)
     // check for veicle in front
     for (i = SMIN; i < range; i += SSTEP)
     {
-        color = getpixel(screen, x + (i * cos(alpha)), y + (i * sin(alpha)));                                                                                 // get color
-        if (color != BGCOLOR && color != -1 && color != FOVCOLOR && color != CURSORCOLOR && color != LINECOLOR && color != LANECOLOR && color != SENSORCOLOR && color!=PAUSE_MENU_COLOR) // if there is a veicle
+        color = getpixel(screen, x + (i * cos(alpha)), y + (i * sin(alpha)));                                                                                                               // get color
+        if (color != BGCOLOR && color != -1 && color != FOVCOLOR && color != CURSORCOLOR && color != LINECOLOR && color != LANECOLOR && color != SENSORCOLOR && color != CONFIG_MENU_COLOR) // if there is a veicle
         {
             distance = (double)i / SCALE_FACTOR; // distance in meter
             break;
@@ -476,8 +463,8 @@ int getSelection(int x, int y, pthread_mutex_t *mutex, struct SharedList *shared
         {
             int xg = (int)round((current->Veicle.pos.x) * SCALE_FACTOR);
             int yg = (int)round((current->Veicle.pos.y) * SCALE_FACTOR);
-            int width = ((Veicles[current->Veicle.veicle]->w) * VEICLE_SCALE);
-            int height = (Veicles[current->Veicle.veicle]->h) * VEICLE_SCALE;
+            int width = ((Veicles[current->Veicle.veicle]->w));
+            int height = (Veicles[current->Veicle.veicle]->h);
 
             if (x > xg && x < xg + width && y > yg && y < yg + height)
             {
@@ -520,7 +507,24 @@ int getSelectedButton()
 void pauseVeicles(pthread_mutex_t *mutex, struct SharedList *shared)
 {
     cleanSupportList();
-    paused[0] = 1;                     // to inform grapfic task to draw pause
+    paused[0] = 1; // to inform grapfic task to draw pause icon
+    pthread_mutex_lock(mutex);
+    struct Node *current = shared->head;
+    while (current != NULL)
+    {
+        paused[current->id] = 1; // set pause to 1
+        printf("OK: Veicle %d paused\n", current->id);
+        current = current->next;
+    }
+    pthread_mutex_unlock(mutex);
+}
+
+// function that pause and open the menu
+void pauseForMenu(pthread_mutex_t *mutex, struct SharedList *shared)
+{
+    cleanSupportList();
+    paused[0] = 1; // to inform grapfic task to draw pause icon
+    paused[1] = 1; // to inform grapfic task to draw menu
     pthread_mutex_lock(mutex);
     struct Node *current = shared->head;
     while (current != NULL)
@@ -546,25 +550,24 @@ void resumeVeicles(pthread_mutex_t *mutex, struct SharedList *shared)
     pthread_mutex_unlock(mutex);
 }
 
+// function that resume and close the menu
+void resumeFromMenu(pthread_mutex_t *mutex, struct SharedList *shared)
+{
+    pthread_mutex_lock(mutex);
+    paused[0] = 0;
+    paused[1] = 0;
+    struct Node *current = shared->head; // current node
+    while (current != NULL)
+    {
+        paused[current->id] = 0; // set pause to 0
+        current = current->next;
+    }
+    pthread_mutex_unlock(mutex);
+}
+
 // function that check if the veicle is paused
 int checkPause(int id)
 {
     return paused[id];
 }
 
-
-// SETTING FUNCTIONS
-
-// SETTER
-
-// function that set autospawn
-void setAutoSpawn(int value)
-{
-    settings.autoSpawn = value;
-}
-
-// GETTER
-int getAutoSpawn()
-{
-    return settings.autoSpawn;
-}

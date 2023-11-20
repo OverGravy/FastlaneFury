@@ -20,7 +20,6 @@ int freeIndex[MAX_TASKS];
 BITMAP *buffer;                   // display buffer bitmap
 BITMAP *background;               // background bitmap
 BITMAP *Veicles[MAX_VEICLE_TYPE]; // array of veicles bitmaps
-BITMAP *otherBmp[MAX_OTHER_BPM]; // array of other bitmaps
 FONT *fonts[MAX_FONT];            // array of fonts
 
 // Shared variable things
@@ -38,7 +37,7 @@ int selectedButton = -1;          // selected button
 FILE* CarFp, *TruckFp, *MotorcycleFp; // file pointer
 
 // Game Variables
-struct Setting settings;            // setting structure
+struct Config configuration;            // setting structure
 
 // Pause menu things
 struct option options[OPTION_NUM];  // array of options
@@ -70,6 +69,9 @@ int main()
         return -1;
     }
 
+    // init configuration structure
+    initConfiguration();
+
 
     // init ptask
     ptask_init(SCHED_FIFO); // init ptask with a SCHED policy
@@ -95,7 +97,7 @@ int main()
     pthread_mutex_init(&supportMutex, NULL);
 
     // init menus
-    initPauseMenu(); 
+    initConfigMenu(); 
 
     // create and start User task
     struct argument userTaskArg;

@@ -41,10 +41,15 @@ void *graphicsTask(void *arg)
         pthread_mutex_unlock(GraphicsArg.mutex);
 
         // check for pause menu
+        if (checkPause(1))
+        {
+            DrawConfigMenu();
+        }
+
+        // drawpause sinbol
         if (checkPause(0))
         {
-            DrawPauseMenu();
-            DrawPause();
+            DrawPauseSymbol();
         }
 
         // draw mouse

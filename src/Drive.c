@@ -59,7 +59,7 @@ void slowDown(struct VeicleState *State, struct VeicleStatistics *Statistics, st
     {
         State->state = ACCELERATE;
     }
-    if (distances->front > 0.5 && distances->front < Statistics->minDistance && State->speed < 15) // check for overtaking condition
+    if (distances->front > 3 && distances->front < Statistics->minDistance) // check for overtaking condition
     {
         State->state = OVERTAKE;
     }
