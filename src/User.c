@@ -133,6 +133,8 @@ void *userTask(void *arg)
 
                 case ROAD:
                     printf("OK: Road selected\n");
+                    selectedVeicle = -1;
+                    setSelectedVeicle(selectedVeicle);
                     break;
                 }
             }
@@ -188,9 +190,9 @@ void *userTask(void *arg)
             // check if the veicle is still active if not deselect it
             if (!task_is_active(selectedVeicle))
             {
-                selectedVeicle = -1;
-                setSelectedVeicle(selectedVeicle);
-            }
+                selectedVeicle = -1;                 // deselect veicle
+                setSelectedVeicle(selectedVeicle);   // comunicate to graphics task that the veicle is deselected
+            } 
         }
 
         if (deadline_miss(ti))

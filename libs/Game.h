@@ -33,6 +33,7 @@
 #define SMAX 200    // max distance in px
 #define SMIN 0      // minimun distance in px
 #define SSTEP 5     // step in px
+#define RANGE 250   // range in px
 
 // color constant
 #define BGCOLOR makecol(188, 188, 188)
@@ -142,7 +143,7 @@ double proximitySensor(double x, double y, int range, double alpha);
 
 // USER FUNCTIONS
 
-// function that returns the index of the selected veicle
+// function that return the selection on the screen and set automatically the id of the selected type of thing
 int getSelection(int x, int y, pthread_mutex_t *mutex, struct SharedList *shared);
 
 // function that returns the index of the selected veicle

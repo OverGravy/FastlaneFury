@@ -23,6 +23,8 @@ In final result feature will be:
 - Is NOW possible to pause all the car by leaving Graphics thread and User thread running.
 - Car handle better with a NEW system to keep track of multiple direction
 - Car Statistics such as MaxSpeed or MaxAcceleration are now loaded from an extern file giving mach variability to car behaviour.
+- Is NOW present a menu to abilitate teh autospawn and chore between differnt time of spawn.
+
 
 # How to use
 Before compiling using make sure you have install the right allegro library version witch is allegro 4.2 using the following command:
@@ -32,23 +34,21 @@ Pressing space after the program spawn 1 car pressing another time spawn another
 - Pressing 'p' again resume the game.
 - Pressing 'esc' will close the game.
 - Pressing 'space' will spawn a car.
+- Pressing 'm' a configuration menu will appear.
 
 
 # Future feature 
 
 - User will be able to zoom on a singol car.
-- There will be a menu to change some option.
 - Car will have a much realistic movement.
 - There will be a menu to change some option about the car and visualization.
 - There will be different type of veicle and by loading data from a file there will be different veicle with different statistics.
-
+- There will be some information that will work as button on the bottom of the screen.
 
 # Actual problem 
 
 - I'm still not able to load different font from the default one.
-- Pause function kill the program.
 - Sometime due to a thread problem closing the game crash it;
-- If you pause the game to fast it will crash
 - Still need a litte bit of work on the car movement.
 
 # Tips 

@@ -232,18 +232,39 @@ void DrawInfo(pthread_mutex_t *mutex, struct SharedList *shared)
                 sprintf(info, "Lane: %d", current->Veicle.lane);
                 textout_ex(buffer, font, info, 650, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 + 60, makecol(255, 255, 255), -1);
                 // speed in km/h
-                speedKmH = (int)round(current->Veicle.speed * 3.6);
-                sprintf(info, "Speed: %.2f", speedKmH);
-                textout_ex(buffer, font, info, 650, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 + 80, makecol(255, 255, 255), -1);
-                sprintf(info, "Acceleration: %.2f", current->Veicle.acceleration);
-                textout_ex(buffer, font, info, 650, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 + 100, makecol(255, 255, 255), -1);
-                sprintf(info, "Position: (%.2f, %.2f)", current->Veicle.pos.x, current->Veicle.pos.y);
-                textout_ex(buffer, font, info, 650, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 + 120, makecol(255, 255, 255), -1);
-                sprintf(info, "Steering Angle: %.2f", current->Veicle.steeringAngle);
-                textout_ex(buffer, font, info, 800, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 + 20, makecol(255, 255, 255), -1);
-                sprintf(info, "State %d", current->Veicle.state);
-                textout_ex(buffer, font, info, 800, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 + 40, makecol(255, 255, 255), -1);
-
+                if (current->Veicle.state != PAUSE)
+                {
+                    speedKmH = (int)round(current->Veicle.speed * 3.6);
+                    sprintf(info, "Speed: %.2f", speedKmH);
+                    textout_ex(buffer, font, info, 650, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 + 80, makecol(255, 255, 255), -1);
+                    sprintf(info, "Acceleration: %.2f", current->Veicle.acceleration);
+                    textout_ex(buffer, font, info, 650, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 + 100, makecol(255, 255, 255), -1);
+                    sprintf(info, "Position: (%.2f, %.2f)", current->Veicle.pos.x, current->Veicle.pos.y);
+                    textout_ex(buffer, font, info, 650, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 + 120, makecol(255, 255, 255), -1);
+                    sprintf(info, "Steering Angle: %.2f", current->Veicle.steeringAngle);
+                    textout_ex(buffer, font, info, 800, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 + 20, makecol(255, 255, 255), -1);
+                    sprintf(info, "State %d", current->Veicle.state);
+                    textout_ex(buffer, font, info, 800, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 + 40, makecol(255, 255, 255), -1);
+                }
+                else
+                {
+                    // find in support list the veicle with id
+                    struct supportList *temp = getSupportNode(current->id);
+                    if (temp != NULL)
+                    {
+                        speedKmH = (int)round(temp->speed * 3.6);
+                        sprintf(info, "Speed: %.2f", speedKmH);
+                        textout_ex(buffer, font, info, 650, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 + 80, makecol(255, 255, 255), -1);
+                        sprintf(info, "Acceleration: %.2f", temp->acceleration);
+                        textout_ex(buffer, font, info, 650, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 + 100, makecol(255, 255, 255), -1);
+                        sprintf(info, "Position: (%.2f, %.2f)", current->Veicle.pos.x, current->Veicle.pos.y);
+                        textout_ex(buffer, font, info, 650, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 + 120, makecol(255, 255, 255), -1);
+                        sprintf(info, "Steering Angle: %.2f", current->Veicle.steeringAngle);
+                        textout_ex(buffer, font, info, 800, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 + 20, makecol(255, 255, 255), -1);
+                        sprintf(info, "State %d", temp->state);
+                        textout_ex(buffer, font, info, 800, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 + 40, makecol(255, 255, 255), -1);
+                    }
+                }
                 // DrawFOV(current->Veicle.pos.x, current->Veicle.pos.y, SMAX, current->Veicle.veicle);
 
                 // Front sensor
@@ -387,16 +408,16 @@ void initVeicleState(struct VeicleState *state, struct VeicleStatistics *statist
     }
     else if (veicle == 2)
     {
-        state->speed = 40.0;       // speed in ms
-        state->acceleration = 5.0; // acceleration in ms^2
+        state->speed = 35.0;       // speed in ms
+        state->acceleration = 0.0; // acceleration in ms^2
         state->lane = 2;
         state->pos.x = (MY_SCREEN_W - 2) / SCALE_FACTOR;                                            // in meter
         margin = ((MY_SCREEN_H / (LANE_NUMBER + 1)) - ((Veicles[state->veicle]->h))) / 2;           // margin in pixel
         state->pos.y = (((MY_SCREEN_H / (LANE_NUMBER + 1)) * state->lane) + margin) / SCALE_FACTOR; // in meter
         statistics->maxSpeed = 40.0;
-        statistics->maxAcceleration = 0.0;
-        statistics->maxDeceleration = 0.0;
-        statistics->minDistance = 10.0;
+        statistics->maxAcceleration = 10.0;
+        statistics->maxDeceleration = -15.0;
+        statistics->minDistance = 50.0;
     }
     else
     {
@@ -468,9 +489,10 @@ int getSelection(int x, int y, pthread_mutex_t *mutex, struct SharedList *shared
 
             if (x > xg && x < xg + width && y > yg && y < yg + height)
             {
-                selection = VEICLE;
-                selectedVeicle = current->id;
-                break;
+                selection = VEICLE;        
+                setSelectedVeicle(current->id);
+                pthread_mutex_unlock(mutex);
+                return selection;                 // if i found what i want i can exit
             }
             current = current->next;
         }
@@ -478,7 +500,11 @@ int getSelection(int x, int y, pthread_mutex_t *mutex, struct SharedList *shared
         pthread_mutex_unlock(mutex);
 
         // check if the mouse is on a button
+
+        // set selected button
     }
+
+    selection = ROAD; // if i don't find anything i return road
 
     return selection;
 }
@@ -570,4 +596,3 @@ int checkPause(int id)
 {
     return paused[id];
 }
-
