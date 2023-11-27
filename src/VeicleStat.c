@@ -5,6 +5,8 @@ int CheckStatisticFile(){
     CarFp = fopen("../Assets/Data/Car.txt", "r");
     TruckFp = fopen("../Assets/Data/Truck.txt", "r");
     MotorcycleFp = fopen("../Assets/Data/Motorcycle.txt", "r");
+    SupercarFp = fopen("../Assets/Data/Supercar.txt", "r");
+
     if (CarFp == NULL)
     {
         printf("Error opening file Car.txt\n");
@@ -18,6 +20,11 @@ int CheckStatisticFile(){
     if (MotorcycleFp == NULL)
     {
         printf("Error opening file Motorcycle.txt\n");
+        return 0;
+    }
+    if (SupercarFp == NULL)
+    {
+        printf("Error opening file Supercar.txt\n");
         return 0;
     }
 
@@ -41,6 +48,9 @@ struct VeicleStatistics *GetVeicleStaitistics(int type){
     case MOTORCYCLE:
         fp = MotorcycleFp;
         break;
+    case SUPERCAR:
+        fp = SupercarFp;
+        break;
     default:
         printf("Error: type not valid\n");
         return NULL;
@@ -59,7 +69,7 @@ struct VeicleStatistics *GetVeicleStaitistics(int type){
     rewind(fp);
 
     // get random row
-    int randomRow = rand() % row;
+    int randomRow = (rand() % row)+1;
 
     // read randomRow avoiding - as separator
     int i = 0;
@@ -68,7 +78,7 @@ struct VeicleStatistics *GetVeicleStaitistics(int type){
     {
         if (i == randomRow)
         {
-            sscanf(line, "%lf-%lf-%lf-%lf", &Statistics->maxSpeed, &Statistics->maxAcceleration, &Statistics->maxDeceleration, &Statistics->minDistance);
+            sscanf(line, "%2lf-%2lf-%2lf-%2lf", &Statistics->maxSpeed, &Statistics->maxAcceleration, &Statistics->maxDeceleration, &Statistics->minDistance);
             break;
         }
         i++;

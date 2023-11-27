@@ -15,6 +15,7 @@
 #define CAR 0
 #define TRUCK 1
 #define MOTORCYCLE 2
+#define SUPERCAR 3
 
 
 // Veicle Statistics struct
@@ -26,7 +27,7 @@ struct VeicleStatistics{
 };
 
 // File variables
-extern FILE* CarFp, *TruckFp, *MotorcycleFp;
+extern FILE* CarFp, *TruckFp, *MotorcycleFp, *SupercarFp;
 
 // function that open the file and return the file pointer
 int CheckStatisticFile();

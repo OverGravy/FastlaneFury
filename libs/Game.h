@@ -25,15 +25,16 @@
 #define MAX_FONT 1
 
 // Game costant 
-#define MAX_VEICLE_TYPE 158  // max veicle type
 #define LANE_NUMBER 4        // number of lane
 #define SCALE_FACTOR 15      // scale factor for car for meter to px
 
 // Sensor costant
 #define SMAX 200    // max distance in px
 #define SMIN 0      // minimun distance in px
-#define SSTEP 5     // step in px
-#define RANGE 250   // range in px
+#define SSTEP 1     // step in px
+#define RANGE_FRONT 200   // range in px
+#define RANGE_BACK 50    // range in px
+#define RANGE_SIDE 150    // range in px
 
 // color constant
 #define BGCOLOR makecol(188, 188, 188)
@@ -54,6 +55,14 @@
 #define ABORTOVERTAKE 5
 #define PAUSE 6
 
+// veicle constatnt 
+#define CAR_NUMBER 89
+#define TRUCK_NUMBER 40
+#define MOTORCYCLE_NUMBER 8
+#define SUPERCAR_NUMBER 16
+#define VEICLE_NUMBER CAR_NUMBER+TRUCK_NUMBER+MOTORCYCLE_NUMBER+SUPERCAR_NUMBER
+
+
 // Selection constant
 #define VEICLE 0
 #define BUTTON 1
@@ -61,10 +70,10 @@
 
 
 // Graphics variables
-extern BITMAP* buffer;                    // display buffer bitmap
-extern BITMAP* background;                // background bitmap
-extern BITMAP* Veicles[MAX_VEICLE_TYPE] ; // array of veicles bitmaps
-extern FONT* fonts[MAX_FONT];             // array of fonts
+extern BITMAP* buffer;                                                              // display buffer bitmap
+extern BITMAP* background;                                                          // background bitmap
+extern BITMAP* Veicles[CAR_NUMBER+TRUCK_NUMBER+MOTORCYCLE_NUMBER+SUPERCAR_NUMBER] ; // array of veicles bitmaps
+extern FONT* fonts[MAX_FONT];                                                       // array of fonts
 
 
 // Game Variables
@@ -129,7 +138,7 @@ void DrawLine(int x1, int y1, int x2, int y2, int color);
 // VEICLE FUNCTIONS
 
 // function that initialize veicle
-void initVeicleState(struct VeicleState *state, struct VeicleStatistics *statistics, int veicle);
+void initVeicleState(struct VeicleState *state, struct VeicleStatistics *statistics);
 
 // function that returns veicle bitmap
 int getVeicleWidth(int veicle);

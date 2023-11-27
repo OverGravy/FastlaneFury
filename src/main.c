@@ -19,7 +19,7 @@ int freeIndex[MAX_TASKS];
 // declare allegro things
 BITMAP *buffer;                   // display buffer bitmap
 BITMAP *background;               // background bitmap
-BITMAP *Veicles[MAX_VEICLE_TYPE]; // array of veicles bitmaps
+BITMAP *Veicles[CAR_NUMBER+TRUCK_NUMBER+MOTORCYCLE_NUMBER+SUPERCAR_NUMBER]; // array of veicles bitmaps
 FONT *fonts[MAX_FONT];            // array of fonts
 
 // Shared variable things
@@ -34,7 +34,7 @@ int selectedVeicle = -1;          // selected veicle
 int selectedButton = -1;          // selected button
 
 // statistic things
-FILE* CarFp, *TruckFp, *MotorcycleFp; // file pointer
+FILE* CarFp, *TruckFp, *MotorcycleFp, *SupercarFp; // file pointer
 
 // Game Variables
 struct Config configuration;            // setting structure

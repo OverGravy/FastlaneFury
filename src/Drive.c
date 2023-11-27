@@ -59,14 +59,13 @@ void slowDown(struct VeicleState *State, struct VeicleStatistics *Statistics, st
     {
         State->state = ACCELERATE;
     }
-    if (distances->front > 3 && distances->front < Statistics->minDistance) // check for overtaking condition
+
+
+    if (distances->front <= Statistics->minDistance )// check for overtaking condition
     {
         State->state = OVERTAKE;
     }
-    if (distances->front < 0.01) // check for crash condition
-    {
-        State->state = CRASH;
-    }
+   
 }
 
 // function that handle OVERTAKE state logic and change state
@@ -77,7 +76,9 @@ void overtake(struct VeicleState *State, struct VeicleStatistics *Statistics, st
 
     // handling state logic
 
-    State->acceleration += 0.5; // set max acceleration
+    State->acceleration += 0.1; // set max acceleration
+
+  
     if (State->acceleration > Statistics->maxAcceleration)
     {
         State->acceleration = Statistics->maxAcceleration;
@@ -123,10 +124,15 @@ void abortOvertake(struct VeicleState *State, struct VeicleStatistics *Statistic
     {
         State->acceleration = distances->front - Statistics->minDistance;
     }
-    else
+    else // still if i have a veicle i was trying to overtake i need to slow down
     {
+        if(distances->right != -1){
+            State->acceleration = distances->right - Statistics->minDistance;
+        }
         State->acceleration = Statistics->maxAcceleration;
     }
+
+    
 
     if (State->acceleration < Statistics->maxDeceleration) // check for max deceleration
     {
@@ -224,7 +230,7 @@ void DoMesurements(struct VeicleState *State, double measurement[], struct Dista
     x = (State->pos.x) * SCALE_FACTOR - 10;
     y = (State->pos.y * SCALE_FACTOR) + (getVeicleHeight(State->veicle) / 2);
 
-    measurement[0] = proximitySensor(x, y, RANGE, 180);
+    measurement[0] = proximitySensor(x, y, RANGE_FRONT, 180);
 
     // # GET DISTANCE LEFT #
 
@@ -234,7 +240,7 @@ void DoMesurements(struct VeicleState *State, double measurement[], struct Dista
     for (i = 1; i <= DETECTION_DEGREE; i++)
     {
         degree = 10 + i;
-        measurement[i] = proximitySensor(x, y, RANGE, degree);
+        measurement[i] = proximitySensor(x, y, RANGE_SIDE, degree);
     }
 
     // # GET DISTANCE RIGHT #
@@ -247,7 +253,7 @@ void DoMesurements(struct VeicleState *State, double measurement[], struct Dista
     {
         j++;
         degree = 190 + j;
-        measurement[i] = proximitySensor(x, y, RANGE, degree);
+        measurement[i] = proximitySensor(x, y, RANGE_SIDE, degree);
     }
 
     // # GET DISTANCE BACK #
@@ -255,7 +261,7 @@ void DoMesurements(struct VeicleState *State, double measurement[], struct Dista
     x = (((State->pos.x) * SCALE_FACTOR) + getVeicleWidth(State->veicle)) + 10;
     y = (((State->pos.y) * SCALE_FACTOR) + (getVeicleHeight(State->veicle) / 2));
 
-    measurement[(DETECTION_DEGREE * 2) + 1] = proximitySensor(x, y, 50, 0);
+    measurement[(DETECTION_DEGREE * 2) + 1] = proximitySensor(x, y, RANGE_BACK, 0);
 
     // CHECK DISTANCE -----------------------------------------------------
 

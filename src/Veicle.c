@@ -20,7 +20,7 @@ void *veicleTask(void *arg)
     struct VeicleState State;           // veicle state
     struct supportList *temp = NULL;    // support list temp node to retrive veicle state after pause
     struct VeicleStatistics Statistics; // veicle statistics
-    initVeicleState(&State, &Statistics, getListSize());
+    initVeicleState(&State, &Statistics);
 
     // initialize veicle variables
     double DeltaPositionX = 0;                       // delta position in m

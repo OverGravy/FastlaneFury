@@ -24,6 +24,7 @@ In final result feature will be:
 - Car handle better with a NEW system to keep track of multiple direction
 - Car Statistics such as MaxSpeed or MaxAcceleration are now loaded from an extern file giving mach variability to car behaviour.
 - Is NOW present a menu to abilitate teh autospawn and chore between differnt time of spawn.
+- There are NOW different Veicle type with different statistics in term of max speed acceleration and deceleration.
 
 
 # How to use
@@ -40,9 +41,6 @@ Pressing space after the program spawn 1 car pressing another time spawn another
 # Future feature 
 
 - User will be able to zoom on a singol car.
-- Car will have a much realistic movement.
-- There will be a menu to change some option about the car and visualization.
-- There will be different type of veicle and by loading data from a file there will be different veicle with different statistics.
 - There will be some information that will work as button on the bottom of the screen.
 
 # Actual problem 
@@ -50,6 +48,7 @@ Pressing space after the program spawn 1 car pressing another time spawn another
 - I'm still not able to load different font from the default one.
 - Sometime due to a thread problem closing the game crash it;
 - Still need a litte bit of work on the car movement.
+- Need a full code review to make it more readable and more efficient.
 
 # Tips 
 

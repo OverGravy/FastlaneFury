@@ -107,7 +107,7 @@ void closeAllegro()
     destroy_bitmap(background);
 
     // destroy all veicles bitmaps
-    for (int i = 0; i < MAX_VEICLE_TYPE; i++)
+    for (int i = 0; i < CAR_NUMBER + TRUCK_NUMBER + MOTORCYCLE_NUMBER + SUPERCAR_NUMBER; i++)
     {
         destroy_bitmap(Veicles[i]);
     }
@@ -140,10 +140,10 @@ int loadGraphicsAssets()
 {
     int i;
     // load all cars bitmaps in folder Sprites
-    for (i = 0; i < MAX_VEICLE_TYPE; i++)
+    for (i = 0; i < CAR_NUMBER; i++)
     {
-        char path[50];
-        sprintf(path, "../Assets/Bitmap/VeicleBitmap/bitmap%d.bmp", i);
+        char path[60];
+        sprintf(path, "../Assets/Bitmap/VeicleBitmap/Car/C_bitmap%d.bmp", i);
         Veicles[i] = load_bitmap(path, NULL);
 
         if (!Veicles[i])
@@ -152,22 +152,55 @@ int loadGraphicsAssets()
             return 0;
         }
     }
-    printf("OK: Loaded all veicle bitmaps\n");
 
-    // load all fonts in folder Fonts
-    /*    for (int i = 0; i < MAX_FONT; i++)
+    printf("OK: Loaded all car bitmaps\n");
+
+    // load all trucks bitmaps in folder Sprites
+    for (i = 0; i < TRUCK_NUMBER; i++)
     {
-        char path[50];
-        sprintf(path, "../Assets/Fonts/font%d.pcx", i);
-        fonts[i] = load_font(path, NULL, NULL);
-        if (!fonts[i])
+        char path[60];
+        sprintf(path, "../Assets/Bitmap/VeicleBitmap/Truck/T_bitmap%d.bmp", i);
+        Veicles[i + CAR_NUMBER] = load_bitmap(path, NULL);
+
+        if (!Veicles[i + CAR_NUMBER])
         {
-            fprintf(stderr, "ERROR: failed to load font%d!\n", i);
+            fprintf(stderr, "ERROR: failed to load truck bitmap %d!\n", i);
             return 0;
         }
     }
-    printf("OK: Loaded all fonts\n");
-    */
+
+    printf("OK: Loaded all truck bitmaps\n");
+
+    // load all motorcycles bitmaps in folder Sprites
+    for (i = 0; i < MOTORCYCLE_NUMBER; i++)
+    {
+        char path[60];
+        sprintf(path, "../Assets/Bitmap/VeicleBitmap/Motorcycle/M_bitmap%d.bmp", i);
+        Veicles[i + CAR_NUMBER + TRUCK_NUMBER] = load_bitmap(path, NULL);
+
+        if (!Veicles[i + CAR_NUMBER + TRUCK_NUMBER])
+        {
+            fprintf(stderr, "ERROR: failed to load motorcycle bitmap %d!\n", i);
+            return 0;
+        }
+    }
+
+    printf("OK: Loaded all motorcycle bitmaps\n");
+
+    // load all supercars bitmaps in folder Sprites
+    for (i = 0; i < SUPERCAR_NUMBER; i++)
+    {
+        char path[60];
+        sprintf(path, "../Assets/Bitmap/VeicleBitmap/SuperCar/SC_bitmap%d.bmp", i);
+        Veicles[i + CAR_NUMBER + TRUCK_NUMBER + MOTORCYCLE_NUMBER] = load_bitmap(path, NULL);
+
+        if (!Veicles[i + CAR_NUMBER + TRUCK_NUMBER + MOTORCYCLE_NUMBER])
+        {
+            fprintf(stderr, "ERROR: failed to load supercar bitmap %d!\n", i);
+            return 0;
+        }
+    }
+    
     return 1;
 }
 
@@ -195,6 +228,7 @@ void DrawInfo(pthread_mutex_t *mutex, struct SharedList *shared)
     double speedKmH = 0;
     int x = 0;
     int y = 0;
+    int State;
 
     // print active veicles
     pthread_mutex_lock(mutex);
@@ -243,8 +277,7 @@ void DrawInfo(pthread_mutex_t *mutex, struct SharedList *shared)
                     textout_ex(buffer, font, info, 650, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 + 120, makecol(255, 255, 255), -1);
                     sprintf(info, "Steering Angle: %.2f", current->Veicle.steeringAngle);
                     textout_ex(buffer, font, info, 800, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 + 20, makecol(255, 255, 255), -1);
-                    sprintf(info, "State %d", current->Veicle.state);
-                    textout_ex(buffer, font, info, 800, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 + 40, makecol(255, 255, 255), -1);
+                    State = current->Veicle.state;
                 }
                 else
                 {
@@ -261,34 +294,65 @@ void DrawInfo(pthread_mutex_t *mutex, struct SharedList *shared)
                         textout_ex(buffer, font, info, 650, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 + 120, makecol(255, 255, 255), -1);
                         sprintf(info, "Steering Angle: %.2f", current->Veicle.steeringAngle);
                         textout_ex(buffer, font, info, 800, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 + 20, makecol(255, 255, 255), -1);
-                        sprintf(info, "State %d", temp->state);
-                        textout_ex(buffer, font, info, 800, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 + 40, makecol(255, 255, 255), -1);
+                        State = temp->state;
                     }
                 }
+
+                switch (State)
+                {
+                case SLOWDOWN:
+                    textout_ex(buffer, font, "State: SLOW_DOWN", 800, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 + 40, makecol(255, 255, 255), -1);
+                    break;
+
+                case ACCELERATE:
+                    textout_ex(buffer, font, "State: ACCELERATE", 800, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 + 40, makecol(255, 255, 255), -1);
+                    break;
+
+                case PAUSE:
+                    textout_ex(buffer, font, "State: PAUSE", 800, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 + 40, makecol(255, 255, 255), -1);
+                    break;
+
+                case OVERTAKE:
+                    textout_ex(buffer, font, "State: OVERTAKE", 800, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 + 40, makecol(255, 255, 255), -1);
+                    break;
+
+                case IDLE:
+                    textout_ex(buffer, font, "State: IDLE", 800, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 + 40, makecol(255, 255, 255), -1);
+                    break;
+
+                case ABORTOVERTAKE:
+                    textout_ex(buffer, font, "State: ABORT_OVERTAKE", 800, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 + 40, makecol(255, 255, 255), -1);
+                    break;
+
+                }
+
+
+
+
                 // DrawFOV(current->Veicle.pos.x, current->Veicle.pos.y, SMAX, current->Veicle.veicle);
 
                 // Front sensor
                 x = (current->Veicle.pos.x) * SCALE_FACTOR - 10;
                 y = (current->Veicle.pos.y * SCALE_FACTOR) + (getVeicleHeight(current->Veicle.veicle) / 2);
-                DrawLine(x, y, x - 150, y, FOVCOLOR);
+                DrawLine(x, y, x - RANGE_FRONT, y, FOVCOLOR);
                 DrawPoint(x, y, SENSORCOLOR);
 
                 // Right sensor
                 x = (current->Veicle.pos.x * SCALE_FACTOR) + (getVeicleWidth(current->Veicle.veicle) / 2);
                 y = (current->Veicle.pos.y * SCALE_FACTOR) - 10;
-                DrawArch(x, y, 150, 190.0, 350.0, FOVCOLOR);
+                DrawArch(x, y, RANGE_SIDE, 190.0, 350.0, FOVCOLOR);
                 DrawPoint(x, y, SENSORCOLOR);
 
                 // Left sensor
                 x = (((current->Veicle.pos.x) * SCALE_FACTOR) + (getVeicleWidth(current->Veicle.veicle) / 2));
                 y = ((current->Veicle.pos.y * SCALE_FACTOR) + getVeicleHeight(current->Veicle.veicle)) + 10;
-                DrawArch(x, y, 150, 10.0, 170.0, FOVCOLOR);
+                DrawArch(x, y, RANGE_SIDE, 10.0, 170.0, FOVCOLOR);
                 DrawPoint(x, y, SENSORCOLOR);
 
                 // Back sensor
                 x = (((current->Veicle.pos.x) * SCALE_FACTOR) + getVeicleWidth(current->Veicle.veicle)) + 10;
                 y = (((current->Veicle.pos.y) * SCALE_FACTOR) + (getVeicleHeight(current->Veicle.veicle) / 2));
-                DrawLine(x, y, x + 50, y, FOVCOLOR);
+                DrawLine(x, y, x + RANGE_BACK, y, FOVCOLOR);
                 DrawPoint(x, y, SENSORCOLOR);
 
                 break;
@@ -388,46 +452,41 @@ int getVeicleHeight(int veicle)
 }
 
 // function that initialize veicle
-void initVeicleState(struct VeicleState *state, struct VeicleStatistics *statistics, int veicle)
+void initVeicleState(struct VeicleState *state, struct VeicleStatistics *statistics)
 {
-    state->veicle = rand() % MAX_VEICLE_TYPE;
-    state->lane = 1;
+    int margin = 0;
+    state->veicle = rand() % VEICLE_NUMBER; // random veicle
+
+    // find the veicle type 
+    if(state->veicle >= 0 && state->veicle <= CAR_NUMBER){
+        statistics = GetVeicleStaitistics(CAR);
+    }else if(state->veicle >= CAR_NUMBER && state->veicle < CAR_NUMBER + TRUCK_NUMBER){
+        statistics = GetVeicleStaitistics(TRUCK);
+    }else if(state->veicle >= CAR_NUMBER + TRUCK_NUMBER && state->veicle < CAR_NUMBER + TRUCK_NUMBER + MOTORCYCLE_NUMBER){
+        statistics = GetVeicleStaitistics(MOTORCYCLE);
+    }else if(state->veicle >= CAR_NUMBER + TRUCK_NUMBER + MOTORCYCLE_NUMBER && state->veicle < CAR_NUMBER + TRUCK_NUMBER + MOTORCYCLE_NUMBER + SUPERCAR_NUMBER){
+        statistics = GetVeicleStaitistics(SUPERCAR);
+    }
+
+
+    state->speed = 10.0;                                                                         // in m/s
+    state->lane = rand() % LANE_NUMBER;
     state->pos.x = (MY_SCREEN_W - 2) / SCALE_FACTOR;                                            // in meter
-    int margin = ((MY_SCREEN_H / (LANE_NUMBER + 1)) - ((Veicles[state->veicle]->h))) / 2;       // margin in pixel
+    margin = ((MY_SCREEN_H / (LANE_NUMBER + 1)) - ((Veicles[state->veicle]->h))) / 2;           // margin in pixel
     state->pos.y = (((MY_SCREEN_H / (LANE_NUMBER + 1)) * state->lane) + margin) / SCALE_FACTOR; // in meter
     state->steeringAngle = 0.0;                                                                 // in degree
+    state->acceleration = 20;                                                                   // in m/s^2
 
-    if (veicle == 0)
-    {
-        state->speed = 10.0;       // speed in ms
-        state->acceleration = 0.0; // acceleration in ms^2
-        statistics->maxSpeed = 10.0;
-        statistics->maxAcceleration = 0.0;
-        statistics->maxDeceleration = 0.0;
-        statistics->minDistance = 10.0;
-    }
-    else if (veicle == 2)
-    {
-        state->speed = 35.0;       // speed in ms
-        state->acceleration = 0.0; // acceleration in ms^2
-        state->lane = 2;
-        state->pos.x = (MY_SCREEN_W - 2) / SCALE_FACTOR;                                            // in meter
-        margin = ((MY_SCREEN_H / (LANE_NUMBER + 1)) - ((Veicles[state->veicle]->h))) / 2;           // margin in pixel
-        state->pos.y = (((MY_SCREEN_H / (LANE_NUMBER + 1)) * state->lane) + margin) / SCALE_FACTOR; // in meter
-        statistics->maxSpeed = 40.0;
-        statistics->maxAcceleration = 10.0;
-        statistics->maxDeceleration = -15.0;
-        statistics->minDistance = 50.0;
-    }
-    else
-    {
-        state->speed = 15.0;       // speed in ms
-        state->acceleration = 0.5; // acceleration in ms^2
-        statistics->maxSpeed = 20.0;
-        statistics->maxAcceleration = 1.5;
-        statistics->maxDeceleration = -7.0;
-        statistics->minDistance = 10.0;
-    }
+    printf("OK: Veicle %d initialized\n", state->veicle);
+    printf("OK: Veicle %d in lane %d\n", state->veicle, state->lane);
+    printf("OK: Veicle %d in position (%.2f, %.2f)\n", state->veicle, state->pos.x, state->pos.y);
+    printf("OK: Veicle %d with steering angle %.2f\n", state->veicle, state->steeringAngle);
+    printf("OK: Veicle %d with max speed %.2f\n", state->veicle, statistics->maxSpeed);
+    printf("OK: Veicle %d with max acceleration %.2f\n", state->veicle, statistics->maxAcceleration);
+    printf("OK: Veicle %d with max deceleration %.2f\n", state->veicle, statistics->maxDeceleration);
+    printf("OK: Veicle %d with min distance %.2f\n", state->veicle, statistics->minDistance);
+    printf("OK: Veicle %d with initial speed %.2f\n", state->veicle, state->speed);
+   
 }
 
 // function that returns the distance from the other veicle

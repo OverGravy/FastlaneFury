@@ -4,7 +4,7 @@
 void initConfiguration()
 {
     configuration.autoSpawn = 0;
-    configuration.autoSpawnTime = 2;
+    configuration.autoSpawnTime = 5;
 }
 
 // Setter

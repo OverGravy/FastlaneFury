@@ -21,8 +21,8 @@ void initConfigMenu()
     options[1].number = 1;
     options[1].pos.x = pauseMenuConfig.RelativeX + 10 + (options[1].number * 140);
     options[1].pos.y = options[0].pos.y+70; 
-    options[1].text = "3 sec";
-    options[1].value = 3;
+    options[1].text = "5 sec";
+    options[1].value = 5;
     options[1].function = &setAutoSpawnTime;
     options[1].selected = 1;
 
@@ -30,8 +30,8 @@ void initConfigMenu()
     options[2].number = 2;
     options[2].pos.x = pauseMenuConfig.RelativeX + 10 + (options[2].number * 140);
     options[2].pos.y = options[0].pos.y+70;
-    options[2].text = "5 sec";
-    options[2].value = 5;
+    options[2].text = "10 sec";
+    options[2].value = 10;
     options[2].function = &setAutoSpawnTime;
     options[2].selected = 0;
 
