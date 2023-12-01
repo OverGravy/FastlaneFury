@@ -140,7 +140,7 @@ int loadGraphicsAssets()
 {
     int i;
     // load all cars bitmaps in folder Sprites
-    for (i = 0; i < CAR_NUMBER; i++)
+    for (i = 0; i <= CAR_NUMBER; i++)
     {
         char path[60];
         sprintf(path, "../Assets/Bitmap/VeicleBitmap/Car/C_bitmap%d.bmp", i);
@@ -156,7 +156,7 @@ int loadGraphicsAssets()
     printf("OK: Loaded all car bitmaps\n");
 
     // load all trucks bitmaps in folder Sprites
-    for (i = 0; i < TRUCK_NUMBER; i++)
+    for (i = 0; i <= TRUCK_NUMBER; i++)
     {
         char path[60];
         sprintf(path, "../Assets/Bitmap/VeicleBitmap/Truck/T_bitmap%d.bmp", i);
@@ -172,7 +172,7 @@ int loadGraphicsAssets()
     printf("OK: Loaded all truck bitmaps\n");
 
     // load all motorcycles bitmaps in folder Sprites
-    for (i = 0; i < MOTORCYCLE_NUMBER; i++)
+    for (i = 0; i <= MOTORCYCLE_NUMBER; i++)
     {
         char path[60];
         sprintf(path, "../Assets/Bitmap/VeicleBitmap/Motorcycle/M_bitmap%d.bmp", i);
@@ -188,7 +188,7 @@ int loadGraphicsAssets()
     printf("OK: Loaded all motorcycle bitmaps\n");
 
     // load all supercars bitmaps in folder Sprites
-    for (i = 0; i < SUPERCAR_NUMBER; i++)
+    for (i = 0; i <= SUPERCAR_NUMBER; i++)
     {
         char path[60];
         sprintf(path, "../Assets/Bitmap/VeicleBitmap/SuperCar/SC_bitmap%d.bmp", i);
@@ -456,15 +456,17 @@ void initVeicleState(struct VeicleState *state, struct VeicleStatistics *statist
 {
     int margin = 0;
     state->veicle = rand() % VEICLE_NUMBER; // random veicle
+    printf("\n");
+    printf("OK: Veicle %d initialized\n", state->veicle);
 
     // find the veicle type 
     if(state->veicle >= 0 && state->veicle <= CAR_NUMBER){
         GetVeicleStaitistics(CAR, statistics);
-    }else if(state->veicle >= CAR_NUMBER && state->veicle < CAR_NUMBER + TRUCK_NUMBER){
+    }else if(state->veicle > CAR_NUMBER && state->veicle <= CAR_NUMBER + TRUCK_NUMBER){
         GetVeicleStaitistics(TRUCK, statistics);
-    }else if(state->veicle >= CAR_NUMBER + TRUCK_NUMBER && state->veicle < CAR_NUMBER + TRUCK_NUMBER + MOTORCYCLE_NUMBER){
+    }else if(state->veicle > CAR_NUMBER + TRUCK_NUMBER && state->veicle <= CAR_NUMBER + TRUCK_NUMBER + MOTORCYCLE_NUMBER){
         GetVeicleStaitistics(MOTORCYCLE, statistics);
-    }else if(state->veicle >= CAR_NUMBER + TRUCK_NUMBER + MOTORCYCLE_NUMBER && state->veicle < CAR_NUMBER + TRUCK_NUMBER + MOTORCYCLE_NUMBER + SUPERCAR_NUMBER){
+    }else if(state->veicle > CAR_NUMBER + TRUCK_NUMBER + MOTORCYCLE_NUMBER && state->veicle <= CAR_NUMBER + TRUCK_NUMBER + MOTORCYCLE_NUMBER + SUPERCAR_NUMBER){
         GetVeicleStaitistics(SUPERCAR, statistics);
     }
 
@@ -475,7 +477,7 @@ void initVeicleState(struct VeicleState *state, struct VeicleStatistics *statist
     margin = ((MY_SCREEN_H / (LANE_NUMBER + 1)) - ((Veicles[state->veicle]->h))) / 2;           // margin in pixel
     state->pos.y = (((MY_SCREEN_H / (LANE_NUMBER + 1)) * state->lane) + margin) / SCALE_FACTOR; // in meter
     state->steeringAngle = 0.0;                                                                 // in degree
-    state->acceleration = 0;                                                                   // in m/s^2
+    state->acceleration = 0;                                                                    // in m/s^2
    
 }
 

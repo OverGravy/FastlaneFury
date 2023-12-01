@@ -61,7 +61,7 @@ void slowDown(struct VeicleState *State, struct VeicleStatistics *Statistics, st
     }
 
 
-    if (distances->front <= Statistics->minDistance && State->lane != LANE_NUMBER)// check for overtaking condition
+    if (distances->front <= Statistics->minDistance && State->lane != LANE_NUMBER -1)// check for overtaking condition
     {
         State->state = OVERTAKE;
     }
@@ -212,10 +212,12 @@ void DrivingHandling(struct VeicleState *State, struct VeicleStatistics *Statist
         State->speed = 0;
     }
 
+    // check max speed 
     if (State->speed > Statistics->maxSpeed)
     {
         State->speed = Statistics->maxSpeed;
     }
+
 }
 
 // function tha handle sensor measurements
