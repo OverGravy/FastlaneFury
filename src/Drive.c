@@ -18,7 +18,7 @@ void idle(struct VeicleState *State, struct VeicleStatistics *Statistics, struct
         State->state = SLOWDOWN;
     }
 
-    if (distances->left == -1 && State->speed > 45) // No car on left and speed > 45 m/s
+    if (distances->left == -1 && State->speed > 45 && State->lane != LANE_NUMBER) // No car on left and speed > 45 m/s
     {
         State->state = OVERTAKE;
     }
@@ -61,7 +61,7 @@ void slowDown(struct VeicleState *State, struct VeicleStatistics *Statistics, st
     }
 
 
-    if (distances->front <= Statistics->minDistance )// check for overtaking condition
+    if (distances->front <= Statistics->minDistance && State->lane != LANE_NUMBER)// check for overtaking condition
     {
         State->state = OVERTAKE;
     }

@@ -26,14 +26,22 @@ struct VeicleStatistics{
     double minDistance;     // min distance in m that the veicle can be from another veicle
 };
 
+struct DataFile{
+    int rowNumber;
+    FILE *fp;
+};
+
 // File variables
-extern FILE* CarFp, *TruckFp, *MotorcycleFp, *SupercarFp;
+extern struct DataFile CarFile;
+extern struct DataFile TruckFile;
+extern struct DataFile MotorcycleFile;
+extern struct DataFile SupercarFile;
 
 // function that open the file and return the file pointer
 int CheckStatisticFile();
 
 // function that read line and retun car Statistic struct pointer
-struct VeicleStatistics *GetVeicleStaitistics(int type);
+void GetVeicleStaitistics(int type, struct VeicleStatistics *Statistics);
 
 // function that close the file
 void CloseStatisticFile();

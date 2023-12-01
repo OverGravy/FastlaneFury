@@ -459,33 +459,23 @@ void initVeicleState(struct VeicleState *state, struct VeicleStatistics *statist
 
     // find the veicle type 
     if(state->veicle >= 0 && state->veicle <= CAR_NUMBER){
-        statistics = GetVeicleStaitistics(CAR);
+        GetVeicleStaitistics(CAR, statistics);
     }else if(state->veicle >= CAR_NUMBER && state->veicle < CAR_NUMBER + TRUCK_NUMBER){
-        statistics = GetVeicleStaitistics(TRUCK);
+        GetVeicleStaitistics(TRUCK, statistics);
     }else if(state->veicle >= CAR_NUMBER + TRUCK_NUMBER && state->veicle < CAR_NUMBER + TRUCK_NUMBER + MOTORCYCLE_NUMBER){
-        statistics = GetVeicleStaitistics(MOTORCYCLE);
+        GetVeicleStaitistics(MOTORCYCLE, statistics);
     }else if(state->veicle >= CAR_NUMBER + TRUCK_NUMBER + MOTORCYCLE_NUMBER && state->veicle < CAR_NUMBER + TRUCK_NUMBER + MOTORCYCLE_NUMBER + SUPERCAR_NUMBER){
-        statistics = GetVeicleStaitistics(SUPERCAR);
+        GetVeicleStaitistics(SUPERCAR, statistics);
     }
 
 
-    state->speed = 10.0;                                                                         // in m/s
+    state->speed = 15.0;                                                                        // in m/s
     state->lane = rand() % LANE_NUMBER;
     state->pos.x = (MY_SCREEN_W - 2) / SCALE_FACTOR;                                            // in meter
     margin = ((MY_SCREEN_H / (LANE_NUMBER + 1)) - ((Veicles[state->veicle]->h))) / 2;           // margin in pixel
     state->pos.y = (((MY_SCREEN_H / (LANE_NUMBER + 1)) * state->lane) + margin) / SCALE_FACTOR; // in meter
     state->steeringAngle = 0.0;                                                                 // in degree
-    state->acceleration = 20;                                                                   // in m/s^2
-
-    printf("OK: Veicle %d initialized\n", state->veicle);
-    printf("OK: Veicle %d in lane %d\n", state->veicle, state->lane);
-    printf("OK: Veicle %d in position (%.2f, %.2f)\n", state->veicle, state->pos.x, state->pos.y);
-    printf("OK: Veicle %d with steering angle %.2f\n", state->veicle, state->steeringAngle);
-    printf("OK: Veicle %d with max speed %.2f\n", state->veicle, statistics->maxSpeed);
-    printf("OK: Veicle %d with max acceleration %.2f\n", state->veicle, statistics->maxAcceleration);
-    printf("OK: Veicle %d with max deceleration %.2f\n", state->veicle, statistics->maxDeceleration);
-    printf("OK: Veicle %d with min distance %.2f\n", state->veicle, statistics->minDistance);
-    printf("OK: Veicle %d with initial speed %.2f\n", state->veicle, state->speed);
+    state->acceleration = 0;                                                                   // in m/s^2
    
 }
 

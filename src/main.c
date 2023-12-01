@@ -34,7 +34,10 @@ int selectedVeicle = -1;          // selected veicle
 int selectedButton = -1;          // selected button
 
 // statistic things
-FILE* CarFp, *TruckFp, *MotorcycleFp, *SupercarFp; // file pointer
+struct DataFile CarFile;
+struct DataFile TruckFile;
+struct DataFile MotorcycleFile;
+struct DataFile SupercarFile;
 
 // Game Variables
 struct Config configuration;            // setting structure
