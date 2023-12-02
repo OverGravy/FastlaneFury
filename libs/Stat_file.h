@@ -1,11 +1,3 @@
-/*  TYPE OF VEICLE
-
-    1) Car
-    2) Truck
-    3) Motorcycle
-    
-*/
-
 #ifndef FILE_H
 #define FILE_H
 

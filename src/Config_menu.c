@@ -1,4 +1,4 @@
-#include "../libs/ConfigMenu.h"
+#include "../libs/Config_menu.h"
 
 // function that init pause menu
 void initConfigMenu()

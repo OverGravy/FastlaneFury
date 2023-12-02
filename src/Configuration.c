@@ -1,10 +1,11 @@
 #include "../libs/Configuration.h"
 
 // function that init configuration
-void initConfiguration()
+int initConfiguration()
 {
     configuration.autoSpawn = 0;
     configuration.autoSpawnTime = 5;
+    return 1;
 }
 
 // Setter

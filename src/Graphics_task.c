@@ -1,4 +1,4 @@
-#include "../libs/Graphics.h"
+#include "../libs/Graphics_task.h"
 
 // periodic task function that perioducally updates the screen
 void *graphicsTask(void *arg)
@@ -17,14 +17,14 @@ void *graphicsTask(void *arg)
     {
         // DRAW SCENE
 
-        // clear display
-        clearDisplay();
+        // clear the buffer bitmap
+        clear_display();
 
         // draw background
-        DrawBackground();
+        draw_background();
 
         // draw info
-        DrawInfo(GraphicsArg.mutex, GraphicsArg.shared);
+        draw_info(GraphicsArg.mutex, GraphicsArg.shared);
 
         // draw veicles
         pthread_mutex_lock(GraphicsArg.mutex);
@@ -34,29 +34,29 @@ void *graphicsTask(void *arg)
             current = GraphicsArg.shared->head;
             while (current != NULL)
             {
-                DrawVeicle(current->Veicle.pos.x, current->Veicle.pos.y, current->Veicle.veicle);
+                draw_veicle(current->Veicle.pos.x, current->Veicle.pos.y, current->Veicle.veicle);
                 current = current->next;
             }
         }
         pthread_mutex_unlock(GraphicsArg.mutex);
 
         // check for pause menu
-        if (checkPause(1))
+        if (checkMenu())
         {
             DrawConfigMenu();
         }
 
         // drawpause sinbol
-        if (checkPause(0))
+        if (checkPause())
         {
-            DrawPauseSymbol();
+            draw_pause_symbol();
         }
 
         // draw mouse
-        DrawMouse(mouse_x, mouse_y);
+        draw_mouse(mouse_x, mouse_y);
 
         // flip the display
-        flipDisplay();
+        flip_display();
 
         // check for miss deadline
         if (deadline_miss(ti))

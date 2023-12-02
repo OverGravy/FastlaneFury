@@ -6,7 +6,7 @@
 #include <pthread.h>
 #include <allegro.h>
 #include "Game.h"
-#include "Veicle.h"
+#include "Veicle_task.h"
 
 void *userTask(void *arg);
 

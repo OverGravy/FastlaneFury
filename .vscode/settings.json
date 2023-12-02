@@ -7,7 +7,8 @@
         "veicle.h": "c",
         "supportlist.h": "c",
         "allegro.h": "c",
-        "graphics.h": "c"
+        "graphics.h": "c",
+        "user_task.h": "c"
     },
     "C_Cpp.dimInactiveRegions": false,
     "C_Cpp.errorSquiggles": "disabled"

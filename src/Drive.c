@@ -18,7 +18,7 @@ void idle(struct VeicleState *State, struct VeicleStatistics *Statistics, struct
         State->state = SLOWDOWN;
     }
 
-    if (distances->left == -1 && State->speed > 45 && State->lane != LANE_NUMBER) // No car on left and speed > 45 m/s
+    if (distances->left == -1 && State->speed > 45*(LANE_NUMBER+1) && State->lane != LANE_NUMBER - 1) // No car on left and speed > 45 m/s
     {
         State->state = OVERTAKE;
     }
@@ -49,7 +49,7 @@ void slowDown(struct VeicleState *State, struct VeicleStatistics *Statistics, st
     // Handling state logic
 
     State->acceleration = distances->front - Statistics->minDistance; // set decelation in function of distance
-    if (State->acceleration < Statistics->maxDeceleration)              // check for max deceleration
+    if (State->acceleration < Statistics->maxDeceleration)            // check for max deceleration
     {
         State->acceleration = Statistics->maxDeceleration; // set max deceleration
     }
@@ -60,12 +60,10 @@ void slowDown(struct VeicleState *State, struct VeicleStatistics *Statistics, st
         State->state = ACCELERATE;
     }
 
-
-    if (distances->front <= Statistics->minDistance && State->lane != LANE_NUMBER -1)// check for overtaking condition
+    if (distances->front <= Statistics->minDistance && State->lane != LANE_NUMBER - 1) // check for overtaking condition
     {
         State->state = OVERTAKE;
     }
-   
 }
 
 // function that handle OVERTAKE state logic and change state
@@ -78,12 +76,11 @@ void overtake(struct VeicleState *State, struct VeicleStatistics *Statistics, st
 
     State->acceleration += 0.1; // set max acceleration
 
-  
     if (State->acceleration > Statistics->maxAcceleration)
     {
         State->acceleration = Statistics->maxAcceleration;
     }
-    State->steeringAngle -= 0.5;                       // increase gradually steering angle
+    State->steeringAngle -= 0.5; // increase gradually steering angle
 
     if (State->steeringAngle < -45) // check for max steering angle
     {
@@ -126,13 +123,12 @@ void abortOvertake(struct VeicleState *State, struct VeicleStatistics *Statistic
     }
     else // still if i have a veicle i was trying to overtake i need to slow down
     {
-        if(distances->right != -1){
+        if (distances->right != -1)
+        {
             State->acceleration = distances->right - Statistics->minDistance;
         }
         State->acceleration = Statistics->maxAcceleration;
     }
-
-    
 
     if (State->acceleration < Statistics->maxDeceleration) // check for max deceleration
     {
@@ -212,20 +208,19 @@ void DrivingHandling(struct VeicleState *State, struct VeicleStatistics *Statist
         State->speed = 0;
     }
 
-    // check max speed 
+    // check max speed
     if (State->speed > Statistics->maxSpeed)
     {
         State->speed = Statistics->maxSpeed;
     }
-
 }
 
 // function tha handle sensor measurements
-void DoMesurements(struct VeicleState *State, double measurement[], struct Distances *distances){
-    
-    int i, j, x, y;                  // support index and variables 
+void DoMesurements(struct VeicleState *State, double measurement[], struct Distances *distances)
+{
+
+    int i, j, x, y; // support index and variables
     int degree;
-   
 
     // # GET DISTANCE FRONT #
 
@@ -234,28 +229,47 @@ void DoMesurements(struct VeicleState *State, double measurement[], struct Dista
 
     measurement[0] = proximitySensor(x, y, RANGE_FRONT, 180);
 
+    // if im in first or in the last lane i dont need to check for left or right
+
     // # GET DISTANCE LEFT #
 
-    x = (((State->pos.x) * SCALE_FACTOR) + (getVeicleWidth(State->veicle) / 2));
-    y = ((State->pos.y * SCALE_FACTOR) + getVeicleHeight(State->veicle)) + 10;
-
-    for (i = 1; i <= DETECTION_DEGREE; i++)
+    if (State->lane != 0)
     {
-        degree = 10 + i;
-        measurement[i] = proximitySensor(x, y, RANGE_SIDE, degree);
-    }
+        x = (((State->pos.x) * SCALE_FACTOR) + (getVeicleWidth(State->veicle) / 2));
+        y = ((State->pos.y * SCALE_FACTOR) + getVeicleHeight(State->veicle)) + 10;
 
+        for (i = 1; i <= DETECTION_DEGREE; i++)
+        {
+            degree = 10 + i;
+            measurement[i] = proximitySensor(x, y, RANGE_SIDE, degree);
+        }
+    }
+    else
+    {
+        for (i = 1; i <= DETECTION_DEGREE; i++)
+        {
+            measurement[i] = -1;
+        }
+    }
     // # GET DISTANCE RIGHT #
 
-    x = (State->pos.x * SCALE_FACTOR) + (getVeicleWidth(State->veicle) / 2);
-    y = (State->pos.y * SCALE_FACTOR) - 10;
+    if( State->lane != LANE_NUMBER - 1){
+        x = (((State->pos.x) * SCALE_FACTOR) + (getVeicleWidth(State->veicle) / 2));
+        y = ((State->pos.y * SCALE_FACTOR) - 10);
 
-    j = 0;
-    for (i = DETECTION_DEGREE + 1; i <= (DETECTION_DEGREE * 2); i++)
+        for (i = DETECTION_DEGREE + 1; i <= (DETECTION_DEGREE * 2); i++)
+        {
+            j++;
+            degree = 190 + j;
+            measurement[i] = proximitySensor(x, y, RANGE_SIDE, degree);
+        }
+    }
+    else
     {
-        j++;
-        degree = 190 + j;
-        measurement[i] = proximitySensor(x, y, RANGE_SIDE, degree);
+        for (i = DETECTION_DEGREE + 1; i <= (DETECTION_DEGREE * 2); i++)
+        {
+            measurement[i] = -1;
+        }
     }
 
     // # GET DISTANCE BACK #
@@ -318,5 +332,4 @@ void DoMesurements(struct VeicleState *State, double measurement[], struct Dista
     {
         distances->back = -1;
     }
-
 }

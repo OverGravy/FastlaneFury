@@ -11,7 +11,7 @@ struct Config
 extern struct Config configuration;            // setting structure
 
 // function that init to default configuration
-void initConfiguration();
+int initConfiguration();
 
 
 // SETTER

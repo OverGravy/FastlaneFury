@@ -3,8 +3,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "../libs/Game.h"
-#include "../libs/Graphics.h"
-#include "../libs/User.h"
+#include "../libs/Graphics_task.h"
+#include "../libs/User_task.h"
+#include "../libs/Draw.h"
 #include <time.h>
 #include <math.h>
 
@@ -20,7 +21,6 @@ int freeIndex[MAX_TASKS];
 BITMAP *buffer;                   // display buffer bitmap
 BITMAP *background;               // background bitmap
 BITMAP *Veicles[CAR_NUMBER+TRUCK_NUMBER+MOTORCYCLE_NUMBER+SUPERCAR_NUMBER]; // array of veicles bitmaps
-FONT *fonts[MAX_FONT];            // array of fonts
 
 // Shared variable things
 struct SharedList *shared;        // shared list
@@ -52,14 +52,14 @@ int main()
     srand(time(NULL));
 
     // init allegro
-    if (!initAllegro())
+    if (!init_allegro())
     {
         fprintf(stderr, "ERROR: failed to initialize allegro!\n");
         return -1;
     }
 
     // load graphics assets
-    if (!loadGraphicsAssets())
+    if (!load_graphics_assets())
     {
         fprintf(stderr, "ERROR: failed to load graphics assets!\n");
         return -1;
@@ -73,7 +73,11 @@ int main()
     }
 
     // init configuration structure
-    initConfiguration();
+    if (!initConfiguration())
+    {
+        fprintf(stderr, "ERROR: failed to propertly initialize configuration!\n");
+        return -1;
+    }
 
 
     // init ptask
@@ -117,12 +121,9 @@ int main()
 
     // create and start Graphics task
     struct argument GraphicsArg;
-    GraphicsArg.mutex = &mutex;
-    GraphicsArg.shared = shared;
-    GraphicsArg.screenH = SCREEN_H;
-    GraphicsArg.screenW = SCREEN_W;
+    GraphicsArg = userTaskArg;
 
-    if (task_create(graphicsTask, 1, GraphicsArg, (int)round((double)1000 / SCREEN_FPS), (int)round((double)1000 / SCREEN_FPS), 80, ACT) != 0)
+    if (task_create(graphicsTask, 1, GraphicsArg, (int)round((double)1000 / SCREEN_FPS), (int)round((double)1000 / SCREEN_FPS)+1, 80, ACT) != 0)
     {
         printf("ERROR: can not create graphics task\n");
         return -1;

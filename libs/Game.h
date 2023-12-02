@@ -13,16 +13,15 @@
 #include <math.h>
 #include "Ptask.h"
 #include "List.h"
-#include "SupportList.h"
-#include "VeicleStat.h"
+#include "Support_list.h"
+#include "Stat_file.h"
 #include "Configuration.h"
-#include "ConfigMenu.h"
+#include "Config_menu.h"
 
 // allegro costant
 #define MY_SCREEN_W 1880
 #define MY_SCREEN_H 720
-#define SCREEN_FPS 60
-#define MAX_FONT 1
+#define SCREEN_FPS 100
 
 // Game costant 
 #define LANE_NUMBER 4             // number of lane
@@ -63,19 +62,15 @@
 #define SUPERCAR_NUMBER 16
 #define VEICLE_NUMBER CAR_NUMBER+TRUCK_NUMBER+MOTORCYCLE_NUMBER+SUPERCAR_NUMBER
 
-
 // Selection constant
 #define VEICLE 0
 #define BUTTON 1
 #define ROAD 2
 
-
 // Graphics variables
 extern BITMAP* buffer;                                                              // display buffer bitmap
 extern BITMAP* background;                                                          // background bitmap
 extern BITMAP* Veicles[CAR_NUMBER+TRUCK_NUMBER+MOTORCYCLE_NUMBER+SUPERCAR_NUMBER] ; // array of veicles bitmaps
-extern FONT* fonts[MAX_FONT];                                                       // array of fonts
-
 
 // Game Variables
 extern int paused[MAX_TASKS];             // array of pause
@@ -89,51 +84,10 @@ extern int selectedButton;                // index of selected button
 // ALLEGRO FUNCTIONS    
 
 // funtion that initialize allegro 4.2
-int initAllegro();
+int init_allegro();
 
 // close duntion that take reference to everithing needed to close allegro
-void closeAllegro();
-
-// load function that takes references of bitmap and font array
-int loadGraphicsAssets();
-
-
-
-// DRAWING FUNCTIONS
-
-// function that clear the display
-void clearDisplay();
-
-// function that flip the display
-void flipDisplay();
-
-// function that draws the backgroung
-void DrawBackground();
-
-// fucntion that draws info
-void DrawInfo(pthread_mutex_t *mutex, struct SharedList *shared);
-
-// function that draws veicle
-void DrawVeicle(double x, double y, int type);
-
-// function that draws mouse
-void DrawMouse(int x, int y);
-
-// function that draws background in buffer
-void DrawBackgroundInBitmap();
-
-// function that draws pause 
-void DrawPauseSymbol();
-
-// function that draws point where we need
-void DrawPoint(int x, int y, int color);
-
-// function that draws arch where we need
-void DrawArch(int x, int y, int radius, double startAngle, double endAngle, int color);
-
-// function that draws line where we need
-void DrawLine(int x1, int y1, int x2, int y2, int color);
-
+void close_allegro();
 
 
 
@@ -187,7 +141,10 @@ void resumeVeicles(pthread_mutex_t *mutex, struct SharedList *shared);
 void resumeFromMenu(pthread_mutex_t *mutex, struct SharedList *shared);
 
 // function that cheks if a veicle is paused
-int checkPause(int id);
+int checkPause();
+
+// function that cheks if the menu is open
+int checkMenu();
 
 
 

@@ -1,4 +1,4 @@
-#include "../libs/User.h"
+#include "../libs/User_task.h"
 
 // user task handle:
 // - create a new veicle
@@ -208,7 +208,7 @@ void *userTask(void *arg)
     task_deactivate(1); // close graphics task
 
     ptask_exit();         // close ramining task and exit
-    closeAllegro();       // close allegro
+    close_allegro();       // close allegro
     CloseStatisticFile(); // close statistic file
     return NULL;
 }
