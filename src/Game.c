@@ -135,6 +135,16 @@ void closeAllegro()
     allegro_exit();
 }
 
+// function that load a scaled version of the bitmap
+BITMAP *load_scaled_bitmap(char *filename, double factor)
+{
+    BITMAP *temp = load_bitmap(filename, NULL);
+    BITMAP *ret = create_bitmap(temp->w * factor, temp->h * factor);
+    stretch_blit(temp, ret, 0, 0, temp->w, temp->h, 0, 0, temp->w * factor, temp->h * factor);
+    destroy_bitmap(temp);
+    return ret;
+}
+
 // function that load all the graphics assets
 int loadGraphicsAssets()
 {
@@ -144,7 +154,9 @@ int loadGraphicsAssets()
     {
         char path[60];
         sprintf(path, "../Assets/Bitmap/VeicleBitmap/Car/C_bitmap%d.bmp", i);
-        Veicles[i] = load_bitmap(path, NULL);
+
+        // load a scaled version of the bitmap
+        Veicles[i] = load_scaled_bitmap(path, VEICLE_SCALE_FACTOR);
 
         if (!Veicles[i])
         {
@@ -160,7 +172,9 @@ int loadGraphicsAssets()
     {
         char path[60];
         sprintf(path, "../Assets/Bitmap/VeicleBitmap/Truck/T_bitmap%d.bmp", i);
-        Veicles[i + CAR_NUMBER] = load_bitmap(path, NULL);
+
+        // load a scaled version of the bitmap
+        Veicles[i+CAR_NUMBER] = load_scaled_bitmap(path, VEICLE_SCALE_FACTOR);
 
         if (!Veicles[i + CAR_NUMBER])
         {
@@ -176,7 +190,9 @@ int loadGraphicsAssets()
     {
         char path[60];
         sprintf(path, "../Assets/Bitmap/VeicleBitmap/Motorcycle/M_bitmap%d.bmp", i);
-        Veicles[i + CAR_NUMBER + TRUCK_NUMBER] = load_bitmap(path, NULL);
+
+        // load a scaled version of the bitmap
+        Veicles[i + CAR_NUMBER + TRUCK_NUMBER] = load_scaled_bitmap(path, VEICLE_SCALE_FACTOR);
 
         if (!Veicles[i + CAR_NUMBER + TRUCK_NUMBER])
         {
@@ -192,7 +208,9 @@ int loadGraphicsAssets()
     {
         char path[60];
         sprintf(path, "../Assets/Bitmap/VeicleBitmap/SuperCar/SC_bitmap%d.bmp", i);
-        Veicles[i + CAR_NUMBER + TRUCK_NUMBER + MOTORCYCLE_NUMBER] = load_bitmap(path, NULL);
+
+        // load a scaled version of the bitmap
+        Veicles[i + CAR_NUMBER + TRUCK_NUMBER + MOTORCYCLE_NUMBER] = load_scaled_bitmap(path, VEICLE_SCALE_FACTOR);
 
         if (!Veicles[i + CAR_NUMBER + TRUCK_NUMBER + MOTORCYCLE_NUMBER])
         {
@@ -203,6 +221,8 @@ int loadGraphicsAssets()
     
     return 1;
 }
+
+
 
 // GRAPHICS FUNCTIONS
 
@@ -366,8 +386,8 @@ void DrawInfo(pthread_mutex_t *mutex, struct SharedList *shared)
 // function that draws veicle
 void DrawVeicle(double x, double y, int type)
 {
-    int xg = (int)round(x * SCALE_FACTOR); // conversion of x in pixel
-    int yg = (int)round(y * SCALE_FACTOR); // conversion of y in pixel
+    int xg = (int)(x * SCALE_FACTOR); // conversion of x in pixel
+    int yg = (int)(y * SCALE_FACTOR); // conversion of y in pixel
 
     draw_sprite(buffer, Veicles[type], xg, yg);
 }
@@ -456,8 +476,6 @@ void initVeicleState(struct VeicleState *state, struct VeicleStatistics *statist
 {
     int margin = 0;
     state->veicle = rand() % VEICLE_NUMBER; // random veicle
-    printf("\n");
-    printf("OK: Veicle %d initialized\n", state->veicle);
 
     // find the veicle type 
     if(state->veicle >= 0 && state->veicle <= CAR_NUMBER){
@@ -471,7 +489,7 @@ void initVeicleState(struct VeicleState *state, struct VeicleStatistics *statist
     }
 
 
-    state->speed = 15.0;                                                                        // in m/s
+    state->speed = 30.0;                                                                        // in m/s
     state->lane = rand() % LANE_NUMBER;
     state->pos.x = (MY_SCREEN_W - 2) / SCALE_FACTOR;                                            // in meter
     margin = ((MY_SCREEN_H / (LANE_NUMBER + 1)) - ((Veicles[state->veicle]->h))) / 2;           // margin in pixel

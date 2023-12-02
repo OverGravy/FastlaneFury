@@ -122,7 +122,7 @@ int main()
     GraphicsArg.screenH = SCREEN_H;
     GraphicsArg.screenW = SCREEN_W;
 
-    if (task_create(graphicsTask, 1, GraphicsArg, (int)ceil((double)1000 / SCREEN_FPS), (int)ceil((double)1000 / SCREEN_FPS), 80, ACT) != 0)
+    if (task_create(graphicsTask, 1, GraphicsArg, (int)round((double)1000 / SCREEN_FPS), (int)round((double)1000 / SCREEN_FPS), 80, ACT) != 0)
     {
         printf("ERROR: can not create graphics task\n");
         return -1;

@@ -13,13 +13,13 @@ In final result feature will be:
 # Actual Feature
 
 - User thread  handle input part and grafics thread handle the screen refresh.
-- There are mosre than 150 different car bitmap preloaded.
+- There are mosre than 150 different car bitmap preloaded and scaled.
 - Car spwan over user command.
 - Car distance is implemented using a sensor.
 - User is able to select a car and see some information about it and thread itseaf
 - Is possible to pause the game.
 - Is possible to see lot of information about the car and the thread by clicking over a car.
-- When cliccking over a car the fowv is realistic on what car see.
+- When cliccking over a car the fov is realistic on what car see.
 - Is NOW possible to pause all the car by leaving Graphics thread and User thread running.
 - Car handle better with a NEW system to keep track of multiple direction
 - Car Statistics such as MaxSpeed or MaxAcceleration are now loaded from an extern file giving mach variability to car behaviour.
@@ -30,7 +30,7 @@ In final result feature will be:
 # How to use
 Before compiling using make sure you have install the right allegro library version witch is allegro 4.2 using the following command:
 ```sudo apt install liballegro4-dev```
-Pressing space after the program spawn 1 car pressing another time spawn another car that perform overtake.
+- Pressing space after the program spawn 1 car pressing another time spawn another car that perform overtake.
 - Pressing 'p' will pause the game.
 - Pressing 'p' again resume the game.
 - Pressing 'esc' will close the game.

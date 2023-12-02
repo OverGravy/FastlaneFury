@@ -86,22 +86,18 @@ void GetVeicleStaitistics(int type, struct VeicleStatistics *Statistics){
     case CAR:
         fp = CarFile.fp;
         randomRow = rand() % CarFile.rowNumber +1;
-        printf("car\n");
         break;
     case TRUCK:
         fp = TruckFile.fp;
         randomRow = rand() % TruckFile.rowNumber +1;
-        printf("truck\n");
         break;
     case MOTORCYCLE:
         fp = MotorcycleFile.fp;
         randomRow = rand() % MotorcycleFile.rowNumber +1;
-        printf("motorcycle\n");
         break;
     case SUPERCAR:
         fp = SupercarFile.fp;
         randomRow = rand() % SupercarFile.rowNumber +1;
-        printf("supercar\n");
         break;
     }
 
@@ -118,11 +114,7 @@ void GetVeicleStaitistics(int type, struct VeicleStatistics *Statistics){
         i++;
     }
 
-    printf("maxSpeed: %lf\n", Statistics->maxSpeed);
-    printf("maxAcceleration: %lf\n", Statistics->maxAcceleration);
-    printf("maxDeceleration: %lf\n", Statistics->maxDeceleration);
-    printf("minDistance: %lf\n", Statistics->minDistance);
-    printf("randomRow: %d\n", randomRow);
+    rewind(fp);
 }
 
 // function that close the file

@@ -25,16 +25,17 @@
 #define MAX_FONT 1
 
 // Game costant 
-#define LANE_NUMBER 4        // number of lane
-#define SCALE_FACTOR 15      // scale factor for car for meter to px
+#define LANE_NUMBER 4             // number of lane
+#define SCALE_FACTOR 15           // scale factor for car for meter to px
+#define VEICLE_SCALE_FACTOR 0.8   // scale factor for veicle
 
 // Sensor costant
-#define SMAX 200    // max distance in px
-#define SMIN 0      // minimun distance in px
-#define SSTEP 1     // step in px
-#define RANGE_FRONT 200   // range in px
-#define RANGE_BACK 50    // range in px
-#define RANGE_SIDE 150    // range in px
+#define SMAX 200                               // max distance in px
+#define SMIN 0                                 // minimun distance in px
+#define SSTEP 1                                // step in px
+#define RANGE_FRONT 200 * VEICLE_SCALE_FACTOR  // range in px
+#define RANGE_BACK 50  * VEICLE_SCALE_FACTOR   // range in px
+#define RANGE_SIDE 150 * VEICLE_SCALE_FACTOR   // range in px
 
 // color constant
 #define BGCOLOR makecol(188, 188, 188)
@@ -97,6 +98,7 @@ void closeAllegro();
 int loadGraphicsAssets();
 
 
+
 // DRAWING FUNCTIONS
 
 // function that clear the display
@@ -148,6 +150,7 @@ int getVeicleHeight(int veicle);
 
 // function that returns distance from other veicle
 double proximitySensor(double x, double y, int range, double alpha);
+
 
 
 // USER FUNCTIONS
