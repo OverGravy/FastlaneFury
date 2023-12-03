@@ -3,7 +3,7 @@
 // USER FUNCTIONS
 
 // function that return the index of the selected veicle
-int get_selection(int x, int y, pthread_mutex_t *mutex, struct Shared_List *shared)
+int set_selection(int x, int y, pthread_mutex_t *mutex, struct Shared_List *shared)
 {
     int selection = -1;
 
@@ -41,8 +41,8 @@ int get_selection(int x, int y, pthread_mutex_t *mutex, struct Shared_List *shar
 
         // set selected button
     }
-
     selection = ROAD; // if i don't find anything i return road
+    selected_veicle = -1;
 
     return selection;
 }
@@ -65,5 +65,15 @@ int get_selected_button()
     return selected_button;
 }
 
+// function that set zoomed veicle id
+void set_zoomed_veicle(int id)
+{
+    zoomed_veicle = id;
+}
 
+// function that get the index of the zoomed veicle
+int get_zoomed_veicle()
+{
+    return zoomed_veicle;
+}
 

@@ -21,6 +21,7 @@ int freeIndex[MAX_TASKS];
 BITMAP *buffer;                   // display buffer bitmap
 BITMAP *background;               // background bitmap
 BITMAP *Veicles[CAR_NUMBER+TRUCK_NUMBER+MOTORCYCLE_NUMBER+SUPERCAR_NUMBER]; // array of veicles bitmaps
+BITMAP *zoom_screen;              // zoom screen bitmaps
 
 // Shared variable things
 struct Shared_List *shared;        // shared list
@@ -32,6 +33,7 @@ int paused[MAX_TASKS];            // array of pause
 // User task things
 int selected_veicle = -1;          // selected veicle
 int selected_button = -1;          // selected button
+int zoomed_veicle = -1;            // zoomed veicle
 
 // statistic things
 struct Data_File CarFile;

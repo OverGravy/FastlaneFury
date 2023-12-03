@@ -12,7 +12,6 @@ void *user_task(void *arg)
 
     // Local selction variables
     int selection = -1;      // what the user clicked
-    int selectedVeicle = -1; // selected veicle id
     int selectedButton = -1; // selected button id
     int pause = 0;           // pause flag
     int menu = 0;            // menu flag
@@ -104,6 +103,10 @@ void *user_task(void *arg)
                     printf("OK: Game resumed\n");
                 }
                 break;
+            case KEY_Z:
+                if(get_selected_veicle() != NONE && pause == 0 && menu == 0){
+                    set_zoomed_veicle(get_selected_veicle());
+                }
             }
         }
 
@@ -118,23 +121,19 @@ void *user_task(void *arg)
                     handle_input_config_menu(mouse_x, mouse_y);
                 }
 
-                selection = get_selection(mouse_x, mouse_y, userTaskArg.mutex, userTaskArg.shared); // handle on what the user clicked
+                selection = set_selection(mouse_x, mouse_y, userTaskArg.mutex, userTaskArg.shared); // handle on what the user clicked
                 switch (selection)
                 {
                 case VEICLE:
-                    selectedVeicle = get_selected_veicle(); // get veicle id
-                    printf("OK: Veicle selected, %d\n", selectedVeicle);
+                    printf("OK: Veicle selected, %d\n", get_selected_veicle());
                     break;
 
                 case BUTTON:
-                    selectedButton = get_selected_button(); // get button id
-                    printf("OK: Button selected, %d\n", selectedButton);
+                    printf("OK: Button selected, %d\n", get_selected_button());
                     break;
 
                 case ROAD:
                     printf("OK: Road selected\n");
-                    selectedVeicle = -1;
-                    set_selected_veicle(selectedVeicle);
                     break;
                 }
             }
@@ -167,7 +166,7 @@ void *user_task(void *arg)
                 veicleTaskArg.mutex = userTaskArg.mutex;
                 veicleTaskArg.shared = userTaskArg.shared;
                 index = get_free_index();
-                if (index == -1)
+                if (index == NONE)
                 {
                     printf("ERROR: Can not create a new veicle No free index\n");
                 }
@@ -185,13 +184,15 @@ void *user_task(void *arg)
 
 
         // check if selected veicle is valid
-        if (selectedVeicle != -1)
+        if (get_selected_veicle() != NONE)
         {
             // check if the veicle is still active if not deselect it
-            if (!task_is_active(selectedVeicle))
+            if (!task_is_active(get_selected_veicle()))
             {
-                selectedVeicle = -1;                 // deselect veicle
-                set_selected_veicle(selectedVeicle);   // comunicate to graphics task that the veicle is deselected
+                set_selected_veicle(NONE);   // comunicate to graphics task that the veicle is deselected
+                if(get_zoomed_veicle() == get_selected_veicle()){
+                    set_zoomed_veicle(NONE);
+                }
             } 
         }
 

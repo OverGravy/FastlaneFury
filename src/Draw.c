@@ -304,3 +304,35 @@ BITMAP *get_background()
 {
     return background;
 }
+
+// function that clear the zoom screen
+void clear_zoom_screen()
+{
+    clear_to_color(zoom_screen, makecol(0, 0, 0));
+}
+
+// function that flips the zoom screen
+void flip_zoom_screen()
+{
+    acquire_screen();
+
+    // center the zoom screen
+    int x = (MY_SCREEN_W - zoom_screen->w) / 2;
+    int y = (MY_SCREEN_H - zoom_screen->h) / 2;
+
+    blit(zoom_screen, screen, 0, 0, x, y, zoom_screen->w, zoom_screen->h);
+
+    release_screen();
+}
+
+// function that draws zoom screen around a selected veicle
+void draw_zoom_screen(int x, int y, int type)
+{
+    // convert car position in pixel
+    int xg = (int)ceil(x * SCALE_FACTOR); // conversion of x in pixel
+    int yg = (int)ceil(y * SCALE_FACTOR); // conversion of y in pixel
+
+    // cut buffer and insert it in zoom_screen
+    zoom_screen = create_sub_bitmap(buffer, xg - 100, yg - 100, 300, 300);
+
+}

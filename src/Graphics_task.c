@@ -19,6 +19,10 @@ void *graphics_task(void *arg)
 
         // clear the buffer bitmap
         clear_display();
+        if(get_zoomed_veicle() != -1)
+        {
+            clear_zoom_screen();
+        }
 
         // draw background
         draw_background();
@@ -40,6 +44,11 @@ void *graphics_task(void *arg)
         }
         pthread_mutex_unlock(GraphicsArg.mutex);
 
+        if(get_zoomed_veicle() != -1)
+        {
+            draw_zoom_screen();
+        }   
+
         // check for pause menu
         if (check_menu())
         {
@@ -56,7 +65,14 @@ void *graphics_task(void *arg)
         draw_mouse(mouse_x, mouse_y);
 
         // flip the display
-        flip_display();
+        if(get_zoomed_veicle() != -1)
+        {
+            flip_zoom_screen();
+        }
+        else
+        {
+            flip_display();
+        }
 
         // check for miss deadline
         if (deadline_miss(ti))

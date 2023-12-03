@@ -13,6 +13,7 @@
 // Graphics variables
 extern BITMAP* buffer;                                                              // display buffer bitmap
 extern BITMAP* background;                                                          // background bitmap
+extern BITMAP* zoom_screen;                                                         // zoom screen bitmaps
 extern BITMAP* Veicles[CAR_NUMBER+TRUCK_NUMBER+MOTORCYCLE_NUMBER+SUPERCAR_NUMBER] ; // array of veicles bitmaps
 
 // DRAWING FUNCTIONS
@@ -50,6 +51,14 @@ int get_veicle_height(int type);
 // function that returns the veicle bitmap width
 int get_veicle_width(int type);
 
+// function that clear the zoom screen
+void clear_zoom_screen();
+
+// function that draws that flip the zoom screen
+void flip_zoom_screen();
+
+// function that draws zoom screen around a selected veicle
+void draw_zoom_screen(int x, int y, int type);
 
 //// !!!!!!!!!!! NOT USED !!!!!!!!!!!!!!
 

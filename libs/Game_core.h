@@ -72,5 +72,6 @@
 #define OPTION_NUM 3
 #define D_AUTO_SPAWN 0
 #define D_AUTO_SPAWN_TIME 5
+#define NONE -1
 
 #endif
