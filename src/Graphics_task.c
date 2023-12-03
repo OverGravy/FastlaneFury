@@ -1,7 +1,7 @@
 #include "../libs/Graphics_task.h"
 
 // periodic task function that perioducally updates the screen
-void *graphicsTask(void *arg)
+void *graphics_task(void *arg)
 {
 
     int running = 1;
@@ -41,13 +41,13 @@ void *graphicsTask(void *arg)
         pthread_mutex_unlock(GraphicsArg.mutex);
 
         // check for pause menu
-        if (checkMenu())
+        if (check_menu())
         {
-            DrawConfigMenu();
+            draw_config_menu();
         }
 
         // drawpause sinbol
-        if (checkPause())
+        if (check_pause())
         {
             draw_pause_symbol();
         }

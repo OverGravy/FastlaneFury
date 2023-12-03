@@ -105,7 +105,7 @@ void flip_display()
 }
 
 // fucntion that draws info
-void draw_info(pthread_mutex_t *mutex, struct SharedList *shared)
+void draw_info(pthread_mutex_t *mutex, struct Shared_List *shared)
 {
     char info[50];
     double speedKmH = 0;
@@ -123,16 +123,16 @@ void draw_info(pthread_mutex_t *mutex, struct SharedList *shared)
     sprintf(info, "Total Deadline Miss: %d", get_deadline_miss());
     textout_ex(buffer, font, info, 20, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 + 40, makecol(255, 255, 255), -1);
 
-    if (selectedVeicle != -1)
+    if (get_selected_veicle() != -1)
     {
         // print info about the task with id
-        sprintf(info, "Task: %d", selectedVeicle);
+        sprintf(info, "Task: %d", selected_veicle);
         textout_ex(buffer, font, info, 450, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 + 20, makecol(255, 255, 255), -1);
-        sprintf(info, "Period: %d", task_get_period(selectedVeicle));
+        sprintf(info, "Period: %d", task_get_period(selected_veicle));
         textout_ex(buffer, font, info, 450, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 + 40, makecol(255, 255, 255), -1);
-        sprintf(info, "Deadline: %d", task_get_deadline(selectedVeicle));
+        sprintf(info, "Deadline: %d", task_get_deadline(selected_veicle));
         textout_ex(buffer, font, info, 450, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 + 60, makecol(255, 255, 255), -1);
-        sprintf(info, "Priority: %d", task_get_priority(selectedVeicle));
+        sprintf(info, "Priority: %d", task_get_priority(selected_veicle));
         textout_ex(buffer, font, info, 450, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 + 80, makecol(255, 255, 255), -1);
 
         // print info about the veicle with id
@@ -140,7 +140,7 @@ void draw_info(pthread_mutex_t *mutex, struct SharedList *shared)
         struct Node *current = shared->head;
         while (current != NULL)
         {
-            if (current->id == selectedVeicle)
+            if (current->id == selected_veicle)
             {
                 sprintf(info, "Veicle: %d", current->id);
                 textout_ex(buffer, font, info, 650, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 + 20, makecol(255, 255, 255), -1);
@@ -165,7 +165,7 @@ void draw_info(pthread_mutex_t *mutex, struct SharedList *shared)
                 else
                 {
                     // find in support list the veicle with id
-                    struct supportList *temp = getSupportNode(current->id);
+                    struct Support_List *temp = get_support_node(current->id);
                     if (temp != NULL)
                     {
                         speedKmH = (int)round(temp->speed * 3.6);
@@ -216,13 +216,13 @@ void draw_info(pthread_mutex_t *mutex, struct SharedList *shared)
 
                 // Front sensor
                 x = (current->Veicle.pos.x) * SCALE_FACTOR - 10;
-                y = (current->Veicle.pos.y * SCALE_FACTOR) + (getVeicleHeight(current->Veicle.veicle) / 2);
+                y = (current->Veicle.pos.y * SCALE_FACTOR) + (Veicles[current->Veicle.veicle]->h / 2);
                 draw_line(x, y, x - RANGE_FRONT, y, FOVCOLOR, buffer);
                 draw_point(x, y, SENSORCOLOR, buffer);
 
                 if(current->Veicle.lane != 0){
                     // Right sensor
-                    x = (current->Veicle.pos.x * SCALE_FACTOR) + (getVeicleWidth(current->Veicle.veicle) / 2);
+                    x = (current->Veicle.pos.x * SCALE_FACTOR) + (Veicles[current->Veicle.veicle]->w / 2);
                     y = (current->Veicle.pos.y * SCALE_FACTOR) - 10;
                     draw_arch(x, y, RANGE_SIDE, 190.0, 350.0, FOVCOLOR, buffer);
                     draw_point(x, y, SENSORCOLOR, buffer);
@@ -231,15 +231,15 @@ void draw_info(pthread_mutex_t *mutex, struct SharedList *shared)
                 
                 if(current->Veicle.lane != LANE_NUMBER - 1){
                     // Left sensor
-                    x = (current->Veicle.pos.x * SCALE_FACTOR) + (getVeicleWidth(current->Veicle.veicle) / 2);
-                    y = ((current->Veicle.pos.y * SCALE_FACTOR) + getVeicleHeight(current->Veicle.veicle)) + 10;
+                    x = (current->Veicle.pos.x * SCALE_FACTOR) + (Veicles[current->Veicle.veicle]->w  / 2);
+                    y = ((current->Veicle.pos.y * SCALE_FACTOR) + Veicles[current->Veicle.veicle]->h) + 10;
                     draw_arch(x, y, RANGE_SIDE, 10.0, 170.0, FOVCOLOR, buffer);
                     draw_point(x, y, SENSORCOLOR, buffer);
                 }
 
                 // Back sensor
-                x = (((current->Veicle.pos.x) * SCALE_FACTOR) + getVeicleWidth(current->Veicle.veicle)) + 10;
-                y = (((current->Veicle.pos.y) * SCALE_FACTOR) + (getVeicleHeight(current->Veicle.veicle) / 2));
+                x = (((current->Veicle.pos.x) * SCALE_FACTOR) + Veicles[current->Veicle.veicle]->w ) + 10;
+                y = (((current->Veicle.pos.y) * SCALE_FACTOR) + (Veicles[current->Veicle.veicle]->h / 2));
                 draw_line(x, y, x + RANGE_BACK, y, FOVCOLOR, buffer);
                 draw_point(x, y, SENSORCOLOR, buffer);
 
@@ -272,7 +272,6 @@ void draw_mouse(int x, int y)
     circlefill(buffer, x, y, 5, makecol(255, 0, 0));
 }
 
-
 // function that draws pause if the veicle is paused
 void draw_pause_symbol()
 {
@@ -280,4 +279,28 @@ void draw_pause_symbol()
     // make the pause sign 5 pixel more hight and in the left
     rectfill(buffer, 30, SCREEN_H - 60, 35, SCREEN_H - 20, makecol(0, 0, 0));
     rectfill(buffer, 45, SCREEN_H - 60, 50, SCREEN_H - 20, makecol(0, 0, 0));
+}
+
+// function that returns the veicle bitmap height
+int get_veicle_height(int type)
+{
+    return Veicles[type]->h;
+}
+
+// function that returns the veicle bitmap width
+int get_veicle_width(int type)
+{
+    return Veicles[type]->w;
+}
+
+// function that returns the pointer to the buffer
+BITMAP *get_buffer()
+{
+    return buffer;
+}
+
+// function that returns the pointer to the background
+BITMAP *get_background()
+{
+    return background;
 }

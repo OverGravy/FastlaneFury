@@ -9,18 +9,14 @@
 #include <signal.h>
 #include "List.h"
 #include "Task_time.h"
-
-#define MAX_TASKS 200
-#define MICRO 0
-#define MILLI 1
-#define ACT 1
+#include "Game_core.h"
 
 
 // task argument
 struct argument
 {
     pthread_mutex_t *mutex;
-    struct SharedList *shared;
+    struct Shared_List *shared;
     int screenW;
     int screenH;
 };

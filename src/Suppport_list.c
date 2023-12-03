@@ -1,18 +1,18 @@
 #include "../libs/Support_list.h"
 
 // fucntion that create support list 
-struct supportList* createSupportList(){
-    struct supportList* newList = (struct supportList*)malloc(sizeof(struct supportList));   // allocate memory for the new list
+struct Support_List* create_support_list(){
+    struct Support_List* newList = (struct Support_List*)malloc(sizeof(struct Support_List));   // allocate memory for the new list
     newList->next = NULL;                                                                    // set next to null
     return newList;
 
 }
 
 // function that insert info in the support list
-void addVecileInfoToSupport(struct VeicleState *veicle, int index){
+void add_vecile_info_to_support(struct Veicle_State *veicle, int index){
 
     // create new node
-    struct supportList* newNode = (struct supportList*)malloc(sizeof(struct supportList));
+    struct Support_List* newNode = (struct Support_List*)malloc(sizeof(struct Support_List));
 
     pthread_mutex_lock(&supportMutex);
 
@@ -28,7 +28,7 @@ void addVecileInfoToSupport(struct VeicleState *veicle, int index){
     }
     else{
         // find last node
-        struct supportList* last = support->next;
+        struct Support_List* last = support->next;
         while(last->next != NULL){
             last = last->next;
         }
@@ -41,12 +41,12 @@ void addVecileInfoToSupport(struct VeicleState *veicle, int index){
 }
 
 // function that return a specific node in the support list
-struct supportList* getSupportNode(int index){
+struct Support_List* get_support_node(int index){
 
     pthread_mutex_lock(&supportMutex);
 
     // find node
-    struct supportList* temp = support->next;
+    struct Support_List* temp = support->next;
     while (temp != NULL)
     {
         if (temp->id == index)
@@ -62,7 +62,7 @@ struct supportList* getSupportNode(int index){
 }
 
 // function that clean all element in support list
-void cleanSupportList(){
+void clean_support_list(){
 
     pthread_mutex_lock(&supportMutex);
     // if list is empty return
@@ -72,9 +72,9 @@ void cleanSupportList(){
     }
 
     // free all nodes
-    struct supportList* current = support->next;
+    struct Support_List* current = support->next;
     while(current != NULL){
-        struct supportList* next = current->next;
+        struct Support_List* next = current->next;
         free(current);
         current = next;
     }
@@ -84,16 +84,16 @@ void cleanSupportList(){
 }
 
 // function that destroy support list
-void destroySupportList(){
+void  destroy_support_list(){
     // if list is empty return
     if(support->next == NULL){
         return;
     }
 
     // free all nodes
-    struct supportList* current = support->next;
+    struct Support_List* current = support->next;
     while(current != NULL){
-        struct supportList* next = current->next;
+        struct Support_List* next = current->next;
         free(current);
         current = next;
     }

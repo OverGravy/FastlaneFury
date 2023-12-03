@@ -8,7 +8,7 @@
  */
 
 // function task veicle
-void *veicleTask(void *arg)
+void *veicle_task(void *arg)
 {
     int running = 1;
 
@@ -18,10 +18,10 @@ void *veicleTask(void *arg)
     wait_for_activation(ti);
 
     // initialize veicle State
-    struct VeicleState State;           // veicle state
-    struct supportList *temp = NULL;    // support list temp node to retrive veicle state after pause
-    struct VeicleStatistics Statistics; // veicle statistics
-    initVeicleState(&State, &Statistics);
+    struct Veicle_State State;           // veicle state
+    struct Support_List *temp = NULL;    // support list temp node to retrive veicle state after pause
+    struct Veicle_Statistics Statistics; // veicle statistics
+    init_veicle_state(&State, &Statistics);
 
     // initialize veicle variables
     double DeltaPositionX = 0;                       // delta position in m
@@ -31,7 +31,7 @@ void *veicleTask(void *arg)
     double measurements[(DETECTION_DEGREE * 2) + 2]; // all sensor measurements
 
     // add veicle to shared list
-    addVeicleToList(ti, State);
+    add_veicle_to_list(ti, State);
 
     printf("OK: Veicle task activated id: %d\n", ti);
 
@@ -50,37 +50,37 @@ void *veicleTask(void *arg)
         State.pos.y -= DeltaPositionY;                                               // position in m
 
         // set veicle state in the list
-        setVeicleState(ti, State);
+        set_veicle_state(ti, State);
 
         // execute sensor
         if (State.state != PAUSE)
         {
-            DoMesurements(&State, measurements, &distance);
+            do_mesurements(&State, measurements, &distance);
         }
 
         // Handle driving logic
-        DrivingHandling(&State, &Statistics, &distance);
+        driving_handling(&State, &Statistics, &distance);
 
         // CHECK STATUS
 
-        if (checkPause(ti) && State.state != PAUSE)
+        if (check_pause(ti) && State.state != PAUSE)
         {
-            addVecileInfoToSupport(&State, ti);
+            add_vecile_info_to_support(&State, ti);
             State.state = PAUSE;
         }
-        else if (State.state == PAUSE && !checkPause(ti))
+        else if (State.state == PAUSE && !check_pause(ti))
         {
-            temp = getSupportNode(ti);
+            temp = get_support_node(ti);
             State.acceleration = temp->acceleration;
             State.speed = temp->speed;
             State.state = temp->state;
         }
 
         // check if veicle is out of screen
-        if ((State.pos.x < -(getVeicleWidth(State.veicle) / SCALE_FACTOR)))
+        if ((State.pos.x < -(get_veicle_width(State.veicle) / SCALE_FACTOR)))
         {
             // remove veicle from list
-            removeVeicleFromList(ti);
+            remove_veicle_from_list(ti);
             running = 0;
         }
 

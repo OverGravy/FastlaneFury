@@ -12,7 +12,7 @@ struct Position{
 };
 
 // Define a structure to represent a veicle state
-struct VeicleState{
+struct Veicle_State{
     double speed;           // speed of the car in m/s
     double steeringAngle;   // steering angle of the car in degree
     double acceleration;    // acceleration of the car in m/s^2
@@ -25,39 +25,36 @@ struct VeicleState{
 // Node structure for the list
 struct Node{
     int id;                    // thread id
-    struct VeicleState Veicle; // veicle state
+    struct Veicle_State Veicle; // veicle state
     struct Node* next;         // pointer to the next node
 };
 
 // Define a structure to represent a list
-struct SharedList{
+struct Shared_List{
    struct Node* head;
    int size;
 };
 
 
-extern struct SharedList *shared;
+extern struct Shared_List *shared;
 extern pthread_mutex_t mutex;
 
 // function that create the list and return the pointer to the liststruct SharedList* createSharedList();                                                   // create a shared list
-struct SharedList* createSharedList();                                                   
+struct Shared_List* create_shared_list();                                                   
 
 // function that insert a veicle in the list 
-void addVeicleToList(int id, struct VeicleState veicle);  
+void add_veicle_to_list(int id, struct Veicle_State veicle);  
 
 // function that remove a veicle from the list
-void removeVeicleFromList(int id);      
+void remove_veicle_from_list(int id);      
 
 // function that set veicle state in the list 
-void setVeicleState(int id, struct VeicleState State);  
+void set_veicle_state(int id, struct Veicle_State State);  
 
 // function that return list size
-int getListSize();
+int get_list_size();
 
 // function that destroy the list
-void destroySharedList();
-
-
-
+void destroy_shared_list();
 
 #endif

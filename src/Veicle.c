@@ -1,9 +1,38 @@
-#include "../libs/Drive.h"
+#include "../libs/Veicle.h"
+
+// function that initialize veicle
+void init_veicle_state(struct Veicle_State *state, struct Veicle_Statistics *statistics)
+{
+    int margin = 0;
+    state->veicle = rand() % VEICLE_NUMBER; // random veicle
+
+    // find the veicle type 
+    if(state->veicle >= 0 && state->veicle <= CAR_NUMBER){
+        get_veicle_staitistics(CAR, statistics);
+    }else if(state->veicle > CAR_NUMBER && state->veicle <= CAR_NUMBER + TRUCK_NUMBER){
+        get_veicle_staitistics(TRUCK, statistics);
+    }else if(state->veicle > CAR_NUMBER + TRUCK_NUMBER && state->veicle <= CAR_NUMBER + TRUCK_NUMBER + MOTORCYCLE_NUMBER){
+        get_veicle_staitistics(MOTORCYCLE, statistics);
+    }else if(state->veicle > CAR_NUMBER + TRUCK_NUMBER + MOTORCYCLE_NUMBER && state->veicle <= CAR_NUMBER + TRUCK_NUMBER + MOTORCYCLE_NUMBER + SUPERCAR_NUMBER){
+        get_veicle_staitistics(SUPERCAR, statistics);
+    }
+
+
+    state->speed = 30.0;                                                                        // in m/s
+    state->lane = rand() % LANE_NUMBER;
+    state->pos.x = (MY_SCREEN_W - 2) / SCALE_FACTOR;                                            // in meter
+    margin = ((MY_SCREEN_H / (LANE_NUMBER + 1)) - ((Veicles[state->veicle]->h))) / 2;           // margin in pixel
+    state->pos.y = (((MY_SCREEN_H / (LANE_NUMBER + 1)) * state->lane) + margin) / SCALE_FACTOR; // in meter
+    state->steeringAngle = 0.0;                                                                 // in degree
+    state->acceleration = 0;                                                                    // in m/s^2
+   
+}
+
 
 // STATE FUNCTIONS
 
 // function that handle IDLE state logic and change state
-void idle(struct VeicleState *State, struct VeicleStatistics *Statistics, struct Distances *distances)
+void idle(struct Veicle_State *State, struct Veicle_Statistics *Statistics, struct Distances *distances)
 {
     // Handling state logic
 
@@ -25,7 +54,7 @@ void idle(struct VeicleState *State, struct VeicleStatistics *Statistics, struct
 }
 
 // function that handle NORMAL state logic and change state
-void accelerate(struct VeicleState *State, struct VeicleStatistics *Statistics, struct Distances *distances)
+void accelerate(struct Veicle_State *State, struct Veicle_Statistics *Statistics, struct Distances *distances)
 {
     // Handling state logic
 
@@ -44,7 +73,7 @@ void accelerate(struct VeicleState *State, struct VeicleStatistics *Statistics, 
 }
 
 // function that handle SLOWDOWN state logic and change state
-void slowDown(struct VeicleState *State, struct VeicleStatistics *Statistics, struct Distances *distances)
+void slowDown(struct Veicle_State *State, struct Veicle_Statistics *Statistics, struct Distances *distances)
 {
     // Handling state logic
 
@@ -67,7 +96,7 @@ void slowDown(struct VeicleState *State, struct VeicleStatistics *Statistics, st
 }
 
 // function that handle OVERTAKE state logic and change state
-void overtake(struct VeicleState *State, struct VeicleStatistics *Statistics, struct Distances *distances)
+void overtake(struct Veicle_State *State, struct Veicle_Statistics *Statistics, struct Distances *distances)
 {
     int margin;
     int middleLane;
@@ -90,7 +119,7 @@ void overtake(struct VeicleState *State, struct VeicleStatistics *Statistics, st
     // changing state logic
 
     // calculate middle lane position to stop overtaking
-    margin = ((MY_SCREEN_H / (LANE_NUMBER + 1)) - (getVeicleHeight(State->veicle))) / 2; // margin in pixel
+    margin = ((MY_SCREEN_H / (LANE_NUMBER + 1)) - (get_veicle_height(State->veicle))) / 2; // margin in pixel
     middleLane = (((MY_SCREEN_H / (LANE_NUMBER + 1)) * (State->lane + 1)) + margin);     // in meter
 
     if (((State->pos.y) * SCALE_FACTOR) >= middleLane)
@@ -108,7 +137,7 @@ void overtake(struct VeicleState *State, struct VeicleStatistics *Statistics, st
 }
 
 // function that handle ABORTOVERTAKE state logic and change state
-void abortOvertake(struct VeicleState *State, struct VeicleStatistics *Statistics, struct Distances *distances)
+void abortOvertake(struct Veicle_State *State, struct Veicle_Statistics *Statistics, struct Distances *distances)
 {
     int margin;
     int middleLane;
@@ -142,7 +171,7 @@ void abortOvertake(struct VeicleState *State, struct VeicleStatistics *Statistic
 
     // changing state logic
 
-    margin = ((MY_SCREEN_H / (LANE_NUMBER + 1)) - (getVeicleHeight(State->veicle))) / 2; // margin in pixel
+    margin = ((MY_SCREEN_H / (LANE_NUMBER + 1)) - (get_veicle_height(State->veicle))) / 2; // margin in pixel
     middleLane = (((MY_SCREEN_H / (LANE_NUMBER + 1)) * (State->lane)) + margin);         // in meter
 
     if (((State->pos.y) * SCALE_FACTOR) <= middleLane)
@@ -154,7 +183,7 @@ void abortOvertake(struct VeicleState *State, struct VeicleStatistics *Statistic
 }
 
 // function that handle CRASH state logic and change state
-void crash(struct VeicleState *State)
+void crash(struct Veicle_State *State)
 {
     // handling state logic
     State->speed = 0;
@@ -163,7 +192,7 @@ void crash(struct VeicleState *State)
 }
 
 // function that handle PAUSE state logic and change state
-void pauseState(struct VeicleState *State)
+void pauseState(struct Veicle_State *State)
 {
     // handling state logic
     State->speed = 0;
@@ -173,7 +202,7 @@ void pauseState(struct VeicleState *State)
 // DRIVING FUNCTION
 
 // function that handle driving movement
-void DrivingHandling(struct VeicleState *State, struct VeicleStatistics *Statistics, struct Distances *distances)
+void driving_handling(struct Veicle_State *State, struct Veicle_Statistics *Statistics, struct Distances *distances)
 {
     switch (State->state)
     {
@@ -216,7 +245,7 @@ void DrivingHandling(struct VeicleState *State, struct VeicleStatistics *Statist
 }
 
 // function tha handle sensor measurements
-void DoMesurements(struct VeicleState *State, double measurement[], struct Distances *distances)
+void do_mesurements(struct Veicle_State *State, double measurement[], struct Distances *distances)
 {
 
     int i, j, x, y; // support index and variables
@@ -225,9 +254,9 @@ void DoMesurements(struct VeicleState *State, double measurement[], struct Dista
     // # GET DISTANCE FRONT #
 
     x = (State->pos.x) * SCALE_FACTOR - 10;
-    y = (State->pos.y * SCALE_FACTOR) + (getVeicleHeight(State->veicle) / 2);
+    y = (State->pos.y * SCALE_FACTOR) + (get_veicle_height(State->veicle) / 2);
 
-    measurement[0] = proximitySensor(x, y, RANGE_FRONT, 180);
+    measurement[0] = proximity_sensor(x, y, RANGE_FRONT, 180);
 
     // if im in first or in the last lane i dont need to check for left or right
 
@@ -235,13 +264,13 @@ void DoMesurements(struct VeicleState *State, double measurement[], struct Dista
 
     if (State->lane != 0)
     {
-        x = (((State->pos.x) * SCALE_FACTOR) + (getVeicleWidth(State->veicle) / 2));
-        y = ((State->pos.y * SCALE_FACTOR) + getVeicleHeight(State->veicle)) + 10;
+        x = (((State->pos.x) * SCALE_FACTOR) + (get_veicle_width(State->veicle) / 2));
+        y = ((State->pos.y * SCALE_FACTOR) + get_veicle_height(State->veicle)) + 10;
 
         for (i = 1; i <= DETECTION_DEGREE; i++)
         {
             degree = 10 + i;
-            measurement[i] = proximitySensor(x, y, RANGE_SIDE, degree);
+            measurement[i] = proximity_sensor(x, y, RANGE_SIDE, degree);
         }
     }
     else
@@ -254,14 +283,14 @@ void DoMesurements(struct VeicleState *State, double measurement[], struct Dista
     // # GET DISTANCE RIGHT #
 
     if( State->lane != LANE_NUMBER - 1){
-        x = (((State->pos.x) * SCALE_FACTOR) + (getVeicleWidth(State->veicle) / 2));
+        x = (((State->pos.x) * SCALE_FACTOR) + (get_veicle_width(State->veicle) / 2));
         y = ((State->pos.y * SCALE_FACTOR) - 10);
 
         for (i = DETECTION_DEGREE + 1; i <= (DETECTION_DEGREE * 2); i++)
         {
             j++;
             degree = 190 + j;
-            measurement[i] = proximitySensor(x, y, RANGE_SIDE, degree);
+            measurement[i] = proximity_sensor(x, y, RANGE_SIDE, degree);
         }
     }
     else
@@ -274,10 +303,10 @@ void DoMesurements(struct VeicleState *State, double measurement[], struct Dista
 
     // # GET DISTANCE BACK #
 
-    x = (((State->pos.x) * SCALE_FACTOR) + getVeicleWidth(State->veicle)) + 10;
-    y = (((State->pos.y) * SCALE_FACTOR) + (getVeicleHeight(State->veicle) / 2));
+    x = (((State->pos.x) * SCALE_FACTOR) + get_veicle_width(State->veicle)) + 10;
+    y = (((State->pos.y) * SCALE_FACTOR) + (get_veicle_height(State->veicle) / 2));
 
-    measurement[(DETECTION_DEGREE * 2) + 1] = proximitySensor(x, y, RANGE_BACK, 0);
+    measurement[(DETECTION_DEGREE * 2) + 1] = proximity_sensor(x, y, RANGE_BACK, 0);
 
     // CHECK DISTANCE -----------------------------------------------------
 

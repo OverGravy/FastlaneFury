@@ -1,16 +1,16 @@
 #include "../libs/List.h"
 
 // function that create a new list
-struct SharedList* createSharedList(){
+struct Shared_List* create_shared_list(){
 
-    struct SharedList* newList = (struct SharedList*)malloc(sizeof(struct SharedList));  // allocate memory for the new list
+    struct Shared_List* newList = (struct Shared_List*)malloc(sizeof(struct Shared_List));  // allocate memory for the new list
     newList->head = NULL;                                                                // set head to null
     return newList;
 
 }                                                
 
 // function that insert a veicle in the list
-void addVeicleToList(int id, struct VeicleState veicle){
+void add_veicle_to_list(int id, struct Veicle_State veicle){
 
 
         // create new node
@@ -44,7 +44,7 @@ void addVeicleToList(int id, struct VeicleState veicle){
 }
 
 // function that remove a veicle from the list 
-void removeVeicleFromList(int id){
+void remove_veicle_from_list(int id){
     
         // lock mutex
         pthread_mutex_lock(&mutex);  
@@ -77,7 +77,7 @@ void removeVeicleFromList(int id){
 
 
 // function that set veicle state in the list
-void setVeicleState(int id, struct VeicleState State){
+void set_veicle_state(int id, struct Veicle_State State){
 
     // lock mutex
     pthread_mutex_lock(&mutex);
@@ -100,7 +100,7 @@ void setVeicleState(int id, struct VeicleState State){
 }
 
 // a function that destroy the list
-void destroySharedList(){
+void destroy_shared_list(){
 
     // free all nodes
     struct Node* current = shared->head;
@@ -116,6 +116,6 @@ void destroySharedList(){
 }
 
 // function that return list size
-int getListSize(){
+int get_list_size(){
     return shared->size;
 }

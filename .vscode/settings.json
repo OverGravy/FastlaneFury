@@ -8,7 +8,15 @@
         "supportlist.h": "c",
         "allegro.h": "c",
         "graphics.h": "c",
-        "user_task.h": "c"
+        "user_task.h": "c",
+        "pthread.h": "c",
+        "draw_primitives.h": "c",
+        "support_list.h": "c",
+        "stat_file.h": "c",
+        "sensor.h": "c",
+        "drive.h": "c",
+        "game_core.h": "c",
+        "config_menu.h": "c"
     },
     "C_Cpp.dimInactiveRegions": false,
     "C_Cpp.errorSquiggles": "disabled"

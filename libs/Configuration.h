@@ -1,35 +1,37 @@
 #ifndef _CONFIGURATION_H_
 #define _CONFIGURATION_H_
 
+#include "Game_core.h"
+
 // setting structures
 struct Config
 {
-    int autoSpawn;     // auto spawn veicle
-    int autoSpawnTime; // auto spawn time in second
+    int auto_spawn;     // auto spawn veicle
+    int auto_spawn_time; // auto spawn time in second
 };
 
 extern struct Config configuration;            // setting structure
 
 // function that init to default configuration
-int initConfiguration();
+int init_configuration();
 
 
 // SETTER
 
 // function that set autospawn 
-void setAutoSpawn(int value);
+void set_auto_spawn(int value);
 
 // function that set autospawn time
-void setAutoSpawnTime(int value);
+void set_auto_spawn_time(int value);
 
 
 // GETTER
 
 // function that get autospawn
-int getAutoSpawn();
+int get_auto_spawn();
 
 // function that get autosspawntime
-int getAutoSpawnTime();
+int get_auto_spawn_time();
 
 
 #endif

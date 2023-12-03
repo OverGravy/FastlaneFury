@@ -1,7 +1,7 @@
 #include "../libs/Stat_file.h"
 
 // function that open the file and return the file pointer
-int CheckStatisticFile(){
+int check_statistic_file(){
 
     int row = 0;
     char c;
@@ -76,7 +76,7 @@ int CheckStatisticFile(){
 }
 
 // function that read line and retun car Statistic struct
-void GetVeicleStaitistics(int type, struct VeicleStatistics *Statistics){
+void get_veicle_staitistics(int type, struct Veicle_Statistics *Statistics){
    
     FILE * fp;
     int randomRow;
@@ -118,7 +118,7 @@ void GetVeicleStaitistics(int type, struct VeicleStatistics *Statistics){
 }
 
 // function that close the file
-void CloseStatisticFile(){
+void close_statistic_file(){
     fclose(CarFile.fp);
     fclose(TruckFile.fp);
     fclose(MotorcycleFile.fp);

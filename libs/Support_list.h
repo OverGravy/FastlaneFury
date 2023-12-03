@@ -7,30 +7,30 @@
 #include <stdlib.h>
 
 
-struct supportList{
+struct Support_List{
     int id;
     int state;
     double acceleration;
     double speed;
-    struct supportList *next;
+    struct Support_List *next;
 };
 
-extern struct supportList *support;  
+extern struct Support_List *support;  
 extern pthread_mutex_t supportMutex;
 
 // function that create the list and return the pointer to the list
-struct supportList* createSupportList();
+struct Support_List* create_support_list();
 
 // function that insert info in the support list
-void addVecileInfoToSupport(struct VeicleState *veicle, int index);
+void add_vecile_info_to_support(struct Veicle_State *veicle, int index);
 
 // function that return a specific node in the support list
-struct supportList* getSupportNode(int index);
+struct Support_List* get_support_node(int index);
 
 // function that free all the element in the support list
-void cleanSupportList();
+void clean_support_list();
 
 // function that destroy the list
-void destroySupportList();
+void destroy_support_list();
 
 #endif

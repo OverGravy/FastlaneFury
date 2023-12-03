@@ -3,39 +3,34 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-
-#define CAR 0
-#define TRUCK 1
-#define MOTORCYCLE 2
-#define SUPERCAR 3
-
+#include "Game_core.h"
 
 // Veicle Statistics struct
-struct VeicleStatistics{
+struct Veicle_Statistics{
     double maxSpeed;        // max speed in m/s
     double maxAcceleration; // max acceleration in m/s^2
     double maxDeceleration; // max deceleration in m/s^2
     double minDistance;     // min distance in m that the veicle can be from another veicle
 };
 
-struct DataFile{
+struct Data_File{
     int rowNumber;
     FILE *fp;
 };
 
 // File variables
-extern struct DataFile CarFile;
-extern struct DataFile TruckFile;
-extern struct DataFile MotorcycleFile;
-extern struct DataFile SupercarFile;
+extern struct Data_File CarFile;
+extern struct Data_File TruckFile;
+extern struct Data_File MotorcycleFile;
+extern struct Data_File SupercarFile;
 
 // function that open the file and return the file pointer
-int CheckStatisticFile();
+int check_statistic_file();
 
 // function that read line and retun car Statistic struct pointer
-void GetVeicleStaitistics(int type, struct VeicleStatistics *Statistics);
+void get_veicle_staitistics(int type, struct Veicle_Statistics *Statistics);
 
 // function that close the file
-void CloseStatisticFile();
+void close_statistic_file();
 
 #endif

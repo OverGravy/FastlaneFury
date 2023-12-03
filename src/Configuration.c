@@ -1,37 +1,37 @@
 #include "../libs/Configuration.h"
 
 // function that init configuration
-int initConfiguration()
+int init_configuration()
 {
-    configuration.autoSpawn = 0;
-    configuration.autoSpawnTime = 5;
+    configuration.auto_spawn = D_AUTO_SPAWN;
+    configuration.auto_spawn_time = D_AUTO_SPAWN_TIME;
     return 1;
 }
 
 // Setter
 
 // function that set autospawn
-void setAutoSpawn(int value)
+void set_auto_spawn(int value)
 {
-    configuration.autoSpawn = !configuration.autoSpawn;
+    configuration.auto_spawn = !configuration.auto_spawn;
 }
 
 // function that set autospawn time
-void setAutoSpawnTime(int value)
+void set_auto_spawn_time(int value)
 {
-    configuration.autoSpawnTime = value;
+    configuration.auto_spawn_time = value;
 }
 
 // Getter
 
 // function that get autospawns
-int getAutoSpawn()
+int get_auto_spawn()
 {
-    return configuration.autoSpawn;
+    return configuration.auto_spawn;
 }
 
 // function that get autospawn time
-int getAutoSpawnTime()
+int get_auto_spawn_time()
 {
-    return configuration.autoSpawnTime;
+    return configuration.auto_spawn_time;
 }

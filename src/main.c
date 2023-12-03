@@ -2,10 +2,10 @@
 #include <allegro.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include "../libs/Game.h"
 #include "../libs/Graphics_task.h"
 #include "../libs/User_task.h"
 #include "../libs/Draw.h"
+#include "../libs/Allegro_core.h"
 #include <time.h>
 #include <math.h>
 
@@ -23,28 +23,28 @@ BITMAP *background;               // background bitmap
 BITMAP *Veicles[CAR_NUMBER+TRUCK_NUMBER+MOTORCYCLE_NUMBER+SUPERCAR_NUMBER]; // array of veicles bitmaps
 
 // Shared variable things
-struct SharedList *shared;        // shared list
+struct Shared_List *shared;        // shared list
 pthread_mutex_t mutex;            // mutex for shared list 
 pthread_mutex_t supportMutex;     // suport mutex
-struct supportList *support;      // support list
+struct Support_List *support;      // support list
 int paused[MAX_TASKS];            // array of pause
 
 // User task things
-int selectedVeicle = -1;          // selected veicle
-int selectedButton = -1;          // selected button
+int selected_veicle = -1;          // selected veicle
+int selected_button = -1;          // selected button
 
 // statistic things
-struct DataFile CarFile;
-struct DataFile TruckFile;
-struct DataFile MotorcycleFile;
-struct DataFile SupercarFile;
+struct Data_File CarFile;
+struct Data_File TruckFile;
+struct Data_File MotorcycleFile;
+struct Data_File SupercarFile;
 
 // Game Variables
 struct Config configuration;            // setting structure
 
 // Pause menu things
-struct option options[OPTION_NUM];  // array of options
-struct MenuConfig pauseMenuConfig;  // pause menu config
+struct Option options[OPTION_NUM];  // array of options
+struct Menu_Config pause_menu_config;  // pause menu config
 
 
 int main()
@@ -66,14 +66,14 @@ int main()
     }
 
     // check statistic file
-    if (!CheckStatisticFile())
+    if (!check_statistic_file())
     {
         fprintf(stderr, "ERROR: failed to load statistic file!\n");
         return -1;
     }
 
     // init configuration structure
-    if (!initConfiguration())
+    if (!init_configuration())
     {
         fprintf(stderr, "ERROR: failed to propertly initialize configuration!\n");
         return -1;
@@ -84,8 +84,8 @@ int main()
     ptask_init(SCHED_FIFO); // init ptask with a SCHED policy
 
     // create a shared list of veicles and support list
-    shared = createSharedList();
-    support = createSupportList();
+    shared = create_shared_list();
+    support = create_support_list();
 
     if (shared == NULL)
     {
@@ -104,7 +104,7 @@ int main()
     pthread_mutex_init(&supportMutex, NULL);
 
     // init menus
-    initConfigMenu(); 
+    init_config_menu(); 
 
     // create and start User task
     struct argument userTaskArg;
@@ -113,7 +113,7 @@ int main()
     userTaskArg.screenH = SCREEN_H;
     userTaskArg.screenW = SCREEN_W;
 
-    if (task_create(userTask, 0, userTaskArg, 15, 15, 90, ACT) != 0)
+    if (task_create(user_task, 0, userTaskArg, 15, 15, 90, ACT) != 0)
     {
         printf("ERROR: can not create user task\n");
         return -1;
@@ -123,7 +123,7 @@ int main()
     struct argument GraphicsArg;
     GraphicsArg = userTaskArg;
 
-    if (task_create(graphicsTask, 1, GraphicsArg, (int)round((double)1000 / SCREEN_FPS), (int)round((double)1000 / SCREEN_FPS)+1, 80, ACT) != 0)
+    if (task_create(graphics_task, 1, GraphicsArg, (int)round((double)1000 / SCREEN_FPS), (int)round((double)1000 / SCREEN_FPS)+1, 80, ACT) != 0)
     {
         printf("ERROR: can not create graphics task\n");
         return -1;

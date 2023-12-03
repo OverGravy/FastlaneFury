@@ -1,7 +1,13 @@
 #ifndef _DRIVE_
 #define _DRIVE_
 
-#include "Game.h"
+#include "Sensor.h"
+#include "Stat_file.h"
+#include "Game_core.h"
+#include "List.h"
+#include "Draw.h"
+#include "Pause.h"
+#include "Ptask.h"
 
 #define DETECTION_DEGREE 160 // degree arch in which the veicle can detect other veicles, left, right
 
@@ -12,10 +18,14 @@ struct Distances {
     int right;                                       // distance from viecle in the right
 };
 
+
+// function that initialize veicle
+void init_veicle_state(struct Veicle_State *state, struct Veicle_Statistics *statistics);
+
 // function that handle driving movement
-void DrivingHandling(struct VeicleState *State, struct VeicleStatistics *Statistics, struct Distances *distances);
+void driving_handling(struct Veicle_State *State, struct Veicle_Statistics *Statistics, struct Distances *distances);
 
 // function tha handle sensor measurements
-void DoMesurements(struct VeicleState *State, double measurement[], struct Distances *distances);
+void do_mesurements(struct Veicle_State *State, double measurement[], struct Distances *distances);
 
 #endif
