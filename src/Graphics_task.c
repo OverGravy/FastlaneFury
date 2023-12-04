@@ -19,13 +19,19 @@ void *graphics_task(void *arg)
 
         // clear the buffer bitmap
         clear_display();
-        if(get_zoomed_veicle() != -1)
+
+        if (get_zoom_flag())
         {
-            clear_zoom_screen();
+            clear_zoom_buffer();
         }
 
         // draw background
         draw_background();
+
+        if (get_selected_veicle() != NONE)
+        {
+            update_selected_veicle_state();
+        }
 
         // draw info
         draw_info(GraphicsArg.mutex, GraphicsArg.shared);
@@ -44,11 +50,6 @@ void *graphics_task(void *arg)
         }
         pthread_mutex_unlock(GraphicsArg.mutex);
 
-        if(get_zoomed_veicle() != -1)
-        {
-            draw_zoom_screen();
-        }   
-
         // check for pause menu
         if (check_menu())
         {
@@ -65,9 +66,10 @@ void *graphics_task(void *arg)
         draw_mouse(mouse_x, mouse_y);
 
         // flip the display
-        if(get_zoomed_veicle() != -1)
+        if (get_zoom_flag())
         {
-            flip_zoom_screen();
+            draw_zoom(get_selected_veicle());
+            flip_zoom_buffer();
         }
         else
         {

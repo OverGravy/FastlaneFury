@@ -54,6 +54,9 @@ void set_veicle_state(int id, struct Veicle_State State);
 // function that return list size
 int get_list_size();
 
+// function that return a specific veicle state
+struct Veicle_State get_veicle_state(int id);
+
 // function that destroy the list
 void destroy_shared_list();
 

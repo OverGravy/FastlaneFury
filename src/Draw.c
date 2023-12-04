@@ -38,7 +38,7 @@ int load_graphics_assets(){
         sprintf(path, "../Assets/Bitmap/VeicleBitmap/Truck/T_bitmap%d.bmp", i);
 
         // load a scaled version of the bitmap
-        Veicles[i+CAR_NUMBER] = load_scaled_bitmap(path, VEICLE_SCALE_FACTOR);
+        Veicles[i + CAR_NUMBER] = load_scaled_bitmap(path, VEICLE_SCALE_FACTOR);
 
         if (!Veicles[i + CAR_NUMBER])
         {
@@ -85,10 +85,9 @@ int load_graphics_assets(){
 
     // create backgroud bitmap
     prerender_background();
-    
+
     return 1;
 }
-
 
 // funtion that clear the display
 void clear_display()
@@ -135,119 +134,111 @@ void draw_info(pthread_mutex_t *mutex, struct Shared_List *shared)
         sprintf(info, "Priority: %d", task_get_priority(selected_veicle));
         textout_ex(buffer, font, info, 450, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 + 80, makecol(255, 255, 255), -1);
 
-        // print info about the veicle with id
-        pthread_mutex_lock(mutex);
-        struct Node *current = shared->head;
-        while (current != NULL)
+        struct Veicle_State *current = get_selected_veicle_state();
+
+
+        sprintf(info, "Veicle: %d", get_selected_veicle());
+        textout_ex(buffer, font, info, 650, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 + 20, makecol(255, 255, 255), -1);
+        sprintf(info, "Type: %d", current->veicle);
+        textout_ex(buffer, font, info, 650, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 + 40, makecol(255, 255, 255), -1);
+        sprintf(info, "Lane: %d", current->lane);
+        textout_ex(buffer, font, info, 650, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 + 60, makecol(255, 255, 255), -1);
+        // speed in km/h
+        if (current->state != PAUSE)
         {
-            if (current->id == selected_veicle)
-            {
-                sprintf(info, "Veicle: %d", current->id);
-                textout_ex(buffer, font, info, 650, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 + 20, makecol(255, 255, 255), -1);
-                sprintf(info, "Type: %d", current->Veicle.veicle);
-                textout_ex(buffer, font, info, 650, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 + 40, makecol(255, 255, 255), -1);
-                sprintf(info, "Lane: %d", current->Veicle.lane);
-                textout_ex(buffer, font, info, 650, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 + 60, makecol(255, 255, 255), -1);
-                // speed in km/h
-                if (current->Veicle.state != PAUSE)
-                {
-                    speedKmH = (int)round(current->Veicle.speed * 3.6);
-                    sprintf(info, "Speed: %.2f", speedKmH);
-                    textout_ex(buffer, font, info, 650, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 + 80, makecol(255, 255, 255), -1);
-                    sprintf(info, "Acceleration: %.2f", current->Veicle.acceleration);
-                    textout_ex(buffer, font, info, 650, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 + 100, makecol(255, 255, 255), -1);
-                    sprintf(info, "Position: (%.2f, %.2f)", current->Veicle.pos.x, current->Veicle.pos.y);
-                    textout_ex(buffer, font, info, 650, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 + 120, makecol(255, 255, 255), -1);
-                    sprintf(info, "Steering Angle: %.2f", current->Veicle.steeringAngle);
-                    textout_ex(buffer, font, info, 800, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 + 20, makecol(255, 255, 255), -1);
-                    State = current->Veicle.state;
-                }
-                else
-                {
-                    // find in support list the veicle with id
-                    struct Support_List *temp = get_support_node(current->id);
-                    if (temp != NULL)
-                    {
-                        speedKmH = (int)round(temp->speed * 3.6);
-                        sprintf(info, "Speed: %.2f", speedKmH);
-                        textout_ex(buffer, font, info, 650, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 + 80, makecol(255, 255, 255), -1);
-                        sprintf(info, "Acceleration: %.2f", temp->acceleration);
-                        textout_ex(buffer, font, info, 650, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 + 100, makecol(255, 255, 255), -1);
-                        sprintf(info, "Position: (%.2f, %.2f)", current->Veicle.pos.x, current->Veicle.pos.y);
-                        textout_ex(buffer, font, info, 650, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 + 120, makecol(255, 255, 255), -1);
-                        sprintf(info, "Steering Angle: %.2f", current->Veicle.steeringAngle);
-                        textout_ex(buffer, font, info, 800, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 + 20, makecol(255, 255, 255), -1);
-                        State = temp->state;
-                    }
-                }
-
-                switch (State)
-                {
-                case SLOWDOWN:
-                    textout_ex(buffer, font, "State: SLOW_DOWN", 800, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 + 40, makecol(255, 255, 255), -1);
-                    break;
-
-                case ACCELERATE:
-                    textout_ex(buffer, font, "State: ACCELERATE", 800, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 + 40, makecol(255, 255, 255), -1);
-                    break;
-
-                case PAUSE:
-                    textout_ex(buffer, font, "State: PAUSE", 800, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 + 40, makecol(255, 255, 255), -1);
-                    break;
-
-                case OVERTAKE:
-                    textout_ex(buffer, font, "State: OVERTAKE", 800, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 + 40, makecol(255, 255, 255), -1);
-                    break;
-
-                case IDLE:
-                    textout_ex(buffer, font, "State: IDLE", 800, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 + 40, makecol(255, 255, 255), -1);
-                    break;
-
-                case ABORTOVERTAKE:
-                    textout_ex(buffer, font, "State: ABORT_OVERTAKE", 800, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 + 40, makecol(255, 255, 255), -1);
-                    break;
-
-                }
-
-
-
-
-                // DrawFOV(current->Veicle.pos.x, current->Veicle.pos.y, SMAX, current->Veicle.veicle);
-
-                // Front sensor
-                x = (current->Veicle.pos.x) * SCALE_FACTOR - 10;
-                y = (current->Veicle.pos.y * SCALE_FACTOR) + (Veicles[current->Veicle.veicle]->h / 2);
-                draw_line(x, y, x - RANGE_FRONT, y, FOVCOLOR, buffer);
-                draw_point(x, y, SENSORCOLOR, buffer);
-
-                if(current->Veicle.lane != 0){
-                    // Right sensor
-                    x = (current->Veicle.pos.x * SCALE_FACTOR) + (Veicles[current->Veicle.veicle]->w / 2);
-                    y = (current->Veicle.pos.y * SCALE_FACTOR) - 10;
-                    draw_arch(x, y, RANGE_SIDE, 190.0, 350.0, FOVCOLOR, buffer);
-                    draw_point(x, y, SENSORCOLOR, buffer);
-                }
-
-                
-                if(current->Veicle.lane != LANE_NUMBER - 1){
-                    // Left sensor
-                    x = (current->Veicle.pos.x * SCALE_FACTOR) + (Veicles[current->Veicle.veicle]->w  / 2);
-                    y = ((current->Veicle.pos.y * SCALE_FACTOR) + Veicles[current->Veicle.veicle]->h) + 10;
-                    draw_arch(x, y, RANGE_SIDE, 10.0, 170.0, FOVCOLOR, buffer);
-                    draw_point(x, y, SENSORCOLOR, buffer);
-                }
-
-                // Back sensor
-                x = (((current->Veicle.pos.x) * SCALE_FACTOR) + Veicles[current->Veicle.veicle]->w ) + 10;
-                y = (((current->Veicle.pos.y) * SCALE_FACTOR) + (Veicles[current->Veicle.veicle]->h / 2));
-                draw_line(x, y, x + RANGE_BACK, y, FOVCOLOR, buffer);
-                draw_point(x, y, SENSORCOLOR, buffer);
-
-                break;
-            }
-            current = current->next;
+            speedKmH = (int)round(current->speed * 3.6);
+            sprintf(info, "Speed: %.2f", speedKmH);
+            textout_ex(buffer, font, info, 650, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 + 80, makecol(255, 255, 255), -1);
+            sprintf(info, "Acceleration: %.2f", current->acceleration);
+            textout_ex(buffer, font, info, 650, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 + 100, makecol(255, 255, 255), -1);
+            sprintf(info, "Position: (%.2f, %.2f)", current->pos.x, current->pos.y);
+            textout_ex(buffer, font, info, 650, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 + 120, makecol(255, 255, 255), -1);
+            sprintf(info, "Steering Angle: %.2f", current->steeringAngle);
+            textout_ex(buffer, font, info, 800, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 + 20, makecol(255, 255, 255), -1);
+            State = current->state;
         }
-        pthread_mutex_unlock(mutex);
+        else
+        {
+            // find in support list the veicle with id
+            struct Support_List *temp = get_support_node(selected_veicle);
+            if (temp != NULL)
+            {
+                speedKmH = (int)round(temp->speed * 3.6);
+                sprintf(info, "Speed: %.2f", speedKmH);
+                textout_ex(buffer, font, info, 650, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 + 80, makecol(255, 255, 255), -1);
+                sprintf(info, "Acceleration: %.2f", temp->acceleration);
+                textout_ex(buffer, font, info, 650, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 + 100, makecol(255, 255, 255), -1);
+                sprintf(info, "Position: (%.2f, %.2f)", current->pos.x, current->pos.y);
+                textout_ex(buffer, font, info, 650, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 + 120, makecol(255, 255, 255), -1);
+                sprintf(info, "Steering Angle: %.2f", current->steeringAngle);
+                textout_ex(buffer, font, info, 800, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 + 20, makecol(255, 255, 255), -1);
+                State = temp->state;
+            }
+        }
+
+        switch (State)
+        {
+        case SLOWDOWN:
+            textout_ex(buffer, font, "State: SLOW_DOWN", 800, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 + 40, makecol(255, 255, 255), -1);
+            break;
+
+        case ACCELERATE:
+            textout_ex(buffer, font, "State: ACCELERATE", 800, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 + 40, makecol(255, 255, 255), -1);
+            break;
+
+        case PAUSE:
+            textout_ex(buffer, font, "State: PAUSE", 800, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 + 40, makecol(255, 255, 255), -1);
+            break;
+
+        case OVERTAKE:
+            textout_ex(buffer, font, "State: OVERTAKE", 800, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 + 40, makecol(255, 255, 255), -1);
+            break;
+
+        case IDLE:
+            textout_ex(buffer, font, "State: IDLE", 800, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 + 40, makecol(255, 255, 255), -1);
+            break;
+
+        case ABORTOVERTAKE:
+            textout_ex(buffer, font, "State: ABORT_OVERTAKE", 800, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 + 40, makecol(255, 255, 255), -1);
+            break;
+        }
+
+        // DrawFOV(current->Veicle.pos.x, current->Veicle.pos.y, SMAX, current->Veicle.veicle);
+
+        // Front sensor
+        x = (current->pos.x) * SCALE_FACTOR - 10;
+        y = (current->pos.y * SCALE_FACTOR) + (Veicles[current->veicle]->h / 2);
+        draw_line(x, y, x - RANGE_FRONT, y, FOVCOLOR, buffer);
+        draw_point(x, y, SENSORCOLOR, buffer);
+
+        if (current->lane != 0)
+        {
+            // Right sensor
+            x = (current->pos.x * SCALE_FACTOR) + (Veicles[current->veicle]->w / 2);
+            y = (current->pos.y * SCALE_FACTOR) - 10;
+            draw_arch(x, y, RANGE_SIDE, 190.0, 350.0, FOVCOLOR, buffer);
+            draw_point(x, y, SENSORCOLOR, buffer);
+        }
+
+        if (current->lane != LANE_NUMBER - 1)
+        {
+            // Left sensor
+            x = (current->pos.x * SCALE_FACTOR) + (Veicles[current->veicle]->w / 2);
+            y = ((current->pos.y * SCALE_FACTOR) + Veicles[current->veicle]->h) + 10;
+            draw_arch(x, y, RANGE_SIDE, 10.0, 170.0, FOVCOLOR, buffer);
+            draw_point(x, y, SENSORCOLOR, buffer);
+        }
+
+        // Back sensor
+        x = (((current->pos.x) * SCALE_FACTOR) + Veicles[current->veicle]->w) + 10;
+        y = (((current->pos.y) * SCALE_FACTOR) + (Veicles[current->veicle]->h / 2));
+        draw_line(x, y, x + RANGE_BACK, y, FOVCOLOR, buffer);
+        draw_point(x, y, SENSORCOLOR, buffer);
+
+        // convert car position in pixel
+        x = (int)ceil(current->pos.x * SCALE_FACTOR); // conversion of x in pixel
+        y = (int)ceil(current->pos.y * SCALE_FACTOR); // conversion of y in pixel
+
     }
 }
 
@@ -303,36 +294,4 @@ BITMAP *get_buffer()
 BITMAP *get_background()
 {
     return background;
-}
-
-// function that clear the zoom screen
-void clear_zoom_screen()
-{
-    clear_to_color(zoom_screen, makecol(0, 0, 0));
-}
-
-// function that flips the zoom screen
-void flip_zoom_screen()
-{
-    acquire_screen();
-
-    // center the zoom screen
-    int x = (MY_SCREEN_W - zoom_screen->w) / 2;
-    int y = (MY_SCREEN_H - zoom_screen->h) / 2;
-
-    blit(zoom_screen, screen, 0, 0, x, y, zoom_screen->w, zoom_screen->h);
-
-    release_screen();
-}
-
-// function that draws zoom screen around a selected veicle
-void draw_zoom_screen(int x, int y, int type)
-{
-    // convert car position in pixel
-    int xg = (int)ceil(x * SCALE_FACTOR); // conversion of x in pixel
-    int yg = (int)ceil(y * SCALE_FACTOR); // conversion of y in pixel
-
-    // cut buffer and insert it in zoom_screen
-    zoom_screen = create_sub_bitmap(buffer, xg - 100, yg - 100, 300, 300);
-
 }

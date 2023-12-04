@@ -51,6 +51,8 @@ int init_allegro()
     clear_to_color(screen, makecol(0, 0, 0)); // Clear to black
 
     background = create_bitmap(MY_SCREEN_W, MY_SCREEN_H);
+    
+    zoom_buffer = create_bitmap(MY_SCREEN_W, MY_SCREEN_H);
 
     return 1;
 }

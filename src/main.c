@@ -21,7 +21,8 @@ int freeIndex[MAX_TASKS];
 BITMAP *buffer;                   // display buffer bitmap
 BITMAP *background;               // background bitmap
 BITMAP *Veicles[CAR_NUMBER+TRUCK_NUMBER+MOTORCYCLE_NUMBER+SUPERCAR_NUMBER]; // array of veicles bitmaps
-BITMAP *zoom_screen;              // zoom screen bitmaps
+BITMAP *zoom_buffer;              // zoom screen bitmaps
+BITMAP *zoom_veicle;              // zoom veicle bitmap
 
 // Shared variable things
 struct Shared_List *shared;        // shared list
@@ -31,9 +32,10 @@ struct Support_List *support;      // support list
 int paused[MAX_TASKS];            // array of pause
 
 // User task things
-int selected_veicle = -1;          // selected veicle
-int selected_button = -1;          // selected button
-int zoomed_veicle = -1;            // zoomed veicle
+int selected_veicle = -1;                   // selected veicle
+int selected_button = -1;                   // selected button
+int zoom_flag = 0;                          // flag that indicate if the zoom is active
+struct Veicle_State selected_veicle_state;  // state of the selected veicle
 
 // statistic things
 struct Data_File CarFile;

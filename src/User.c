@@ -59,6 +59,15 @@ void set_selected_veicle(int id)
    selected_veicle = id;
 }
 
+// function that update the state of the selected veicle
+void update_selected_veicle_state()
+{
+    if(selected_veicle != -1)
+    {
+        selected_veicle_state = get_veicle_state(selected_veicle);
+    }
+}
+
 // function that return the index of the selected button
 int get_selected_button()
 {
@@ -66,14 +75,19 @@ int get_selected_button()
 }
 
 // function that set zoomed veicle id
-void set_zoomed_veicle(int id)
+void set_zoom_flag()
 {
-    zoomed_veicle = id;
+    zoom_flag = !zoom_flag;
 }
 
 // function that get the index of the zoomed veicle
-int get_zoomed_veicle()
+int get_zoom_flag()
 {
-    return zoomed_veicle;
+    return zoom_flag;
 }
 
+// funtion that return the pointer to the selected veicle state
+struct Veicle_State *get_selected_veicle_state()
+{
+    return &selected_veicle_state;
+}

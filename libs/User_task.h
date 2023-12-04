@@ -11,6 +11,7 @@
 #include "Game_core.h"
 #include "Veicle_task.h"
 #include "Pause.h"
+#include "Zoom_veicle.h"
 
 void *user_task(void *arg);
 

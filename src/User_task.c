@@ -12,10 +12,8 @@ void *user_task(void *arg)
 
     // Local selction variables
     int selection = -1;      // what the user clicked
-    int selectedButton = -1; // selected button id
     int pause = 0;           // pause flag
     int menu = 0;            // menu flag
-
     int mouse = 0;           // mouse click flag to avoid multiple click
 
     // car variables
@@ -23,8 +21,8 @@ void *user_task(void *arg)
     int index = 0;
 
     // autospawn variables
-    time_t nextAutoSpawn;  // will contain the time that pass between activation and deactivation
-    int autoSpawn = 0; // autospawn flag
+    time_t nextAutoSpawn; // will contain the time that pass between activation and deactivation
+    int autoSpawn = 0;    // autospawn flag
 
     // get task index
     int ti = get_task_index(arg);
@@ -34,7 +32,7 @@ void *user_task(void *arg)
 
     // user input
     while (running)
-    {   
+    {
         // check for user input
         if (keypressed())
         {
@@ -104,8 +102,9 @@ void *user_task(void *arg)
                 }
                 break;
             case KEY_Z:
-                if(get_selected_veicle() != NONE && pause == 0 && menu == 0){
-                    set_zoomed_veicle(get_selected_veicle());
+                if (get_selected_veicle() != NONE && pause == 0 && menu == 0)
+                {
+                    set_zoom_flag();
                 }
             }
         }
@@ -150,8 +149,10 @@ void *user_task(void *arg)
         }
 
         // handle auto spawn veicle
-        if (get_auto_spawn()){
-            if(autoSpawn == 0){ // calculate next time car will spawn
+        if (get_auto_spawn())
+        {
+            if (autoSpawn == 0)
+            { // calculate next time car will spawn
                 nextAutoSpawn = time(NULL) + (get_auto_spawn_time());
 
                 // print nextAutoSpawn
@@ -159,10 +160,10 @@ void *user_task(void *arg)
                 char s[64];
                 strftime(s, sizeof(s), "%c", tm);
 
-
                 autoSpawn = 1;
             }
-            if(time(NULL) >= nextAutoSpawn){ // spawn car
+            if (time(NULL) >= nextAutoSpawn)
+            { // spawn car
                 veicleTaskArg.mutex = userTaskArg.mutex;
                 veicleTaskArg.shared = userTaskArg.shared;
                 index = get_free_index();
@@ -179,9 +180,7 @@ void *user_task(void *arg)
                 }
                 autoSpawn = 0;
             }
-
         }
-
 
         // check if selected veicle is valid
         if (get_selected_veicle() != NONE)
@@ -189,11 +188,13 @@ void *user_task(void *arg)
             // check if the veicle is still active if not deselect it
             if (!task_is_active(get_selected_veicle()))
             {
-                set_selected_veicle(NONE);   // comunicate to graphics task that the veicle is deselected
-                if(get_zoomed_veicle() == get_selected_veicle()){
-                    set_zoomed_veicle(NONE);
+                set_selected_veicle(NONE); // comunicate to graphics task that the veicle is deselected
+                if (get_zoom_flag())
+                {
+                    // reset zoom flag
+                    set_zoom_flag();
                 }
-            } 
+            }
         }
 
         if (deadline_miss(ti))
@@ -208,8 +209,8 @@ void *user_task(void *arg)
     // close the game
     task_deactivate(1); // close graphics task
 
-    ptask_exit();         // close ramining task and exit
-    close_allegro();       // close allegro
+    ptask_exit();           // close ramining task and exit
+    close_allegro();        // close allegro
     close_statistic_file(); // close statistic file
     return NULL;
 }

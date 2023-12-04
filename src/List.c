@@ -99,6 +99,28 @@ void set_veicle_state(int id, struct Veicle_State State){
 
 }
 
+//function that return a specific veicle state
+struct Veicle_State get_veicle_state(int id){
+
+    // lock mutex
+    pthread_mutex_lock(&mutex);
+
+    // search the correct node
+    struct Node* current = shared->head;
+    while(current->next != NULL){
+        if(current->id == id){
+            break;
+        }
+        current = current->next;
+    }
+
+    // unlock mutex  
+    pthread_mutex_unlock(&mutex);
+
+    return current->Veicle;
+
+}
+
 // a function that destroy the list
 void destroy_shared_list(){
 
