@@ -43,3 +43,13 @@ void draw_zoom(int veicle)
 
     blit(zoom, zoom_buffer, 0, 0, x, y, zoom->w, zoom->h);
 }
+
+// function that check if the veicle is still in the screen
+void check_zoom()
+{
+    struct Veicle_State *current = get_selected_veicle_state();
+
+    if(current->pos.x < 0){
+        set_zoom_flag();
+    }
+}

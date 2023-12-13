@@ -27,6 +27,9 @@ void *user_task(void *arg)
     // get task index
     int ti = get_task_index(arg);
     wait_for_activation(ti);
+    
+    // set the buffer to draw to the main buffer
+    set_buffer_id(MAIN_BUFFER);
 
     printf("OK: User task activated\n");
 

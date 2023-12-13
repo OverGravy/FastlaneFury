@@ -62,10 +62,7 @@ void set_selected_veicle(int id)
 // function that update the state of the selected veicle
 void update_selected_veicle_state()
 {
-    if(selected_veicle != -1)
-    {
         selected_veicle_state = get_veicle_state(selected_veicle);
-    }
 }
 
 // function that return the index of the selected button
@@ -90,4 +87,10 @@ int get_zoom_flag()
 struct Veicle_State *get_selected_veicle_state()
 {
     return &selected_veicle_state;
+}
+
+// function that set the buffer id to draw on
+void set_buffer_id(int id)
+{
+    BufferId = id;
 }

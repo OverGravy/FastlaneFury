@@ -9,6 +9,7 @@
 #include "Veicle.h"
 #include "List.h"
 #include "Pause.h"
+#include "User.h"
 
 void *veicle_task(void *arg);
 

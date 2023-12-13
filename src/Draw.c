@@ -11,7 +11,8 @@ BITMAP *load_scaled_bitmap(char *filename, double factor)
 }
 
 // function that load all the graphics assets
-int load_graphics_assets(){
+int load_graphics_assets()
+{
     int i;
     // load all cars bitmaps in folder Sprites
     for (i = 0; i <= CAR_NUMBER; i++)
@@ -134,8 +135,12 @@ void draw_info(pthread_mutex_t *mutex, struct Shared_List *shared)
         sprintf(info, "Priority: %d", task_get_priority(selected_veicle));
         textout_ex(buffer, font, info, 450, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 + 80, makecol(255, 255, 255), -1);
 
+      
         struct Veicle_State *current = get_selected_veicle_state();
-
+    
+        if(current == NULL){
+            return;
+        }
 
         sprintf(info, "Veicle: %d", get_selected_veicle());
         textout_ex(buffer, font, info, 650, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 + 20, makecol(255, 255, 255), -1);
@@ -238,7 +243,6 @@ void draw_info(pthread_mutex_t *mutex, struct Shared_List *shared)
         // convert car position in pixel
         x = (int)ceil(current->pos.x * SCALE_FACTOR); // conversion of x in pixel
         y = (int)ceil(current->pos.y * SCALE_FACTOR); // conversion of y in pixel
-
     }
 }
 

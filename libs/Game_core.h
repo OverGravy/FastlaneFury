@@ -16,12 +16,12 @@
 // allegro costant
 #define MY_SCREEN_W 1880
 #define MY_SCREEN_H 720
-#define SCREEN_FPS 100
+#define SCREEN_FPS 60
 
 // Game costant 
 #define LANE_NUMBER 4             // number of lane
 #define SCALE_FACTOR 15           // scale factor for car for meter to px
-#define VEICLE_SCALE_FACTOR 0.8   // scale factor for veicle
+#define VEICLE_SCALE_FACTOR 0.6   // scale factor for veicle
 
 // Sensor costant
 #define SMAX 200                               // max distance in px
@@ -73,5 +73,10 @@
 #define D_AUTO_SPAWN 0
 #define D_AUTO_SPAWN_TIME 5
 #define NONE -1
+
+// constat id for buffer 
+#define MAIN_BUFFER 0
+#define ZOOM_STREET 1
+#define ZOOM_VEICLE 2
 
 #endif

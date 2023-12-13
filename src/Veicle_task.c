@@ -79,6 +79,15 @@ void *veicle_task(void *arg)
         // check if veicle is out of screen
         if ((State.pos.x < -(get_veicle_width(State.veicle) / SCALE_FACTOR)))
         {
+            // if im the selected veicle i have to deselect it
+            if (get_selected_veicle() == ti)
+            {
+                set_selected_veicle(NONE);
+                if (get_zoom_flag()) // if i'm zoomed i have to reset zoom flag
+                {
+                    set_zoom_flag();
+                }
+            }
             // remove veicle from list
             remove_veicle_from_list(ti);
             running = 0;
@@ -93,6 +102,7 @@ void *veicle_task(void *arg)
         // wait for period
         wait_for_period(ti);
     }
+
     printf("OK: Veicle task terminated id: %d\n", ti);
     task_clean(ti);
     return NULL;

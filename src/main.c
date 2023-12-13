@@ -21,8 +21,8 @@ int freeIndex[MAX_TASKS];
 BITMAP *buffer;                   // display buffer bitmap
 BITMAP *background;               // background bitmap
 BITMAP *Veicles[CAR_NUMBER+TRUCK_NUMBER+MOTORCYCLE_NUMBER+SUPERCAR_NUMBER]; // array of veicles bitmaps
-BITMAP *zoom_buffer;              // zoom screen bitmaps
-BITMAP *zoom_veicle;              // zoom veicle bitmap
+BITMAP *zoom_viecle_buffer;              // zoom screen bitmaps
+
 
 // Shared variable things
 struct Shared_List *shared;        // shared list

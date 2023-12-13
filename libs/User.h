@@ -10,10 +10,11 @@
 #include "Game_core.h"
 #include "List.h"
 #include "Draw.h"
+#include "Ptask.h"
 
 
 // User variables
-extern int zoom_flag;                      // flag that indicate if the zoom is active
+extern int BufferId;                       // id of the buffer i have to draw on the screen
 extern int selected_veicle;                // index of selected veicle
 extern struct Veicle_State selected_veicle_state; // state of the selected veicle
 extern int selected_button;                // index of selected button
@@ -45,5 +46,8 @@ int get_selected_button();
 
 // function that return the state of the selected veicle
 struct Veicle_State *get_selected_veicle_state();
+
+// function that set the buffer id to draw on
+void set_buffer_id(int id);
 
 #endif

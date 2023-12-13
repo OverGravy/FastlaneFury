@@ -68,6 +68,7 @@ void *graphics_task(void *arg)
         // flip the display
         if (get_zoom_flag())
         {
+            check_zoom();
             draw_zoom(get_selected_veicle());
             flip_zoom_buffer();
         }
