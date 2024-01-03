@@ -13,13 +13,13 @@ void *veicle_task(void *arg)
     int running = 1;
 
     // get task argument and wait for activation
-    struct argument veicleArg = get_task_argument(arg);
+    struct argument_struct veicleArg = get_task_argument(arg);
     int ti = get_task_index(arg);
     wait_for_activation(ti);
 
     // initialize veicle State
     struct Veicle_State State;           // veicle state
-    struct Support_List *temp = NULL;    // support list temp node to retrive veicle state after pause
+    struct Support_List temp;            // support list temp node to retrive veicle state after pause
     struct Veicle_Statistics Statistics; // veicle statistics
     init_veicle_state(&State, &Statistics);
 
@@ -31,7 +31,7 @@ void *veicle_task(void *arg)
     double measurements[(DETECTION_DEGREE * 2) + 2]; // all sensor measurements
 
     // add veicle to shared list
-    add_veicle_to_list(ti, State);
+    add_veicle_to_list(ti, State, veicleArg.shared_list, veicleArg.shared_list_mutex);
 
     printf("OK: Veicle task activated id: %d\n", ti);
 
@@ -50,12 +50,12 @@ void *veicle_task(void *arg)
         State.pos.y -= DeltaPositionY;                                               // position in m
 
         // set veicle state in the list
-        set_veicle_state(ti, State);
+        set_veicle_state(ti, State, veicleArg.shared_list, veicleArg.shared_list_mutex);
 
         // execute sensor
         if (State.state != PAUSE)
         {
-            do_mesurements(&State, measurements, &distance);
+            do_mesurements(&State, measurements, &distance, veicleArg.scene);
         }
 
         // Handle driving logic
@@ -63,45 +63,47 @@ void *veicle_task(void *arg)
 
         // CHECK STATUS
 
-        if (check_pause(ti) && State.state != PAUSE)
+        if (veicleArg.shared_struct->game_state == PAUSE_G && State.state != PAUSE)
         {
-            add_vecile_info_to_support(&State, ti);
+            add_vecile_info_to_support(veicleArg.support_list, veicleArg.support_list_mutex, &State, ti);
             State.state = PAUSE;
         }
-        else if (State.state == PAUSE && !check_pause(ti))
+        else if (State.state == PAUSE && veicleArg.shared_struct->game_state == PLAY)
         {
-            temp = get_support_node(ti);
-            State.acceleration = temp->acceleration;
-            State.speed = temp->speed;
-            State.state = temp->state;
+            temp = get_support_node(veicleArg.support_list, veicleArg.support_list_mutex, ti);
+            State.acceleration = temp.acceleration;
+            State.speed = temp.speed;
+            State.state = temp.state;
         }
 
         // check if veicle is out of screen
         if ((State.pos.x < -(get_veicle_width(State.veicle) / SCALE_FACTOR)))
         {
             // if im the selected veicle i have to deselect it
-            if (get_selected_veicle() == ti)
+            if (ti == veicleArg.shared_struct->selected_veicle)
             {
-                set_selected_veicle(NONE);
-                if (get_zoom_flag()) // if i'm zoomed i have to reset zoom flag
-                {
-                    set_zoom_flag();
-                }
+                pthread_mutex_lock(veicleArg.shared_struct_mutex);
+                veicleArg.shared_struct->selected_veicle = NONE;
+                veicleArg.shared_struct->buffer_id = MAIN_SCENE;
+                pthread_mutex_unlock(veicleArg.shared_struct_mutex);
+                printf("OK: selected veicle %d removed\n", ti);
             }
+
             // remove veicle from list
-            remove_veicle_from_list(ti);
+            remove_veicle_from_list(ti, veicleArg.shared_list, veicleArg.shared_list_mutex);
             running = 0;
         }
 
         // check for miss deadline
         if (deadline_miss(ti))
         {
-            printf("VEICLE: deadline missed\n");
+            printf("ERROR: veicle_task deadline missed\n");
         }
 
         // wait for period
         wait_for_period(ti);
     }
+
 
     printf("OK: Veicle task terminated id: %d\n", ti);
     task_clean(ti);

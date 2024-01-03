@@ -19,7 +19,6 @@ void ptask_init(int policy)
 
     for (i = 0; i < MAX_TASKS; i++)
     {
-        tp[i].paused = 0;
         pthread_mutex_init(&tp[i].pauseMut, NULL);
         pthread_cond_init(&tp[i].pauseCond, NULL);
     }
@@ -60,23 +59,21 @@ long get_sys_time(int unit)
 }
 
 // function that create a task
-int task_create(void *(*task)(void *), int i, struct argument input, int period, int drel, int prio, int aflag)
+int task_create(void *(*task)(void *), int i, struct argument_struct input, int period, int drel, int prio, int aflag)
 {
     pthread_attr_t myatt;     // thread attributes
     struct sched_param mypar; // scheduling parameters for the thread
     int tret;
 
-    freeIndex[i] = 1;
+    freeIndex[i] = 1;     // set the index to 1 to indicate that the index is used
 
-    tp[i].index = i;
-    tp[i].arg.mutex = input.mutex;
-    tp[i].arg.shared = input.shared;
-    tp[i].arg.screenH = input.screenH;
-    tp[i].arg.screenW = input.screenW;
-    tp[i].period = period;
-    tp[i].deadline = drel;
-    tp[i].priority = prio;
-    tp[i].dmiss = 0;
+    // set the task parameters<<<
+    tp[i].index = i;       // set the task index
+    tp[i].period = period; // set the task period
+    tp[i].deadline = drel; // set the task deadline
+    tp[i].priority = prio; // set the task priority
+    tp[i].dmiss = 0;       // set the number of deadline misses to 0
+    tp[i].arg = input;     // set the task argument
 
     pthread_attr_init(&myatt); // initialize the thread attributes
 
@@ -157,7 +154,7 @@ int get_free_index()
 }
 
 // funtion that return the task argument
-struct argument get_task_argument(void *arg)
+struct argument_struct get_task_argument(void *arg)
 {
     struct task_par *tpar = (struct task_par *)arg;
     return tpar->arg;
@@ -201,6 +198,13 @@ int get_deadline_miss()
         }
     }
     return sum;
+}
+
+// function that reset the deadline of a single task
+void reset_deadline(int i)
+{
+    time_copy(&(tp[i].dl), tp[i].at);
+    time_add_ms(&(tp[i].dl), tp[i].deadline);
 }
 
 // function that wait fo a period

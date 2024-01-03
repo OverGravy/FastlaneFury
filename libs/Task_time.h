@@ -17,6 +17,4 @@ void time_add_ms(struct timespec *t, int ms);
 // funtion that gets the current time
 long get_sys_time(int unit);
 
-
-
 #endif

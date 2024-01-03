@@ -6,6 +6,6 @@
 #include "Game_core.h"
 
 // function that returns distance from other veicle
-double proximity_sensor(double x, double y, int range, double alpha);
+double proximity_sensor(double x, double y, int range, double alpha, BITMAP *scene);
 
 #endif

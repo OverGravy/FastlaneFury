@@ -8,79 +8,89 @@ void *graphics_task(void *arg)
     struct Node *current;
 
     // gets the arguments
-    struct argument GraphicsArg = get_task_argument(arg);
+    struct argument_struct GraphicsArg = get_task_argument(arg);
 
     int ti = get_task_index(arg);
     wait_for_activation(ti);
+
+    // realize and init all the bitmap needed
+    BITMAP *screen_buffer = create_bitmap(MY_SCREEN_W, MY_SCREEN_H);
+    BITMAP *scene_buffer = create_bitmap(SCENE_W, SCENE_H);
+    BITMAP *bg = create_bitmap(SCENE_W, SCENE_H);
+    prerender_background(bg);
+
+    printf("OK: Graphics task activated\n");
+    reset_deadline(ti);
 
     while (running == 1)
     {
         // DRAW SCENE
 
         // clear the buffer bitmap
-        clear_display();
-
-        if (get_zoom_flag())
-        {
-            clear_zoom_buffer();
-        }
+        clear_scene_buffer(scene_buffer);
 
         // draw background
-        draw_background();
-
-        if (get_selected_veicle() != NONE)
-        {
-            update_selected_veicle_state();
-        }
-
-        // draw info
-        draw_info(GraphicsArg.mutex, GraphicsArg.shared);
+        render_background(scene_buffer, bg);
 
         // draw veicles
-        pthread_mutex_lock(GraphicsArg.mutex);
-
-        if (GraphicsArg.shared->size > 0) // draw veicles only if there are veicles in the list
+        if (GraphicsArg.shared_list->size > 0)
         {
-            current = GraphicsArg.shared->head;
-            while (current != NULL)
+            pthread_mutex_lock(GraphicsArg.shared_list_mutex);
+
+            if (GraphicsArg.shared_list->size > 0) // draw veicles only if there are veicles in the list
             {
-                draw_veicle(current->Veicle.pos.x, current->Veicle.pos.y, current->Veicle.veicle);
-                current = current->next;
+                current = GraphicsArg.shared_list->head;
+                while (current != NULL)
+                {
+                    render_veicle(current->Veicle.pos.x, current->Veicle.pos.y, get_veicle_bitmap(current->Veicle.veicle), scene_buffer);
+                    current = current->next;
+                }
             }
+            pthread_mutex_unlock(GraphicsArg.shared_list_mutex);
         }
-        pthread_mutex_unlock(GraphicsArg.mutex);
+        // blit the scene buffer to the shared buffer
+        blit(scene_buffer, GraphicsArg.scene, 0, 0, 0, 0, SCENE_W, SCENE_H);
 
-        // check for pause menu
-        if (check_menu())
+        // DRAW SCREEN
+        clear_to_color(screen_buffer, makecol(0, 0, 0));
+        switch (GraphicsArg.shared_struct->buffer_id)
         {
-            draw_config_menu();
+        case MAIN_SCENE:
+            // draw the scene buffer to the screen buffer
+            blit(scene_buffer, screen_buffer, 0, 0, 0, 0, SCENE_W, SCENE_H);
+            // draw the info part of the screen
+            render_info(GraphicsArg.shared_list, GraphicsArg.support_list, GraphicsArg.shared_list_mutex, GraphicsArg.support_list_mutex, screen_buffer, GraphicsArg.shared_struct->selected_veicle);
+            // draw the pause simbol if the game is paused
+            if (GraphicsArg.shared_struct->game_state == PAUSE)
+            {
+                render_pause_simbol(screen_buffer);
+            }
+            // draw the menu if the game is in config state
+
+            render_mouse(screen_buffer);
+            break;
+
+        case ZOOM_SCENE:
+            printf("ZOOM\n");
+            break;
+
+        case ZOOM_VEICLE:
+            // render in scene space the zoom veicle
+            render_zoom_veicle(screen_buffer, GraphicsArg.scene, GraphicsArg.shared_struct->selected_veicle, GraphicsArg.shared_list, GraphicsArg.shared_list_mutex, GraphicsArg.config_struct);
+            printf("ZOOM VEICLE\n");
+            // render the info part of the screen
+            render_info_zoom(GraphicsArg.shared_list, GraphicsArg.support_list, GraphicsArg.shared_list_mutex, GraphicsArg.support_list_mutex, screen_buffer, GraphicsArg.shared_struct->selected_veicle);
+
+            break;
         }
 
-        // drawpause sinbol
-        if (check_pause())
-        {
-            draw_pause_symbol();
-        }
-
-        // draw mouse
-        draw_mouse(mouse_x, mouse_y);
-
-        // flip the display
-        if (get_zoom_flag())
-        {
-            check_zoom();
-            draw_zoom(get_selected_veicle());
-            flip_zoom_buffer();
-        }
-        else
-        {
-            flip_display();
-        }
+        // blit the screen buffer to the screen
+        blit(screen_buffer, screen, 0, 0, 0, 0, MY_SCREEN_W, MY_SCREEN_H);
 
         // check for miss deadline
         if (deadline_miss(ti))
         {
-            printf("GRAPHICS: deadline missed\n");
+             printf("ERROR: graphics_task deadline missed\n");
         }
 
         // wait for next activation

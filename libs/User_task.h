@@ -5,13 +5,10 @@
 #include <stdlib.h>
 #include <pthread.h>
 #include <allegro.h>
-#include "Config_menu.h"
-#include "Configuration.h"
-#include "Ptask.h"
+#include "Tasks_core.h"
+#include "User.h"
 #include "Game_core.h"
 #include "Veicle_task.h"
-#include "Pause.h"
-#include "Zoom_veicle.h"
 
 void *user_task(void *arg);
 

@@ -5,10 +5,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-#include "Ptask.h"
+#include "Assets.h"
+#include "Tasks_core.h"
+#include "Game_core.h"
 #include "Veicle.h"
 #include "List.h"
-#include "Pause.h"
 #include "User.h"
 
 void *veicle_task(void *arg);

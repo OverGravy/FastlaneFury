@@ -21,7 +21,7 @@ void init_veicle_state(struct Veicle_State *state, struct Veicle_Statistics *sta
     state->speed = 30.0;                                                                        // in m/s
     state->lane = rand() % LANE_NUMBER;
     state->pos.x = (MY_SCREEN_W - 2) / SCALE_FACTOR;                                            // in meter
-    margin = ((MY_SCREEN_H / (LANE_NUMBER + 1)) - ((Veicles[state->veicle]->h))) / 2;           // margin in pixel
+    margin = ((MY_SCREEN_H / (LANE_NUMBER + 1)) - (get_veicle_height(state->veicle))) / 2;           // margin in pixel
     state->pos.y = (((MY_SCREEN_H / (LANE_NUMBER + 1)) * state->lane) + margin) / SCALE_FACTOR; // in meter
     state->steeringAngle = 0.0;                                                                 // in degree
     state->acceleration = 0;                                                                    // in m/s^2
@@ -245,7 +245,7 @@ void driving_handling(struct Veicle_State *State, struct Veicle_Statistics *Stat
 }
 
 // function tha handle sensor measurements
-void do_mesurements(struct Veicle_State *State, double measurement[], struct Distances *distances)
+void do_mesurements(struct Veicle_State *State, double measurement[], struct Distances *distances, BITMAP *scene_buffer)
 {
 
     int i, j, x, y; // support index and variables
@@ -256,7 +256,7 @@ void do_mesurements(struct Veicle_State *State, double measurement[], struct Dis
     x = (State->pos.x) * SCALE_FACTOR - 10;
     y = (State->pos.y * SCALE_FACTOR) + (get_veicle_height(State->veicle) / 2);
 
-    measurement[0] = proximity_sensor(x, y, RANGE_FRONT, 180);
+    measurement[0] = proximity_sensor(x, y, RANGE_FRONT, 180, scene_buffer);
 
     // if im in first or in the last lane i dont need to check for left or right
 
@@ -270,7 +270,7 @@ void do_mesurements(struct Veicle_State *State, double measurement[], struct Dis
         for (i = 1; i <= DETECTION_DEGREE; i++)
         {
             degree = 10 + i;
-            measurement[i] = proximity_sensor(x, y, RANGE_SIDE, degree);
+            measurement[i] = proximity_sensor(x, y, RANGE_SIDE, degree, scene_buffer);
         }
     }
     else
@@ -290,7 +290,7 @@ void do_mesurements(struct Veicle_State *State, double measurement[], struct Dis
         {
             j++;
             degree = 190 + j;
-            measurement[i] = proximity_sensor(x, y, RANGE_SIDE, degree);
+            measurement[i] = proximity_sensor(x, y, RANGE_SIDE, degree, scene_buffer);
         }
     }
     else
@@ -306,7 +306,7 @@ void do_mesurements(struct Veicle_State *State, double measurement[], struct Dis
     x = (((State->pos.x) * SCALE_FACTOR) + get_veicle_width(State->veicle)) + 10;
     y = (((State->pos.y) * SCALE_FACTOR) + (get_veicle_height(State->veicle) / 2));
 
-    measurement[(DETECTION_DEGREE * 2) + 1] = proximity_sensor(x, y, RANGE_BACK, 0);
+    measurement[(DETECTION_DEGREE * 2) + 1] = proximity_sensor(x, y, RANGE_BACK, 0, scene_buffer);
 
     // CHECK DISTANCE -----------------------------------------------------
 

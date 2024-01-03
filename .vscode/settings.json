@@ -18,7 +18,8 @@
         "game_core.h": "c",
         "config_menu.h": "c",
         "zoom_veicle.h": "c",
-        "draw.h": "c"
+        "draw.h": "c",
+        "assets.h": "c"
     },
     "C_Cpp.dimInactiveRegions": false,
     "C_Cpp.errorSquiggles": "disabled"

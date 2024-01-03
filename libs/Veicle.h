@@ -5,8 +5,7 @@
 #include "Stat_file.h"
 #include "Game_core.h"
 #include "List.h"
-#include "Draw.h"
-#include "Pause.h"
+#include "Assets.h"
 #include "Ptask.h"
 
 #define DETECTION_DEGREE 160 // degree arch in which the veicle can detect other veicles, left, right
@@ -26,6 +25,6 @@ void init_veicle_state(struct Veicle_State *state, struct Veicle_Statistics *sta
 void driving_handling(struct Veicle_State *State, struct Veicle_Statistics *Statistics, struct Distances *distances);
 
 // function tha handle sensor measurements
-void do_mesurements(struct Veicle_State *State, double measurement[], struct Distances *distances);
+void do_mesurements(struct Veicle_State *State, double measurement[], struct Distances *distances, BITMAP *scene_buffer);
 
 #endif

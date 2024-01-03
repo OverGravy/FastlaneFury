@@ -9,12 +9,12 @@ struct Support_List* create_support_list(){
 }
 
 // function that insert info in the support list
-void add_vecile_info_to_support(struct Veicle_State *veicle, int index){
+void add_vecile_info_to_support(struct Support_List *support, pthread_mutex_t *support_mutex, struct Veicle_State *veicle, int index){
 
     // create new node
     struct Support_List* newNode = (struct Support_List*)malloc(sizeof(struct Support_List));
 
-    pthread_mutex_lock(&supportMutex);
+    pthread_mutex_lock(support_mutex);
 
     // set node data
     newNode->state = veicle->state;
@@ -36,14 +36,14 @@ void add_vecile_info_to_support(struct Veicle_State *veicle, int index){
         last->next = newNode;
     }
 
-    pthread_mutex_unlock(&supportMutex);
+    pthread_mutex_unlock(support_mutex);
 
 }
 
 // function that return a specific node in the support list
-struct Support_List* get_support_node(int index){
+struct Support_List get_support_node(struct Support_List *support, pthread_mutex_t *support_mutex, int index){
 
-    pthread_mutex_lock(&supportMutex);
+    pthread_mutex_lock(support_mutex);
 
     // find node
     struct Support_List* temp = support->next;
@@ -56,18 +56,19 @@ struct Support_List* get_support_node(int index){
         temp = temp->next;
         
     }
-    pthread_mutex_unlock(&supportMutex);
+    pthread_mutex_unlock(support_mutex);
 
-    return temp;
+    // return copy of node
+    return *temp;   
 }
 
 // function that clean all element in support list
-void clean_support_list(){
+void clean_support_list(struct Support_List *support, pthread_mutex_t *supportMutex){
 
-    pthread_mutex_lock(&supportMutex);
+    pthread_mutex_lock(supportMutex);
     // if list is empty return
     if(support->next == NULL){
-        pthread_mutex_unlock(&supportMutex);
+        pthread_mutex_unlock(supportMutex);
         return;
     }
 
@@ -79,12 +80,12 @@ void clean_support_list(){
         current = next;
     }
     support->next = NULL;
-    pthread_mutex_unlock(&supportMutex);
+    pthread_mutex_unlock(supportMutex);
 
 }
 
 // function that destroy support list
-void  destroy_support_list(){
+void  destroy_support_list(struct Support_List *support){
     // if list is empty return
     if(support->next == NULL){
         return;

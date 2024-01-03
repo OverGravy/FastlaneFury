@@ -6,18 +6,16 @@
 
 void *user_task(void *arg)
 {
-    struct argument userTaskArg = get_task_argument(arg);
-
+    struct argument_struct userTaskArg = get_task_argument(arg);
     int running = 1;
 
     // Local selction variables
-    int selection = -1;      // what the user clicked
-    int pause = 0;           // pause flag
-    int menu = 0;            // menu flag
-    int mouse = 0;           // mouse click flag to avoid multiple click
+    int selection = NONE;       // what the user clicked
+    int selected_veicle = NONE; // id of the selected veicle
+    int game_state = PLAY;      // game state
+    int mouse = 0;              // mouse click flag to avoid multiple click
 
     // car variables
-    struct argument veicleTaskArg;
     int index = 0;
 
     // autospawn variables
@@ -27,19 +25,21 @@ void *user_task(void *arg)
     // get task index
     int ti = get_task_index(arg);
     wait_for_activation(ti);
-    
-    // set the buffer to draw to the main buffer
-    set_buffer_id(MAIN_BUFFER);
 
     printf("OK: User task activated\n");
+    reset_deadline(ti);
 
     // user input
     while (running)
     {
+        // get selected veicle from shared struct
+        selected_veicle = userTaskArg.shared_struct->selected_veicle;
+
         // check for user input
         if (keypressed())
         {
             // check keyboard
+            
             int key = readkey() >> 8;
 
             switch (key)
@@ -51,64 +51,65 @@ void *user_task(void *arg)
                 break;
 
             case KEY_SPACE: // spawn a veicle
-                if (!get_auto_spawn())
+
+                index = get_free_index();
+                if (index == -1)
                 {
-                    veicleTaskArg.mutex = userTaskArg.mutex;
-                    veicleTaskArg.shared = userTaskArg.shared;
-                    index = get_free_index();
-                    if (index == -1)
+                    printf("ERROR: Can not create a new veicle No free index\n");
+                }
+                else
+                {
+                    if (game_state == PLAY)
                     {
-                        printf("ERROR: Can not create a new veicle No free index\n");
+                        if (create_veicle_task(userTaskArg, index) != 0)
+                        {
+                            printf("ERROR: error creating a new veicle_task\n");
+                        }
                     }
                     else
                     {
-                        if (pause == 0 && menu == 0)
-                        {
-                            task_create(veicle_task, index, veicleTaskArg, 20, 20, 10, ACT);
-                        }
-                        else
-                        {
-                            printf("ERROR: Can not create a new veicle game paused\n");
-                        }
+                        printf("ERROR: Can not create a new veicle game paused\n");
                     }
-                }
-                break;
-
-            case KEY_M: // open config menu
-                if (menu == 0 && pause == 0)
-                {
-                    pause_for_menu(userTaskArg.mutex, userTaskArg.shared);
-                    printf("OK: Config menu open\n");
-                    menu = 1;
-                }
-                else if (menu == 1 && pause == 0)
-                {
-                    menu = 0;
-                    resume_from_menu(userTaskArg.mutex, userTaskArg.shared);
-                    printf("OK: Config menu closed\n");
                 }
 
                 break;
 
             case KEY_P: // pause game to cheng config
-                if (pause == 0 && menu == 0)
+                if (game_state == PLAY)
                 {
-                    pause_veicles(userTaskArg.mutex, userTaskArg.shared);
                     printf("OK: Game paused\n");
-                    pause = 1;
+                    game_state = PAUSE_G;
+                    userTaskArg.shared_struct->game_state = PAUSE_G;
                 }
-                else if (pause == 1 && menu == 0)
+                else if (game_state == PAUSE_G)
                 {
-                    pause = 0;
-                    resume_veicles(userTaskArg.mutex, userTaskArg.shared);
                     printf("OK: Game resumed\n");
+                    game_state = PLAY;
+                    userTaskArg.shared_struct->game_state = PLAY;
                 }
                 break;
             case KEY_Z:
-                if (get_selected_veicle() != NONE && pause == 0 && menu == 0)
+                if (selected_veicle != NONE && userTaskArg.shared_struct->buffer_id == MAIN_SCENE)
                 {
-                    set_zoom_flag();
+                    userTaskArg.shared_struct->buffer_id = ZOOM_VEICLE;
                 }
+                else if (selected_veicle != NONE && selection == ROAD && userTaskArg.shared_struct->buffer_id == ZOOM_VEICLE)
+                {
+                    userTaskArg.shared_struct->buffer_id = ZOOM_SCENE;
+                }
+                break;
+            case KEY_A:
+                if (userTaskArg.config_struct->auto_spawn == AUTO)
+                {
+                    userTaskArg.config_struct->auto_spawn = MANUAL;
+                    printf("OK: Auto spawn disabled\n");
+                }
+                else
+                {
+                    userTaskArg.config_struct->auto_spawn = AUTO;
+                    printf("OK: Auto spawn enabled\n");
+                }
+                break;
             }
         }
 
@@ -117,26 +118,25 @@ void *user_task(void *arg)
         {
             if (mouse == 0)
             {
+                // to avoid multiple click
                 mouse = 1;
-                if (menu == 1)
-                {
-                    handle_input_config_menu(mouse_x, mouse_y);
-                }
 
-                selection = set_selection(mouse_x, mouse_y, userTaskArg.mutex, userTaskArg.shared); // handle on what the user clicked
+                selection = set_selection(mouse_x, mouse_y, userTaskArg.shared_list, userTaskArg.shared_struct_mutex, userTaskArg.shared_struct); // handle on what the user clicked
+                printf("OK: Selection %d\n", selection);
                 switch (selection)
                 {
                 case VEICLE:
-                    printf("OK: Veicle selected, %d\n", get_selected_veicle());
+                    printf("OK: Veicle selected, %d\n", selected_veicle);
                     break;
 
                 case BUTTON:
-                    printf("OK: Button selected, %d\n", get_selected_button());
+                    printf("OK: Button selected\n");
                     break;
 
                 case ROAD:
                     printf("OK: Road selected\n");
                     break;
+
                 }
             }
         }
@@ -152,11 +152,11 @@ void *user_task(void *arg)
         }
 
         // handle auto spawn veicle
-        if (get_auto_spawn())
+        if (userTaskArg.config_struct->auto_spawn == AUTO)
         {
             if (autoSpawn == 0)
             { // calculate next time car will spawn
-                nextAutoSpawn = time(NULL) + (get_auto_spawn_time());
+                nextAutoSpawn = time(NULL) + (userTaskArg.config_struct->auto_spawn_time);
 
                 // print nextAutoSpawn
                 struct tm *tm = localtime(&nextAutoSpawn);
@@ -166,9 +166,8 @@ void *user_task(void *arg)
                 autoSpawn = 1;
             }
             if (time(NULL) >= nextAutoSpawn)
-            { // spawn car
-                veicleTaskArg.mutex = userTaskArg.mutex;
-                veicleTaskArg.shared = userTaskArg.shared;
+            {
+                // spawn car
                 index = get_free_index();
                 if (index == NONE)
                 {
@@ -176,33 +175,21 @@ void *user_task(void *arg)
                 }
                 else
                 {
-                    if (pause == 0 && menu == 0)
+                    if (game_state == PLAY)
                     {
-                        task_create(veicle_task, index, veicleTaskArg, 20, 20, 10, ACT);
+                        if (create_veicle_task(userTaskArg, index) != 0)
+                        {
+                            printf("ERROR: error creating a new veicle_task\n");
+                        }
                     }
                 }
                 autoSpawn = 0;
             }
         }
 
-        // check if selected veicle is valid
-        if (get_selected_veicle() != NONE)
-        {
-            // check if the veicle is still active if not deselect it
-            if (!task_is_active(get_selected_veicle()))
-            {
-                set_selected_veicle(NONE); // comunicate to graphics task that the veicle is deselected
-                if (get_zoom_flag())
-                {
-                    // reset zoom flag
-                    set_zoom_flag();
-                }
-            }
-        }
-
         if (deadline_miss(ti))
         {
-            printf("USER: deadline missed\n");
+             printf("ERROR: user_task deadline missed\n");
         }
 
         // wait for next activation
