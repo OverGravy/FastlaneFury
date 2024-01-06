@@ -26,10 +26,13 @@ int set_selection(int x, int y, struct Shared_List *shared, pthread_mutex_t *sha
                 // set in shared struct the selection and the selected veicle
                 shared_struct->selection = VEICLE;
                 shared_struct->selected_veicle = current->id;
+                pthread_mutex_unlock(shared_struct_mutex);
+                return VEICLE;
                 
             }
             current = current->next;
         }
+        pthread_mutex_unlock(shared_struct_mutex);
 
         // check if the mouse is on a button
 
@@ -37,12 +40,18 @@ int set_selection(int x, int y, struct Shared_List *shared, pthread_mutex_t *sha
 
         // if nothing have been selected set selection on road if inside teh screen
         shared_struct->selection = ROAD;
+        shared_struct->selected_veicle = NONE;
+        shared_struct->mouse_pos.x = x;
+        shared_struct->mouse_pos.y = y;
+        return ROAD;
+
     }
     else
     {
         // set selection on none
         shared_struct->selection = NONE;
+        return NONE;
     }
-    pthread_mutex_unlock(shared_struct_mutex);
-    return shared_struct->selection;
+    
+  
 }

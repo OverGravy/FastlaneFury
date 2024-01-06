@@ -52,7 +52,7 @@ void render_info(struct Shared_List *shared, struct Support_List *support, pthre
             sprintf(info, "Position: (%.2f, %.2f)", current.pos.x, current.pos.y);
             textout_ex(dest_buffer, font, info, 650, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 + 120, makecol(255, 255, 255), -1);
             sprintf(info, "Steering Angle: %.2f", current.steeringAngle);
-            textout_ex(dest_buffer, font, info, 800, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 + 20, makecol(255, 255, 255), -1);
+            textout_ex(dest_buffer, font, info, 900, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 + 20, makecol(255, 255, 255), -1);
             State = current.state;
         }
         else
@@ -68,33 +68,33 @@ void render_info(struct Shared_List *shared, struct Support_List *support, pthre
             sprintf(info, "Position: (%.2f, %.2f)", current.pos.x, current.pos.y);
             textout_ex(dest_buffer, font, info, 650, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 + 120, makecol(255, 255, 255), -1);
             sprintf(info, "Steering Angle: %.2f", current.steeringAngle);
-            textout_ex(dest_buffer, font, info, 800, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 + 20, makecol(255, 255, 255), -1);
+            textout_ex(dest_buffer, font, info, 900, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 + 20, makecol(255, 255, 255), -1);
             State = temp.state;
         }
         switch (State)
         {
         case SLOWDOWN:
-            textout_ex(dest_buffer, font, "State: SLOW_DOWN", 800, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 + 40, makecol(255, 255, 255), -1);
+            textout_ex(dest_buffer, font, "State: SLOW_DOWN", 900, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 + 40, makecol(255, 255, 255), -1);
             break;
 
         case ACCELERATE:
-            textout_ex(dest_buffer, font, "State: ACCELERATE", 800, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 + 40, makecol(255, 255, 255), -1);
+            textout_ex(dest_buffer, font, "State: ACCELERATE", 900, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 + 40, makecol(255, 255, 255), -1);
             break;
 
         case PAUSE:
-            textout_ex(dest_buffer, font, "State: PAUSE", 800, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 + 40, makecol(255, 255, 255), -1);
+            textout_ex(dest_buffer, font, "State: PAUSE", 900, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 + 40, makecol(255, 255, 255), -1);
             break;
 
         case OVERTAKE:
-            textout_ex(dest_buffer, font, "State: OVERTAKE", 800, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 + 40, makecol(255, 255, 255), -1);
+            textout_ex(dest_buffer, font, "State: OVERTAKE", 900, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 + 40, makecol(255, 255, 255), -1);
             break;
 
         case IDLE:
-            textout_ex(dest_buffer, font, "State: IDLE", 800, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 + 40, makecol(255, 255, 255), -1);
+            textout_ex(dest_buffer, font, "State: IDLE", 900, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 + 40, makecol(255, 255, 255), -1);
             break;
 
         case ABORTOVERTAKE:
-            textout_ex(dest_buffer, font, "State: ABORT_OVERTAKE", 800, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 + 40, makecol(255, 255, 255), -1);
+            textout_ex(dest_buffer, font, "State: ABORT_OVERTAKE", 900, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 + 40, makecol(255, 255, 255), -1);
             break;
         }
 

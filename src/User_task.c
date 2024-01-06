@@ -39,17 +39,17 @@ void *user_task(void *arg)
         if (keypressed())
         {
             // check keyboard
-            
+
             int key = readkey() >> 8;
 
             switch (key)
             {
-
+            // esc key
             case KEY_ESC: // esc key
                 running = 0;
                 printf("OK: User task deactivated\n");
                 break;
-
+            // spawn key
             case KEY_SPACE: // spawn a veicle
 
                 index = get_free_index();
@@ -73,7 +73,7 @@ void *user_task(void *arg)
                 }
 
                 break;
-
+            // pause key
             case KEY_P: // pause game to cheng config
                 if (game_state == PLAY)
                 {
@@ -88,16 +88,60 @@ void *user_task(void *arg)
                     userTaskArg.shared_struct->game_state = PLAY;
                 }
                 break;
+            // zoom key
             case KEY_Z:
+                // zoom the veicle if a veicle is selected
                 if (selected_veicle != NONE && userTaskArg.shared_struct->buffer_id == MAIN_SCENE)
                 {
                     userTaskArg.shared_struct->buffer_id = ZOOM_VEICLE;
+                    userTaskArg.config_struct->zv_scale_factor = Z1_FACTOR;
                 }
-                else if (selected_veicle != NONE && selection == ROAD && userTaskArg.shared_struct->buffer_id == ZOOM_VEICLE)
+                // add zoom to the veicle if the veicle is already zoomed
+                else if (userTaskArg.shared_struct->buffer_id == ZOOM_VEICLE)
+                {
+                    if (userTaskArg.config_struct->zv_scale_factor == Z1_FACTOR)
+                    {
+                        userTaskArg.config_struct->zv_scale_factor = Z2_FACTOR;
+                    }
+                    else if (userTaskArg.config_struct->zv_scale_factor == Z2_FACTOR)
+                    {
+                        userTaskArg.config_struct->zv_scale_factor = Z3_FACTOR;
+                    }
+                    else if (userTaskArg.config_struct->zv_scale_factor == Z3_FACTOR)
+                    {
+                        userTaskArg.config_struct->zv_scale_factor = Z1_FACTOR;
+                    }
+                }
+                // zoom the scene if no veicle is selected
+                if (userTaskArg.shared_struct->buffer_id == MAIN_SCENE && selected_veicle == NONE)
                 {
                     userTaskArg.shared_struct->buffer_id = ZOOM_SCENE;
                 }
+                // add zoom to the scene if the scene is already zoomed
+                else if (userTaskArg.shared_struct->buffer_id == ZOOM_SCENE)
+                {
+                    if (userTaskArg.config_struct->zv_scale_factor == Z1_FACTOR)
+                    {
+                        userTaskArg.config_struct->zv_scale_factor = Z2_FACTOR;
+                    }
+                    else if (userTaskArg.config_struct->zv_scale_factor == Z2_FACTOR)
+                    {
+                        userTaskArg.config_struct->zv_scale_factor = Z3_FACTOR;
+                    }
+                    else if (userTaskArg.config_struct->zv_scale_factor == Z3_FACTOR)
+                    {
+                        userTaskArg.config_struct->zv_scale_factor = Z1_FACTOR;
+                    }
+                }
                 break;
+            // zoom out key
+            case KEY_X:
+                if (userTaskArg.shared_struct->buffer_id == ZOOM_VEICLE || userTaskArg.shared_struct->buffer_id == ZOOM_SCENE)
+                {
+                    userTaskArg.shared_struct->buffer_id = MAIN_SCENE;
+                }
+                break;
+            // auto spawn key
             case KEY_A:
                 if (userTaskArg.config_struct->auto_spawn == AUTO)
                 {
@@ -120,9 +164,7 @@ void *user_task(void *arg)
             {
                 // to avoid multiple click
                 mouse = 1;
-
                 selection = set_selection(mouse_x, mouse_y, userTaskArg.shared_list, userTaskArg.shared_struct_mutex, userTaskArg.shared_struct); // handle on what the user clicked
-                printf("OK: Selection %d\n", selection);
                 switch (selection)
                 {
                 case VEICLE:
@@ -136,7 +178,6 @@ void *user_task(void *arg)
                 case ROAD:
                     printf("OK: Road selected\n");
                     break;
-
                 }
             }
         }
@@ -189,7 +230,7 @@ void *user_task(void *arg)
 
         if (deadline_miss(ti))
         {
-             printf("ERROR: user_task deadline missed\n");
+            printf("ERROR: user_task deadline missed\n");
         }
 
         // wait for next activation

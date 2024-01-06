@@ -36,6 +36,8 @@ struct argument_struct *init_argument_struct(){
     a_struct->shared_struct->selection = NONE;
     a_struct->shared_struct->selected_veicle = NONE;
     a_struct->shared_struct->buffer_id = MAIN_SCENE;
+    a_struct->shared_struct->mouse_pos.x = 0;
+    a_struct->shared_struct->mouse_pos.y = 0;
    
     // init config struct
     struct Config *config_struct = (struct Config*)malloc(sizeof(struct Config));
@@ -43,7 +45,8 @@ struct argument_struct *init_argument_struct(){
     a_struct->config_struct->auto_spawn = AUTO;
     a_struct->config_struct->auto_spawn_time = AS_T1;
     a_struct->config_struct->zv_scale_factor = Z1_FACTOR;
-    
+  
+
 
     return a_struct;
 }

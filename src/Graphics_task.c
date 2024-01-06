@@ -65,24 +65,29 @@ void *graphics_task(void *arg)
             {
                 render_pause_simbol(screen_buffer);
             }
-            // draw the menu if the game is in config state
-
-            render_mouse(screen_buffer);
             break;
 
         case ZOOM_SCENE:
-            printf("ZOOM\n");
+            // render in scene space the zoom scene
+            render_zoom_road(screen_buffer, GraphicsArg.scene, &GraphicsArg.shared_struct->mouse_pos, GraphicsArg.config_struct);
+
+            // render the info part of the screen
+            render_info_zoom_road(GraphicsArg.shared_list, screen_buffer);
             break;
 
         case ZOOM_VEICLE:
             // render in scene space the zoom veicle
             render_zoom_veicle(screen_buffer, GraphicsArg.scene, GraphicsArg.shared_struct->selected_veicle, GraphicsArg.shared_list, GraphicsArg.shared_list_mutex, GraphicsArg.config_struct);
-            printf("ZOOM VEICLE\n");
             // render the info part of the screen
             render_info_zoom(GraphicsArg.shared_list, GraphicsArg.support_list, GraphicsArg.shared_list_mutex, GraphicsArg.support_list_mutex, screen_buffer, GraphicsArg.shared_struct->selected_veicle);
 
             break;
         }
+        // render mouse position
+        render_mouse(screen_buffer);
+
+        // render the instruction part of the screen
+        render_instruction(screen_buffer, &GraphicsArg);
 
         // blit the screen buffer to the screen
         blit(screen_buffer, screen, 0, 0, 0, 0, MY_SCREEN_W, MY_SCREEN_H);

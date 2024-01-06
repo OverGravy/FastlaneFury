@@ -13,9 +13,6 @@
 #include "Ptask.h"
 
 
-// User variables
-extern struct Veicle_State selected_veicle_state; // state of the selected veicle
-
 // USER TASK FUNCTIONS
 
 // function that return the selection on the screen and set automatically the id of the selected type of thing

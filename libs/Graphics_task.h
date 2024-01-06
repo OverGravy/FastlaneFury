@@ -5,6 +5,8 @@
 #include "Graphics_Scene_function.h"
 #include "Graphics_Interface_function.h"
 #include "Graphics_zoom_veicle.h"
+#include "Graphics_zoom_road.h"
+#include "Graphics_instruction.h"
 #include "Game_core.h"
 
 void *graphics_task(void *arg);

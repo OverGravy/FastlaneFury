@@ -12,6 +12,12 @@
 #include "Task_time.h"
 #include "Game_core.h"
 
+// struct to rappresent where the mouse click on the road
+struct position{
+    int x;
+    int y;
+};
+
 // setting structures
 struct Config
 {
@@ -26,7 +32,8 @@ struct shared_struct{
     int selection;                    // integer that rappresent the selection on the screen
     int selected_veicle;              // index of the selected veicle
     int buffer_id;                    // id rappresenting what screen is going to be drawn 
-};
+    struct position mouse_pos;             // struct that contain the mouse position
+};  
 
 // task argument with variable shared between tasks
 struct argument_struct

@@ -106,8 +106,13 @@
 #define AS_T3 4             // autospawn time of 4 second
 
 // zoom factor constant
-#define Z1_FACTOR 4         // zoom factor 1
+#define Z1_FACTOR 5         // zoom factor 1
 #define Z2_FACTOR 3         // zoom factor 2
-#define Z3_FACTOR 2         // zoom factor 3
+#define Z3_FACTOR 1         // zoom factor 3
+
+// label constant
+#define LABEL_MARGIN 20                              // margin between label
+#define LABEL_HEIGHT 15                              // label height
+#define LABEL_FRAME_COLOR makecol(100, 100, 100)
 
 #endif

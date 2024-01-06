@@ -1,7 +1,8 @@
 #include "../libs/Graphics_zoom_veicle.h"
 
 // function that render the zoom veicle screen part
-void render_zoom_veicle(BITMAP *dest_buffer, BITMAP *scene_surce, int selected_veicle, struct Shared_List *shared, pthread_mutex_t *list_mutex, struct Config *config){
+void render_zoom_veicle(BITMAP *dest_buffer, BITMAP *scene_surce, int selected_veicle, struct Shared_List *shared, pthread_mutex_t *list_mutex, struct Config *config)
+{
 
     int x, y, veicle;
     int scale = config->zv_scale_factor * 100;
@@ -15,34 +16,44 @@ void render_zoom_veicle(BITMAP *dest_buffer, BITMAP *scene_surce, int selected_v
     int width = get_veicle_width(veicle) + scale;
     int height = get_veicle_height(veicle) + scale;
 
-    BITMAP *zoom_buffer = create_bitmap(width, height);
+    // create a buffer with the cutted scene
+    BITMAP *zoom_veicle = create_bitmap(width, height);
 
-    // cut the scene around the veicle and blit it to the zoom buffer
-    BITMAP *zoom_veicle = create_bitmap(SCENE_W, SCENE_H);
-    clear_to_color(zoom_veicle, makecol(0, 0, 0));
-    blit(scene_surce, zoom_buffer, x - (scale / 2), y - (scale / 2), 0, 0, width, height);
+    if( x - (scale / 2) > 0)
+        x = x - (scale / 2);
+    else
+        x = 0;
+    
+    if ( y - (scale / 2) > 0)
+        y = y - (scale / 2);
+    else
+        y = 0;
 
-    stretch_blit(zoom_buffer, zoom_veicle, 0, 0, width, height, 0, 0, SCENE_W / 3, SCENE_H / 3);
+    blit(scene_surce, zoom_veicle, x, y, 0, 0, width, height);
 
-    // draw the zoom veicle buffer centered in the destination buffer
-    blit(zoom_veicle, dest_buffer, 0, 0, (SCENE_W) / 2, 0, SCENE_W / 3, SCENE_H / 3);
+    // calcultate ma new max width and height to fit in the scene and mantain the same aspect ratio
+    int n_height = SCENE_H;
+    int n_width = (int)round(((double)width / (double)height) * (double)n_height);
+    
+    // create a buffer with the zoom veicle scaled to fit in the scene
+    BITMAP *zoom_buffer = create_bitmap(n_width, n_height);
+    stretch_blit(zoom_veicle, zoom_buffer, 0, 0, width, height, 0, 0, n_width, n_height);
+
+    // blit the buffer in the middle of the scene
+    blit(zoom_buffer, dest_buffer, 0, 0, (SCENE_W / 2) - (n_width / 2), 0, n_width, n_height);
+    
 }
 
 // function that print the info about the veicle in the zoom veicle screen
 void render_info_zoom(struct Shared_List *shared, struct Support_List *support, pthread_mutex_t *list_mutex, pthread_mutex_t *support_mutex, BITMAP *dest_buffer, int selected_veicle)
 {
-
     char info[50];
     double speedKmH = 0;
-    int x = 0;
-    int y = 0;
     int State;
 
     // print active veicles
-    pthread_mutex_lock(list_mutex);
     sprintf(info, "Active Veicles: %d", shared->size);
     textout_ex(dest_buffer, font, info, 20, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 + 20, makecol(255, 255, 255), -1);
-    pthread_mutex_unlock(list_mutex);
 
     // print dead line missed
     sprintf(info, "Total Deadline Miss: %d", get_deadline_miss());
