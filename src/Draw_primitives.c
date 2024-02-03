@@ -18,6 +18,7 @@ void draw_arch(int x, int y, int radius, double startAngle, double endAngle, int
     startAngle = (startAngle * M_PI) / 180;
     endAngle = (endAngle * M_PI) / 180;
 
+    // draw the arch
     for (angle = startAngle; angle <= endAngle; angle += 0.01)
     {
         px = x + radius * cos(angle);
@@ -29,6 +30,7 @@ void draw_arch(int x, int y, int radius, double startAngle, double endAngle, int
 // function that draws line where we need
 void draw_line(int x1, int y1, int x2, int y2, int color, BITMAP *dest)
 {
+    // draw thick line
     for (int i = 0; i < 5; i++)
     {
         line(dest, x1, y1 + i, x2, y2 + i, color);

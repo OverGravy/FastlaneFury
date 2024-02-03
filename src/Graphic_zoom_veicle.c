@@ -3,21 +3,31 @@
 // function that render the zoom veicle screen part
 void render_zoom_veicle(BITMAP *dest_buffer, BITMAP *scene_surce, int selected_veicle, struct Shared_List *shared, pthread_mutex_t *list_mutex, struct Config *config)
 {
-
+    // Position of veicle and veicle type
     int x, y, veicle;
-    int scale = config->zv_scale_factor * 100;
+    int scale = config->zv_scale_factor * 100; // scale factor
 
-    // get the veicle position
+    // width and height of the cutted scene
+    int width;
+    int height;
+
+    // calcultate ma new max width and height to fit in the scene and mantain the same aspect ratio
+    int n_height = SCENE_H;
+    int n_width;
+
+    // set variables
     x = (get_veicle_state(selected_veicle, shared, list_mutex).pos.x) * SCALE_FACTOR;
     y = (get_veicle_state(selected_veicle, shared, list_mutex).pos.y) * SCALE_FACTOR;
     veicle = get_veicle_state(selected_veicle, shared, list_mutex).veicle;
-
-    // width and height of the cutted scene
-    int width = get_veicle_width(veicle) + scale;
-    int height = get_veicle_height(veicle) + scale;
+    width = get_veicle_width(veicle) + scale;
+    height = get_veicle_height(veicle) + scale;
+    n_width = (int)round(((double)width / (double)height) * (double)n_height);
 
     // create a buffer with the cutted scene
     BITMAP *zoom_veicle = create_bitmap(width, height);
+
+    // create a buffer with the cutted scene
+    BITMAP *zoom_buffer = create_bitmap(n_width, n_height);
 
     if( x - (scale / 2) > 0)
         x = x - (scale / 2);
@@ -29,14 +39,10 @@ void render_zoom_veicle(BITMAP *dest_buffer, BITMAP *scene_surce, int selected_v
     else
         y = 0;
 
+    // blit the scene in the buffer
     blit(scene_surce, zoom_veicle, x, y, 0, 0, width, height);
-
-    // calcultate ma new max width and height to fit in the scene and mantain the same aspect ratio
-    int n_height = SCENE_H;
-    int n_width = (int)round(((double)width / (double)height) * (double)n_height);
     
-    // create a buffer with the zoom veicle scaled to fit in the scene
-    BITMAP *zoom_buffer = create_bitmap(n_width, n_height);
+    // stretch the buffer to fit in the scene
     stretch_blit(zoom_veicle, zoom_buffer, 0, 0, width, height, 0, 0, n_width, n_height);
 
     // blit the buffer in the middle of the scene
@@ -51,6 +57,10 @@ void render_info_zoom(struct Shared_List *shared, struct Support_List *support, 
     double speedKmH = 0;
     int State;
 
+    // get the veicle state
+    struct Veicle_State current;
+    struct Support_List temp;
+
     // print active veicles
     sprintf(info, "Active Veicles: %d", shared->size);
     textout_ex(dest_buffer, font, info, 20, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 + 20, makecol(255, 255, 255), -1);
@@ -58,6 +68,8 @@ void render_info_zoom(struct Shared_List *shared, struct Support_List *support, 
     // print dead line missed
     sprintf(info, "Total Deadline Miss: %d", get_deadline_miss());
     textout_ex(dest_buffer, font, info, 20, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 + 40, makecol(255, 255, 255), -1);
+
+    current = get_veicle_state(selected_veicle, shared, list_mutex);
 
     // print info about the task with id
     sprintf(info, "Task: %d", selected_veicle);
@@ -69,9 +81,8 @@ void render_info_zoom(struct Shared_List *shared, struct Support_List *support, 
     sprintf(info, "Priority: %d", task_get_priority(selected_veicle));
     textout_ex(dest_buffer, font, info, 450, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 + 80, makecol(255, 255, 255), -1);
 
+   
     // print info about the veicle with id
-    struct Veicle_State current = get_veicle_state(selected_veicle, shared, list_mutex);
-
     sprintf(info, "Veicle: %d", selected_veicle);
     textout_ex(dest_buffer, font, info, 650, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 + 20, makecol(255, 255, 255), -1);
     sprintf(info, "Type: %d", current.veicle);
@@ -95,7 +106,7 @@ void render_info_zoom(struct Shared_List *shared, struct Support_List *support, 
     else
     {
         // find in support list the veicle with id
-        struct Support_List temp = get_support_node(support, support_mutex, selected_veicle);
+        temp = get_support_node(support, support_mutex, selected_veicle);
 
         speedKmH = (int)round(temp.speed * 3.6);
         sprintf(info, "Speed: %.2f", speedKmH);

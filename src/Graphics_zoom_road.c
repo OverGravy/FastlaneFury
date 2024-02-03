@@ -6,12 +6,20 @@ void render_zoom_road(BITMAP *dest_buffer, BITMAP *scene_surce, struct position 
     int x, y;
     int scale = config->zv_scale_factor * 100;
 
-    x = pos->x;
-    y = pos->y;
-
     // width and height of the cutted scene
     int width = 500 + scale;
     int height = 300 + scale;
+
+    // calcultate ma new max width and height to fit in the scene and mantain the same aspect ratio
+    int n_height = SCENE_H;
+    int n_width = (int)round(((double)width / (double)height) * (double)n_height);
+
+    // create a buffer with the zoom veicle scaled to fit in the scene
+    BITMAP *zoom_buffer = create_bitmap(n_width, n_height);
+
+    // set the veicle position
+    x = pos->x;
+    y = pos->y;
 
     // create a buffer with the cutted scene
     BITMAP *zoom_road = create_bitmap(width, height);
@@ -28,15 +36,10 @@ void render_zoom_road(BITMAP *dest_buffer, BITMAP *scene_surce, struct position 
 
     blit(scene_surce, zoom_road, x, y, 0, 0, width, height);
 
-    // calcultate ma new max width and height to fit in the scene and mantain the same aspect ratio
-    int n_height = SCENE_H;
-    int n_width = (int)round(((double)width / (double)height) * (double)n_height);
-
-    // create a buffer with the zoom veicle scaled to fit in the scene
-    BITMAP *zoom_buffer = create_bitmap(n_width, n_height);
+    // stretch the buffer to fit in the scene
     stretch_blit(zoom_road, zoom_buffer, 0, 0, width, height, 0, 0, n_width, n_height);
 
-    // blit the buffer in the middle of the scene
+    // blit the buffer in the middle of the sceneS
     blit(zoom_buffer, dest_buffer, 0, 0, (SCENE_W / 2) - (n_width / 2), 0, n_width, n_height);
 }
 

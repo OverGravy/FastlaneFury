@@ -83,6 +83,7 @@ void *veicle_task(void *arg)
             if (ti == veicleArg.shared_struct->selected_veicle)
             {
                 pthread_mutex_lock(veicleArg.shared_struct_mutex);
+                veicleArg.shared_struct->selection = NONE;
                 veicleArg.shared_struct->selected_veicle = NONE;
                 veicleArg.shared_struct->buffer_id = MAIN_SCENE;
                 pthread_mutex_unlock(veicleArg.shared_struct_mutex);

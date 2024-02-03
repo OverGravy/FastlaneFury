@@ -41,6 +41,7 @@ int init_allegro()
 
     printf("OK: Keyboard and mouse installed\n");    
 
+    // return 1 cause everything is ok
     return 1;
 }
 

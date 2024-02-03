@@ -10,6 +10,10 @@ void render_info(struct Shared_List *shared, struct Support_List *support, pthre
     int y = 0;
     int State;
 
+    // veiucle state struct
+    struct Veicle_State current;
+    struct Support_List temp;
+
     // print active veicles
     pthread_mutex_lock(list_mutex);
     sprintf(info, "Active Veicles: %d", shared->size);
@@ -33,7 +37,7 @@ void render_info(struct Shared_List *shared, struct Support_List *support, pthre
         textout_ex(dest_buffer, font, info, 450, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 + 80, makecol(255, 255, 255), -1);
 
         // print info about the veicle with id
-        struct Veicle_State current = get_veicle_state(selected_veicle, shared, list_mutex);
+        current = get_veicle_state(selected_veicle, shared, list_mutex);
 
         sprintf(info, "Veicle: %d", selected_veicle);
         textout_ex(dest_buffer, font, info, 650, ((SCREEN_H / (LANE_NUMBER + 1))) * 4 + 20, makecol(255, 255, 255), -1);
@@ -58,7 +62,7 @@ void render_info(struct Shared_List *shared, struct Support_List *support, pthre
         else
         {
             // find in support list the veicle with id
-            struct Support_List temp = get_support_node(support, support_mutex, selected_veicle);
+            temp = get_support_node(support, support_mutex, selected_veicle);
 
             speedKmH = (int)round(temp.speed * 3.6);
             sprintf(info, "Speed: %.2f", speedKmH);

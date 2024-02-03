@@ -9,7 +9,7 @@ BIN_DIR := ./bin
 SOURCES := $(shell find $(SRC_DIR) -name '*.c')
 OBJECTS := $(patsubst $(SRC_DIR)/%.c,$(OBJ_DIR)/%.o,$(SOURCES))
 
-TARGET = Highway
+TARGET = FastFuryLane
 BIN_TARGET = $(BIN_DIR)/$(TARGET)
 
 all: $(BIN_TARGET)

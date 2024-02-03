@@ -5,6 +5,7 @@ BITMAP *load_scaled_bitmap(char *filename, double factor)
 {
     BITMAP *temp = load_bitmap(filename, NULL);
     BITMAP *ret = create_bitmap(temp->w * factor, temp->h * factor);
+    // stretch the original bitmap to the new one
     stretch_blit(temp, ret, 0, 0, temp->w, temp->h, 0, 0, temp->w * factor, temp->h * factor);
     destroy_bitmap(temp);
     return ret;
@@ -14,10 +15,11 @@ BITMAP *load_scaled_bitmap(char *filename, double factor)
 int load_graphics_assets()
 {
     int i;
+     char path[60];
+
     // load all cars bitmaps in folder Sprites
     for (i = 0; i <= CAR_NUMBER; i++)
     {
-        char path[60];
         sprintf(path, "../Assets/Bitmap/VeicleBitmap/Car/C_bitmap%d.bmp", i);
 
         // load a scaled version of the bitmap
@@ -35,7 +37,6 @@ int load_graphics_assets()
     // load all trucks bitmaps in folder Sprites
     for (i = 0; i <= TRUCK_NUMBER; i++)
     {
-        char path[60];
         sprintf(path, "../Assets/Bitmap/VeicleBitmap/Truck/T_bitmap%d.bmp", i);
 
         // load a scaled version of the bitmap
@@ -53,7 +54,6 @@ int load_graphics_assets()
     // load all motorcycles bitmaps in folder Sprites
     for (i = 0; i <= MOTORCYCLE_NUMBER; i++)
     {
-        char path[60];
         sprintf(path, "../Assets/Bitmap/VeicleBitmap/Motorcycle/M_bitmap%d.bmp", i);
 
         // load a scaled version of the bitmap
@@ -71,7 +71,6 @@ int load_graphics_assets()
     // load all supercars bitmaps in folder Sprites
     for (i = 0; i <= SUPERCAR_NUMBER; i++)
     {
-        char path[60];
         sprintf(path, "../Assets/Bitmap/VeicleBitmap/SuperCar/SC_bitmap%d.bmp", i);
 
         // load a scaled version of the bitmap
@@ -84,6 +83,7 @@ int load_graphics_assets()
         }
     }
 
+    // return 1 cause everything is ok
     return 1;
 }
 

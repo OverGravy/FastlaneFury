@@ -43,5 +43,4 @@ void render_instruction(BITMAP *dest_buffer, struct argument_struct *arg){
     render_label(relative_x + margin + (is_width/2), relative_y + (margin*2) + label_height, "Press ESC to exit", dest_buffer);
     
 
-
 }

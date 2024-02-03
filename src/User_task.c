@@ -22,6 +22,13 @@ void *user_task(void *arg)
     time_t nextAutoSpawn; // will contain the time that pass between activation and deactivation
     int autoSpawn = 0;    // autospawn flag
 
+    // input variables
+    int key = 0;
+
+    // time variables
+    struct tm *tm;
+    char s[64];
+
     // get task index
     int ti = get_task_index(arg);
     wait_for_activation(ti);
@@ -40,7 +47,7 @@ void *user_task(void *arg)
         {
             // check keyboard
 
-            int key = readkey() >> 8;
+            key = readkey() >> 8;
 
             switch (key)
             {
@@ -113,7 +120,7 @@ void *user_task(void *arg)
                     }
                 }
                 // zoom the scene if no veicle is selected
-                if (userTaskArg.shared_struct->buffer_id == MAIN_SCENE && selected_veicle == NONE)
+                if (userTaskArg.shared_struct->buffer_id == MAIN_SCENE && selected_veicle == NONE && userTaskArg.shared_struct->selection != NONE)
                 {
                     userTaskArg.shared_struct->buffer_id = ZOOM_SCENE;
                 }
@@ -200,8 +207,7 @@ void *user_task(void *arg)
                 nextAutoSpawn = time(NULL) + (userTaskArg.config_struct->auto_spawn_time);
 
                 // print nextAutoSpawn
-                struct tm *tm = localtime(&nextAutoSpawn);
-                char s[64];
+                tm = localtime(&nextAutoSpawn);
                 strftime(s, sizeof(s), "%c", tm);
 
                 autoSpawn = 1;

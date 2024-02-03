@@ -2,8 +2,11 @@
 
 // function that init shared structure
 struct argument_struct *init_argument_struct(){
-    // init argument structure
+
+    // structure declaration 
     struct argument_struct *a_struct = (struct argument_struct*)malloc(sizeof(struct argument_struct));
+    struct shared_struct *shared_struct = NULL;
+    struct Config *config_struct = NULL;
 
     // init shared list and his mutex
     a_struct->shared_list = create_shared_list();
@@ -29,7 +32,7 @@ struct argument_struct *init_argument_struct(){
     a_struct->shared_struct_mutex = shared_struct_mutex;
 
     // init shared struct
-    struct shared_struct *shared_struct = (struct shared_struct*)malloc(sizeof(struct shared_struct));
+    shared_struct = (struct shared_struct*)malloc(sizeof(struct shared_struct));
     a_struct->shared_struct = shared_struct;
 
     a_struct->shared_struct->game_state = PLAY;
@@ -40,14 +43,12 @@ struct argument_struct *init_argument_struct(){
     a_struct->shared_struct->mouse_pos.y = 0;
    
     // init config struct
-    struct Config *config_struct = (struct Config*)malloc(sizeof(struct Config));
+    config_struct = (struct Config*)malloc(sizeof(struct Config));
     a_struct->config_struct = config_struct;
     a_struct->config_struct->auto_spawn = AUTO;
     a_struct->config_struct->auto_spawn_time = AS_T1;
     a_struct->config_struct->zv_scale_factor = Z1_FACTOR;
   
-
-
     return a_struct;
 }
 

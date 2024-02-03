@@ -12,9 +12,9 @@ struct Shared_List* create_shared_list(){
 // function that insert a veicle in the list
 void add_veicle_to_list(int id, struct Veicle_State veicle, struct Shared_List* shared_list, pthread_mutex_t* mutex){
 
-
-        // create new node
+        // create new node and last node
         struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));
+        struct Node* last = NULL;
 
         // set node data
         newNode->id = id;
@@ -30,7 +30,7 @@ void add_veicle_to_list(int id, struct Veicle_State veicle, struct Shared_List* 
         }
         else{
             // find last node
-            struct Node* last = shared_list->head;
+            last = shared_list->head;
             while(last->next != NULL){
                 last = last->next;
             }
@@ -45,7 +45,10 @@ void add_veicle_to_list(int id, struct Veicle_State veicle, struct Shared_List* 
 
 // function that remove a veicle from the list 
 void remove_veicle_from_list(int id, struct Shared_List* shared_list, pthread_mutex_t* mutex){
-    
+
+        // create current node
+        struct Node* current = NULL;
+
         // lock mutex
         pthread_mutex_lock(mutex);  
 
@@ -59,7 +62,7 @@ void remove_veicle_from_list(int id, struct Shared_List* shared_list, pthread_mu
         }
     
         // find node to remove
-        struct Node* current = shared_list->head;
+        current = shared_list->head;
         while(current->next != NULL){
             if(current->next->id == id){
                 break;
@@ -84,6 +87,8 @@ void set_veicle_state(int id, struct Veicle_State State, struct Shared_List* sha
 
     // search the correct node
     struct Node* current = shared_list->head;
+
+    // search the correct node an the set it 
     while(current->next != NULL){
         if(current->id == id){
             break;
@@ -107,6 +112,8 @@ struct Veicle_State get_veicle_state(int id, struct Shared_List* shared_list, pt
 
     // search the correct node
     struct Node* current = shared_list->head;
+
+    // search the correct node and then return a copy of it
     while(current->next != NULL){
         if(current->id == id){
             break;
@@ -125,10 +132,13 @@ struct Veicle_State get_veicle_state(int id, struct Shared_List* shared_list, pt
 // a function that destroy the list
 void destroy_shared_list(struct Shared_List* shared_list){
 
-    // free all nodes
+    
     struct Node* current = shared_list->head;
+    struct Node* next = NULL;
+
+    // free all nodes
     while(current != NULL){
-        struct Node* next = current->next;
+        next = current->next;
         free(current);
         current = next;
     }

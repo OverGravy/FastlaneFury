@@ -6,11 +6,13 @@ int check_statistic_file(){
     int row = 0;
     char c;
 
+    // file pointer
     CarFile.fp = fopen("../Assets/Data/Car.txt", "r");
     TruckFile.fp = fopen("../Assets/Data/Truck.txt", "r");
     MotorcycleFile.fp = fopen("../Assets/Data/Motorcycle.txt", "r");
     SupercarFile.fp = fopen("../Assets/Data/Supercar.txt", "r");
 
+    // check if the file is open
     if (CarFile.fp == NULL)
     {
         printf("Error opening file Car.txt\n");
@@ -80,7 +82,10 @@ void get_veicle_staitistics(int type, struct Veicle_Statistics *Statistics){
    
     FILE * fp;
     int randomRow;
+    int i = 0;
+    char line[256];
 
+    // select the file to read depending on the type that is passed
     switch (type)
     {
     case CAR:
@@ -102,8 +107,6 @@ void get_veicle_staitistics(int type, struct Veicle_Statistics *Statistics){
     }
 
     // read randomRow avoiding - as separator
-    int i = 0;
-    char line[256];
     while (fgets(line, sizeof(line), fp))
     {
         if (i == randomRow)
@@ -119,6 +122,8 @@ void get_veicle_staitistics(int type, struct Veicle_Statistics *Statistics){
 
 // function that close the file
 void close_statistic_file(){
+
+    // close the file
     fclose(CarFile.fp);
     fclose(TruckFile.fp);
     fclose(MotorcycleFile.fp);

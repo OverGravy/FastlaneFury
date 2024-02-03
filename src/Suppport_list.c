@@ -3,7 +3,7 @@
 // fucntion that create support list 
 struct Support_List* create_support_list(){
     struct Support_List* newList = (struct Support_List*)malloc(sizeof(struct Support_List));   // allocate memory for the new list
-    newList->next = NULL;                                                                    // set next to null
+    newList->next = NULL;                                                                       // set next to null
     return newList;
 
 }
@@ -13,6 +13,7 @@ void add_vecile_info_to_support(struct Support_List *support, pthread_mutex_t *s
 
     // create new node
     struct Support_List* newNode = (struct Support_List*)malloc(sizeof(struct Support_List));
+    struct Support_List* last = NULL;
 
     pthread_mutex_lock(support_mutex);
 
@@ -28,7 +29,7 @@ void add_vecile_info_to_support(struct Support_List *support, pthread_mutex_t *s
     }
     else{
         // find last node
-        struct Support_List* last = support->next;
+        last = support->next;
         while(last->next != NULL){
             last = last->next;
         }
@@ -65,6 +66,9 @@ struct Support_List get_support_node(struct Support_List *support, pthread_mutex
 // function that clean all element in support list
 void clean_support_list(struct Support_List *support, pthread_mutex_t *supportMutex){
 
+    struct Support_List* current = NULL;
+    struct Support_List* next = NULL;
+
     pthread_mutex_lock(supportMutex);
     // if list is empty return
     if(support->next == NULL){
@@ -73,9 +77,9 @@ void clean_support_list(struct Support_List *support, pthread_mutex_t *supportMu
     }
 
     // free all nodes
-    struct Support_List* current = support->next;
+   current = support->next;
     while(current != NULL){
-        struct Support_List* next = current->next;
+        next = current->next;
         free(current);
         current = next;
     }
@@ -86,15 +90,19 @@ void clean_support_list(struct Support_List *support, pthread_mutex_t *supportMu
 
 // function that destroy support list
 void  destroy_support_list(struct Support_List *support){
+
+    struct Support_List* current = NULL;
+    struct Support_List* next = NULL;
+
     // if list is empty return
     if(support->next == NULL){
         return;
     }
 
     // free all nodes
-    struct Support_List* current = support->next;
+    current = support->next;
     while(current != NULL){
-        struct Support_List* next = current->next;
+        next = current->next;
         free(current);
         current = next;
     }

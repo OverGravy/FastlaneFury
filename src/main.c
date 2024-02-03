@@ -27,6 +27,11 @@ struct Data_File SupercarFile;
 
 int main()
 {
+
+    // variable declaration 
+    struct argument_struct *argument = NULL;
+
+
     srand(time(NULL));
 
     // init allegro
@@ -54,7 +59,7 @@ int main()
     ptask_init(SCHED_FIFO); // init ptask with a SCHED policy
 
     // init argument struct
-    struct argument_struct *argument = init_argument_struct();
+    argument = init_argument_struct();
     
     // create user task to menage I/O
     if (create_user_task(*argument) != 0){
