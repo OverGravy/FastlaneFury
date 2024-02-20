@@ -1,14 +1,21 @@
-# FastlaneFury
+# FASTLANE FURY
 Small university project that include using pthread and Allegro library and multi thread programming. The program will be a small dimulation of a fraction of an highway with  ultiple veicle and every veicle will be a task-
 
-# Final result
-In final result feature will be:
+# Install & usage:
 
-- User thread will handle input part.
-- Grafics thread will handle the screen refresh and zoom function.
-- Car spwan over user command.
-- Userwill be able to zoom on a singol car.
-- Cars will interact using sensor avoiding other car and slow down if needed.
+Before compiling using make sure you have install the right allegro library version witch is allegro 4.2 using the following command:
+```sudo apt install liballegro4-dev```
+- Pressing space after the program spawn 1 car pressing another time spawn another car that perform overtake.
+- Pressing 'p' will pause the game.
+- Pressing 'p' again resume the game.
+- Pressing 'esc' will close the game.
+- Pressing 'space' will spawn a car.
+- Pressing 'm' a configuration menu will appear.
+
+# OVERVIEW
+
+The game consist in 2 persistent thread. The graphics thread that handle the screen refresh and the user thread that handle the input part. The game consist in a small simulation of a fraction of an highway with multiple veicle and every veicle is a task. The user is able to spawn a car and see some information about it and thread itself. The objective of the game is to avoid collision and to see how the car behave in a real world situation. The game is a small university project that include using pthread and Allegro library and multi thread programming.
+
 
 # Actual Feature
 
@@ -27,28 +34,9 @@ In final result feature will be:
 - There are NOW different Veicle type with different statistics in term of max speed acceleration and deceleration.
 
 
-# How to use
-Before compiling using make sure you have install the right allegro library version witch is allegro 4.2 using the following command:
-```sudo apt install liballegro4-dev```
-- Pressing space after the program spawn 1 car pressing another time spawn another car that perform overtake.
-- Pressing 'p' will pause the game.
-- Pressing 'p' again resume the game.
-- Pressing 'esc' will close the game.
-- Pressing 'space' will spawn a car.
-- Pressing 'm' a configuration menu will appear.
+# Kown bugs 
 
-
-# Future feature 
-
-- User will be able to zoom on a singol car.
-- There will be some information that will work as button on the bottom of the screen.
-
-# Actual problem 
-
-- I'm still not able to load different font from the default one.
-- Sometime due to a thread problem closing the game crash it;
-- Still need a litte bit of work on the car movement.
-- Need a full code review to make it more readable and more efficient.
+- Using the brogram over a VM will cause the program to crash or to have a weird amount of dead line miss
 
 # Tips 
 
