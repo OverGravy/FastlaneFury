@@ -1,33 +1,74 @@
 #include "../libs/Veicle.h"
 
 // function that initialize veicle
-void init_veicle_state(struct Veicle_State *state, struct Veicle_Statistics *statistics)
+void init_veicle_state(struct Veicle_State *state, struct Veicle_Statistics *statistics, struct argument_struct argument, int index)
 {
     int margin = 0;
-    state->veicle = rand() % VEICLE_NUMBER; // random veicle
 
-    // find the veicle type 
-    if(state->veicle >= 0 && state->veicle <= CAR_NUMBER){
+    // check if the veicle is predefined in argument struct
+    if (argument.VeicleType[index] != -1)
+    {
+        // randomize veicle type considering the predefined veicle
+        switch (argument.VeicleType[index])
+        {
+        case CAR:
+            state->veicle = rand() % CAR_NUMBER;
+            break;
+        case TRUCK:
+            state->veicle = rand() % TRUCK_NUMBER + CAR_NUMBER;
+            break;
+        case MOTORCYCLE:
+            state->veicle = rand() % MOTORCYCLE_NUMBER + CAR_NUMBER + TRUCK_NUMBER;
+            break;
+        case SUPERCAR:
+            state->veicle = rand() % SUPERCAR_NUMBER + CAR_NUMBER + TRUCK_NUMBER + MOTORCYCLE_NUMBER;
+            break;
+        }
+    }
+    else
+    {
+        state->veicle = rand() % (CAR_NUMBER + TRUCK_NUMBER + MOTORCYCLE_NUMBER + SUPERCAR_NUMBER);
+    }
+
+    // find the veicle type
+    if (state->veicle >= 0 && state->veicle <= CAR_NUMBER)
+    {
         get_veicle_staitistics(CAR, statistics);
-    }else if(state->veicle > CAR_NUMBER && state->veicle <= CAR_NUMBER + TRUCK_NUMBER){
+    }
+    else if (state->veicle > CAR_NUMBER && state->veicle <= CAR_NUMBER + TRUCK_NUMBER)
+    {
         get_veicle_staitistics(TRUCK, statistics);
-    }else if(state->veicle > CAR_NUMBER + TRUCK_NUMBER && state->veicle <= CAR_NUMBER + TRUCK_NUMBER + MOTORCYCLE_NUMBER){
+    }
+    else if (state->veicle > CAR_NUMBER + TRUCK_NUMBER && state->veicle <= CAR_NUMBER + TRUCK_NUMBER + MOTORCYCLE_NUMBER)
+    {
         get_veicle_staitistics(MOTORCYCLE, statistics);
-    }else if(state->veicle > CAR_NUMBER + TRUCK_NUMBER + MOTORCYCLE_NUMBER && state->veicle <= CAR_NUMBER + TRUCK_NUMBER + MOTORCYCLE_NUMBER + SUPERCAR_NUMBER){
+    }
+    else if (state->veicle > CAR_NUMBER + TRUCK_NUMBER + MOTORCYCLE_NUMBER && state->veicle <= CAR_NUMBER + TRUCK_NUMBER + MOTORCYCLE_NUMBER + SUPERCAR_NUMBER)
+    {
         get_veicle_staitistics(SUPERCAR, statistics);
     }
 
+    state->speed = 30.0; // in m/s
+    if (*(argument.LastLane) == NONE)
+    {
+        state->lane = rand() % LANE_NUMBER;
+    }
+    else
+    {
+        // randomize lane considering the last lane used in the argument struct to avoid collision
+        do
+        {
+            state->lane = rand() % LANE_NUMBER;
+        } while(*(argument.LastLane) == state->lane);
+        *(argument.LastLane) = state->lane;           // update last lane used
+    }
 
-    state->speed = 30.0;                                                                        // in m/s
-    state->lane = rand() % LANE_NUMBER;
     state->pos.x = (MY_SCREEN_W - 2) / SCALE_FACTOR;                                            // in meter
-    margin = ((MY_SCREEN_H / (LANE_NUMBER + 1)) - (get_veicle_height(state->veicle))) / 2;           // margin in pixel
+    margin = ((MY_SCREEN_H / (LANE_NUMBER + 1)) - (get_veicle_height(state->veicle))) / 2;      // margin in pixel
     state->pos.y = (((MY_SCREEN_H / (LANE_NUMBER + 1)) * state->lane) + margin) / SCALE_FACTOR; // in meter
     state->steeringAngle = 0.0;                                                                 // in degree
     state->acceleration = 0;                                                                    // in m/s^2
-   
 }
-
 
 // STATE FUNCTIONS
 
@@ -47,7 +88,7 @@ void idle(struct Veicle_State *State, struct Veicle_Statistics *Statistics, stru
         State->state = SLOWDOWN;
     }
 
-    if (distances->left == -1 && State->speed > 45*(LANE_NUMBER+1) && State->lane != LANE_NUMBER - 1) // No car on left and speed > 45 m/s
+    if (distances->left == -1 && State->speed > 45 * (LANE_NUMBER + 1) && State->lane != LANE_NUMBER - 1) // No car on left and speed > 45 m/s
     {
         State->state = OVERTAKE;
     }
@@ -120,7 +161,7 @@ void overtake(struct Veicle_State *State, struct Veicle_Statistics *Statistics, 
 
     // calculate middle lane position to stop overtaking
     margin = ((MY_SCREEN_H / (LANE_NUMBER + 1)) - (get_veicle_height(State->veicle))) / 2; // margin in pixel
-    middleLane = (((MY_SCREEN_H / (LANE_NUMBER + 1)) * (State->lane + 1)) + margin);     // in meter
+    middleLane = (((MY_SCREEN_H / (LANE_NUMBER + 1)) * (State->lane + 1)) + margin);       // in meter
 
     if (((State->pos.y) * SCALE_FACTOR) >= middleLane)
     { // check if i am in the middle lane
@@ -172,7 +213,7 @@ void abortOvertake(struct Veicle_State *State, struct Veicle_Statistics *Statist
     // changing state logic
 
     margin = ((MY_SCREEN_H / (LANE_NUMBER + 1)) - (get_veicle_height(State->veicle))) / 2; // margin in pixel
-    middleLane = (((MY_SCREEN_H / (LANE_NUMBER + 1)) * (State->lane)) + margin);         // in meter
+    middleLane = (((MY_SCREEN_H / (LANE_NUMBER + 1)) * (State->lane)) + margin);           // in meter
 
     if (((State->pos.y) * SCALE_FACTOR) <= middleLane)
     { // check if i am in the middle lane
@@ -282,7 +323,8 @@ void do_mesurements(struct Veicle_State *State, double measurement[], struct Dis
     }
     // # GET DISTANCE RIGHT #
 
-    if( State->lane != LANE_NUMBER - 1){
+    if (State->lane != LANE_NUMBER - 1)
+    {
         x = (((State->pos.x) * SCALE_FACTOR) + (get_veicle_width(State->veicle) / 2));
         y = ((State->pos.y * SCALE_FACTOR) - 10);
 

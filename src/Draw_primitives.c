@@ -11,8 +11,8 @@ void draw_point(int x, int y, int color, BITMAP *dest)
 void draw_arch(int x, int y, int radius, double startAngle, double endAngle, int color, BITMAP *dest)
 {
     // draw arch using line to fill it
-    double angle;
-    int px, py;
+    double angle;   // angle in rad
+    int px, py;     // coordinates of the point to draw
 
     // convert angle in rad
     startAngle = (startAngle * M_PI) / 180;

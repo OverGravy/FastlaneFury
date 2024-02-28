@@ -48,7 +48,29 @@ struct argument_struct *init_argument_struct(){
     a_struct->config_struct->auto_spawn = AUTO;
     a_struct->config_struct->auto_spawn_time = AS_T1;
     a_struct->config_struct->zv_scale_factor = Z1_FACTOR;
-  
+
+    // init the veicle type array
+    a_struct->VeicleType = (int*)malloc(sizeof(int) * MAX_TASKS);
+
+    // set the first 2 in the array as NONE cause the first 2 veicle are non existent
+    // i chose to keep the same index of the task for this array to avoid confusion
+    // the first 2 veicle are non existent cause they are used for the user and graphic task
+    for (int i = 0; i < 2; i++)
+    {
+        a_struct->VeicleType[i] = NONE;
+    }
+
+    // init the last lane used
+    a_struct->LastLane = (int*)malloc(sizeof(int));
+
+    // set last lane as NONE
+   *(a_struct->LastLane) = NONE;
+
+    // set the simulation speed to 1
+    a_struct->SimSpeed = (float*)malloc(sizeof(float));
+    *(a_struct->SimSpeed) = 1;
+
+    // return the structure
     return a_struct;
 }
 
@@ -65,7 +87,20 @@ int create_graphic_task(struct argument_struct argument){
 }
 
 // function that create the veicle task
-int create_veicle_task(struct argument_struct argument, int index){
+int create_veicle_task(struct argument_struct argument, int index, int predefined){
+
+    // if the veicle is predefined set the veicle type else set a random veicle type
+    if (predefined != NONE)
+    {
+        // set the predefined veicle
+        argument.VeicleType[index] = predefined;
+    }
+    else
+    {
+        // set the random veicle
+        argument.VeicleType[index] = rand() % 3;
+    }
+
     // create the veicle task
     return task_create(veicle_task, index, argument, VT_PERIOD, VT_DEADLINE, VT_PRIORITY, ACT);
 }

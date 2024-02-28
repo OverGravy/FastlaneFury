@@ -1,22 +1,36 @@
 #include "../libs/Graphics_task.h"
 
+
+/*
+screen division in 2 part, the scene have its own dedicated buffer
+_________________________________
+|_______________________________|
+|_________   SCENE   ___________|
+|_______________________________
+|_______________________________|
+|\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\|
+|\\\\\\\      INFO     \\\\\\\\\|
+---------------------------------
+
+*/
+
 // periodic task function that perioducally updates the screen
 void *graphics_task(void *arg)
 {
 
-    int running = 1;
-    struct Node *current;
+    int running = 1;        // flag to check if the task is running
+    struct Node *current;   // current node of the list
 
     // gets the arguments
     struct argument_struct GraphicsArg = get_task_argument(arg);
 
-    int ti = get_task_index(arg);
+    int ti = get_task_index(arg);   // get the task index
     wait_for_activation(ti);
 
     // realize and init all the bitmap needed
-    BITMAP *screen_buffer = create_bitmap(MY_SCREEN_W, MY_SCREEN_H);
-    BITMAP *scene_buffer = create_bitmap(SCENE_W, SCENE_H);
-    BITMAP *bg = create_bitmap(SCENE_W, SCENE_H);
+    BITMAP *screen_buffer = create_bitmap(MY_SCREEN_W, MY_SCREEN_H);      // screen buffer
+    BITMAP *scene_buffer = create_bitmap(SCENE_W, SCENE_H);               // scene buffer
+    BITMAP *bg = create_bitmap(SCENE_W, SCENE_H);                         // background buffer
     prerender_background(bg);
 
     printf("OK: Graphics task activated\n");
@@ -48,6 +62,10 @@ void *graphics_task(void *arg)
             }
             pthread_mutex_unlock(GraphicsArg.shared_list_mutex);
         }
+
+        // draw spawn lane point
+        render_spawn_lane(scene_buffer, *(GraphicsArg.LastLane));
+
         // blit the scene buffer to the shared buffer
         blit(scene_buffer, GraphicsArg.scene, 0, 0, 0, 0, SCENE_W, SCENE_H);
 

@@ -3,8 +3,8 @@
 // function that render the zoom road peace on screen_buffer
 void render_zoom_road(BITMAP *dest_buffer, BITMAP *scene_surce, struct position *pos, struct Config *config)
 {
-    int x, y;
-    int scale = config->zv_scale_factor * 100;
+    int x, y;                                   // coordinates of the veicle
+    int scale = config->zv_scale_factor * 100;  // scale factor
 
     // width and height of the cutted scene
     int width = 500 + scale;

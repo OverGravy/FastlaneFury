@@ -21,4 +21,7 @@ void render_veicle(double x, double y, BITMAP *veicle, BITMAP *dest_buffer);
 // function that draws background in buffer
 void prerender_background(BITMAP *background);
 
+// function that render the last lane sign
+void render_spawn_lane(BITMAP *dest_buffer, int lane);
+
 #endif

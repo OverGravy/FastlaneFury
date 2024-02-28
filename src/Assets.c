@@ -14,8 +14,8 @@ BITMAP *load_scaled_bitmap(char *filename, double factor)
 // function that load all the graphics assets
 int load_graphics_assets()
 {
-    int i;
-     char path[60];
+    int i;          
+    char path[60]; 
 
     // load all cars bitmaps in folder Sprites
     for (i = 0; i <= CAR_NUMBER; i++)

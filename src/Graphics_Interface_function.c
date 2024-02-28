@@ -4,11 +4,9 @@
 void render_info(struct Shared_List *shared, struct Support_List *support, pthread_mutex_t *list_mutex, pthread_mutex_t *support_mutex, BITMAP *dest_buffer, int selected_veicle)
 {
 
-    char info[50];
-    double speedKmH = 0;
-    int x = 0;
-    int y = 0;
-    int State;
+    char info[50];          // string to print info
+    double speedKmH = 0;    // speed in km/h          
+    int State, x, y;        // integer rappresenting the state of the veicle
 
     // veiucle state struct
     struct Veicle_State current;

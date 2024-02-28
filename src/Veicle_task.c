@@ -21,7 +21,7 @@ void *veicle_task(void *arg)
     struct Veicle_State State;           // veicle state
     struct Support_List temp;            // support list temp node to retrive veicle state after pause
     struct Veicle_Statistics Statistics; // veicle statistics
-    init_veicle_state(&State, &Statistics);
+    init_veicle_state(&State, &Statistics, veicleArg, ti);
 
     // initialize veicle variables
     double DeltaPositionX = 0;                       // delta position in m
@@ -40,10 +40,10 @@ void *veicle_task(void *arg)
         // UPDATE VEICLE STATE
 
         // calculate veiele speed and position using MKS unit
-        DeltaSpeed = State.acceleration * ((double)task_get_period(ti) / 1000.0); // delta speed in m/s0
-        State.speed += DeltaSpeed;                                                // speed in m/s
-        DeltaPositionX = State.speed * ((double)task_get_period(ti) / 1000.0);    // delta position in m
-        State.pos.x -= DeltaPositionX;                                            // position in m
+        DeltaSpeed = State.acceleration * ((double)task_get_period(ti) / 1000.0);                          // delta speed in m/s0
+        State.speed += DeltaSpeed;                                                                         // speed in m/s
+        DeltaPositionX = State.speed * ((double)task_get_period(ti) / 1000.0)*(*(veicleArg.SimSpeed));    // delta position in m
+        State.pos.x -= DeltaPositionX;                                                                     // position in m
 
         // change in function of sterin angle
         DeltaPositionY = DeltaPositionX * tan(State.steeringAngle * (M_PI / 180.0)); // delta position in m

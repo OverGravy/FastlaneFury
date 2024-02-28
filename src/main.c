@@ -9,7 +9,7 @@
 #include <math.h>
 
 // declare ptask things
-pthread_t tid[MAX_TASKS];
+pthread_t tid[MAX_TASKS];   
 struct task_par tp[MAX_TASKS];
 struct timespec ptask_t0;
 int ptaskPolicy;
@@ -19,7 +19,7 @@ int freeIndex[MAX_TASKS];
 // declare allegro things
 BITMAP *Veicles[CAR_NUMBER+TRUCK_NUMBER+MOTORCYCLE_NUMBER+SUPERCAR_NUMBER]; // array of veicles bitmaps
 
-// statistic things
+// statistic data file struct 
 struct Data_File CarFile;
 struct Data_File TruckFile;
 struct Data_File MotorcycleFile;

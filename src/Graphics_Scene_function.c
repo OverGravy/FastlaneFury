@@ -6,8 +6,8 @@ void prerender_background(BITMAP *background)
     rectfill(background, 0, 0, SCENE_W, SCENE_H, makecol(188, 188, 188));     // road
 
     // dashed line variables
-    int x1 = 0;
-    int y1 = ((MY_SCREEN_H / (LANE_NUMBER + 1)));
+    int x1 = 0;                                             
+    int y1 = ((MY_SCREEN_H / (LANE_NUMBER + 1)));   
     int x2 = SCENE_W;
     int y2 = ((MY_SCREEN_H / (LANE_NUMBER + 1)));
 
@@ -59,4 +59,13 @@ void render_veicle(double x, double y, BITMAP *veicle, BITMAP *dest_buffer)
 void render_background(BITMAP *dest_buffer, BITMAP *bg)
 {
     blit(bg, dest_buffer, 0, 0, 0, 0, SCENE_W, SCENE_H);
+}
+
+
+// function that marks with a circle the last lane where a veicle spawn
+void render_spawn_lane(BITMAP *dest_buffer, int lane)
+{
+    int x = MY_SCREEN_W - 20;
+    int y = ((MY_SCREEN_H / (LANE_NUMBER + 1))) * lane + 10;
+    circlefill(dest_buffer, x, y, 10, FOVCOLOR);
 }

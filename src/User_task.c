@@ -68,7 +68,7 @@ void *user_task(void *arg)
                 {
                     if (game_state == PLAY)
                     {
-                        if (create_veicle_task(userTaskArg, index) != 0)
+                        if (create_veicle_task(userTaskArg, index, NONE) != 0)
                         {
                             printf("ERROR: error creating a new veicle_task\n");
                         }
@@ -161,6 +161,97 @@ void *user_task(void *arg)
                     printf("OK: Auto spawn enabled\n");
                 }
                 break;
+            // car spawn key 
+            case KEY_1:
+                if (game_state == PLAY) // check if the game is paused
+                {
+                    index = get_free_index(); // get a free index
+                    if (index == -1)
+                    {
+                        printf("ERROR: Can not create a new veicle No free index\n");
+                    }
+                    else
+                    {
+                        if (create_veicle_task(userTaskArg, index, CAR) != 0) // create a car 
+                        {
+                            printf("ERROR: error creating a new veicle_task\n");
+                        }
+                    }
+                }
+                printf("OK: Car selected\n");
+                break;
+            // truck spawn key
+            case KEY_2:
+                if (game_state == PLAY) // check if the game is paused
+                {
+                    index = get_free_index(); // get a free index
+                    if (index == -1)
+                    {
+                        printf("ERROR: Can not create a new veicle No free index\n");
+                    }
+                    else
+                    {
+                        if (create_veicle_task(userTaskArg, index, TRUCK) != 0) // create a car 
+                        {
+                            printf("ERROR: error creating a new veicle_task\n");
+                        }
+                    }
+                }
+                printf("OK: Car selected\n");
+                break;
+            // motorcycle spawn key
+            case KEY_3:
+                if (game_state == PLAY) // check if the game is paused
+                {
+                    index = get_free_index(); // get a free index
+                    if (index == -1)
+                    {
+                        printf("ERROR: Can not create a new veicle No free index\n");
+                    }
+                    else
+                    {
+                        if (create_veicle_task(userTaskArg, index, MOTORCYCLE) != 0) // create a car 
+                        {
+                            printf("ERROR: error creating a new veicle_task\n");
+                        }
+                    }
+                }
+                printf("OK: Car selected\n");
+                break;
+            // supercar spawn key
+            case KEY_4:
+                if (game_state == PLAY) // check if the game is paused
+                {
+                    index = get_free_index(); // get a free index
+                    if (index == -1)
+                    {
+                        printf("ERROR: Can not create a new veicle No free index\n");
+                    }
+                    else
+                    {
+                        if (create_veicle_task(userTaskArg, index, SUPERCAR) != 0) // create a car 
+                        {
+                            printf("ERROR: error creating a new veicle_task\n");
+                        }
+                    }
+                }
+                printf("OK: Car selected\n");
+                break;
+            // use the arrow to increase the speed of the sim 
+            case KEY_UP:
+                if (userTaskArg.shared_struct->game_state == PLAY )
+                {
+                    *(userTaskArg.SimSpeed) += 0.1;
+                }
+                break;
+            // use the arrow to decrease the speed of the sim
+            case KEY_DOWN:
+                if (userTaskArg.shared_struct->game_state == PLAY && *(userTaskArg.SimSpeed)>=0)
+                {
+                    *(userTaskArg.SimSpeed) -= 0.1;
+                }
+                break;
+
             }
         }
 
@@ -200,7 +291,7 @@ void *user_task(void *arg)
         }
 
         // handle auto spawn veicle
-        if (userTaskArg.config_struct->auto_spawn == AUTO)
+        if (userTaskArg.config_struct->auto_spawn == AUTO && *(userTaskArg.SimSpeed) >= 0)
         {
             if (autoSpawn == 0)
             { // calculate next time car will spawn
@@ -224,7 +315,7 @@ void *user_task(void *arg)
                 {
                     if (game_state == PLAY)
                     {
-                        if (create_veicle_task(userTaskArg, index) != 0)
+                        if (create_veicle_task(userTaskArg, index, NONE) != 0)
                         {
                             printf("ERROR: error creating a new veicle_task\n");
                         }

@@ -4,7 +4,7 @@
 void render_zoom_veicle(BITMAP *dest_buffer, BITMAP *scene_surce, int selected_veicle, struct Shared_List *shared, pthread_mutex_t *list_mutex, struct Config *config)
 {
     // Position of veicle and veicle type
-    int x, y, veicle;
+    int x, y, veicle;                          // coordinates of the veicle and veicle number
     int scale = config->zv_scale_factor * 100; // scale factor
 
     // width and height of the cutted scene
@@ -53,9 +53,9 @@ void render_zoom_veicle(BITMAP *dest_buffer, BITMAP *scene_surce, int selected_v
 // function that print the info about the veicle in the zoom veicle screen
 void render_info_zoom(struct Shared_List *shared, struct Support_List *support, pthread_mutex_t *list_mutex, pthread_mutex_t *support_mutex, BITMAP *dest_buffer, int selected_veicle)
 {
-    char info[50];
-    double speedKmH = 0;
-    int State;
+    char info[50];          // string to print info
+    double speedKmH = 0;    // speed in km/h
+    int State;              // integer rappresenting the state of the veicle
 
     // get the veicle state
     struct Veicle_State current;

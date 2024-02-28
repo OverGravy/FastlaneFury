@@ -73,7 +73,7 @@
 #define ABORTOVERTAKE 5
 #define PAUSE 6
 
-// veicle id constant
+// veicle id constant, costant corrispond to keyboard key to spwan veicle
 #define CAR 0
 #define TRUCK 1
 #define MOTORCYCLE 2

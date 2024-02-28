@@ -3,8 +3,8 @@
 // function that open the file and return the file pointer
 int check_statistic_file(){
 
-    int row = 0;
-    char c;
+    int row = 0;    // row counter inside the file
+    char c;         // character read from the file
 
     // file pointer
     CarFile.fp = fopen("../Assets/Data/Car.txt", "r");
@@ -80,10 +80,10 @@ int check_statistic_file(){
 // function that read line and retun car Statistic struct
 void get_veicle_staitistics(int type, struct Veicle_Statistics *Statistics){
    
-    FILE * fp;
-    int randomRow;
+    FILE * fp;          // file pointer for the file to read
+    int randomRow;      
     int i = 0;
-    char line[256];
+    char line[256];     // line read from the file
 
     // select the file to read depending on the type that is passed
     switch (type)

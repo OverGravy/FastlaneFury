@@ -26,7 +26,7 @@ int create_user_task(struct argument_struct argument);
 int create_graphic_task(struct argument_struct argument);
 
 // function that create Veicle_task using Ptask
-int create_veicle_task(struct argument_struct argument, int index);
+int create_veicle_task(struct argument_struct argument, int index, int predefined);
 
 
 #endif

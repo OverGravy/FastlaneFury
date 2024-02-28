@@ -38,6 +38,9 @@ struct shared_struct{
 // task argument with variable shared between tasks
 struct argument_struct
 {
+    float *SimSpeed;                            // pointer to the simulation speed moltiplier
+    int *VeicleType;                          // pointer to array containing the veicle type 
+    int *LastLane;                            // pointer to an int rappresenting the last lane used
     struct Shared_List *shared_list;          // shared list cantaining the veicles position
     pthread_mutex_t *shared_list_mutex;       // mutex needed to access to the shared list
     struct Support_List *support_list;        // support list containing the veicles info

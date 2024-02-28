@@ -13,8 +13,8 @@ struct Shared_List* create_shared_list(){
 void add_veicle_to_list(int id, struct Veicle_State veicle, struct Shared_List* shared_list, pthread_mutex_t* mutex){
 
         // create new node and last node
-        struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));
-        struct Node* last = NULL;
+        struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));   // allocate memory for the new node
+        struct Node* last = NULL;                                           // last node
 
         // set node data
         newNode->id = id;
@@ -47,7 +47,7 @@ void add_veicle_to_list(int id, struct Veicle_State veicle, struct Shared_List* 
 void remove_veicle_from_list(int id, struct Shared_List* shared_list, pthread_mutex_t* mutex){
 
         // create current node
-        struct Node* current = NULL;
+        struct Node* current = NULL;    // current node
 
         // lock mutex
         pthread_mutex_lock(mutex);  
@@ -86,7 +86,7 @@ void set_veicle_state(int id, struct Veicle_State State, struct Shared_List* sha
     pthread_mutex_lock(mutex);
 
     // search the correct node
-    struct Node* current = shared_list->head;
+    struct Node* current = shared_list->head;     // current node  
 
     // search the correct node an the set it 
     while(current->next != NULL){
@@ -111,7 +111,7 @@ struct Veicle_State get_veicle_state(int id, struct Shared_List* shared_list, pt
     pthread_mutex_lock(mutex);
 
     // search the correct node
-    struct Node* current = shared_list->head;
+    struct Node* current = shared_list->head;    // current node
 
     // search the correct node and then return a copy of it
     while(current->next != NULL){

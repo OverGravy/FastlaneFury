@@ -19,7 +19,7 @@ struct Distances {
 
 
 // function that initialize veicle
-void init_veicle_state(struct Veicle_State *state, struct Veicle_Statistics *statistics);
+void init_veicle_state(struct Veicle_State *state, struct Veicle_Statistics *statistics, struct argument_struct argument, int index);
 
 // function that handle driving movement
 void driving_handling(struct Veicle_State *State, struct Veicle_Statistics *Statistics, struct Distances *distances);

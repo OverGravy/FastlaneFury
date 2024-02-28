@@ -6,9 +6,9 @@ double proximity_sensor(double x, double y, int range, double alpha, BITMAP *sce
 
     // the sensor return the distance from the other veicle in meter and obtain position in pixel and range in pixel
 
-    double distance = -1.0;
-    int i = 0;
-    int color;
+    double distance = -1.0;               // distance from the veicle
+    int i = 0;                            // counter for the pixel to check
+    int color;                             // color of the pixel
 
     // convert alpha in rad
     alpha = (alpha * M_PI) / 180;
