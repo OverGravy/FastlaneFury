@@ -14,9 +14,13 @@
 #define ACT 1
 
 // allegro costant
-#define MY_SCREEN_W 1880
-#define MY_SCREEN_H 720
+#define MY_SCREEN_W 1220
+#define MY_SCREEN_H 600
 #define SCREEN_FPS 60
+
+// info zone costant
+#define INFO_H SCENE_H
+#define INFO_W MY_SCREEN_W
 
 // scene costant
 #define SCENE_H (MY_SCREEN_H / (LANE_NUMBER + 1)) * LANE_NUMBER

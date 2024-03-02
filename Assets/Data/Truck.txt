@@ -1,2 +1,2 @@
 | max-speed | min-distance  |  max-acceleration  |  max-deceleration  |
-30-10-20-7
+20-10-20-7

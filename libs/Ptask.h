@@ -32,13 +32,13 @@ struct shared_struct{
     int selection;                    // integer that rappresent the selection on the screen
     int selected_veicle;              // index of the selected veicle
     int buffer_id;                    // id rappresenting what screen is going to be drawn 
-    struct position mouse_pos;             // struct that contain the mouse position
+    struct position mouse_pos;        // struct that contain the mouse position
 };  
 
 // task argument with variable shared between tasks
 struct argument_struct
 {
-    float *SimSpeed;                            // pointer to the simulation speed moltiplier
+    float *SimSpeed;                          // pointer to the simulation speed moltiplier
     int *VeicleType;                          // pointer to array containing the veicle type 
     int *LastLane;                            // pointer to an int rappresenting the last lane used
     struct Shared_List *shared_list;          // shared list cantaining the veicles position
