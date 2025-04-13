@@ -12,7 +12,7 @@ Before compiling using make sure you have install the right allegro library vers
 - Pressing 'space' will spawn a car.
 - Pressing 'm' a configuration menu will appear.
 
-# OVERVIEW
+# Overview
 
 The game consist in 2 persistent thread. The graphics thread that handle the screen refresh and the user thread that handle the input part. The game consist in a small simulation of a fraction of an highway with multiple veicle and every veicle is a task. The user is able to spawn a car and see some information about it and thread itself. The objective of the game is to avoid collision and to see how the car behave in a real world situation. The game is a small university project that include using pthread and Allegro library and multi thread programming.
 
